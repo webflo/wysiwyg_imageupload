@@ -1,0 +1,296 @@
+<?php
+# Copyright (c) 2010 Impressive.media
+# Author: Eugen Mayer
+
+function wysiwyg_imageupload_menu() {
+	$items = array();
+  	$items['ajax/wysiwyg_imgupl/load/%'] = array(    
+	  'page callback' => 'drupal_get_form',
+    'page arguments' => array('wysiwyg_imageupload_upload_form', 3),
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+ 	 );
+	 
+	$items['ajax/wysiwyg_imgupl/upload/%'] = array(
+	'page callback' => '_wysiwyg_imageupload_upload',
+	'page arguments' => array(3),
+    'access callback' => true,
+	'type' => MENU_CALLBACK,
+ 	 );
+	 
+	 $items['ajax/wysiwyg_imgupl/rebuild_table/%'] = array(
+	'page callback' => '_wysiwyg_imageupload_rebuild_attachments_table',
+	'page arguments' => array(3),
+    'access callback' => true,
+	'type' => MENU_CALLBACK,
+ 	 );
+	return $items;
+}
+
+function wysiwyg_imageupload_wysiwyg_include_directory($type) {
+  switch ($type) {
+    case 'plugins':
+      return $type;
+  }
+}
+
+function wysiwyg_imageupload_upload_form(&$form_state,$form_id) {
+	modalframe_child_js();
+	module_invoke('admin_menu', 'suppress');
+	$form = array();
+  $form['#attributes'] = array('enctype' => "multipart/form-data");	
+	$form['image_upload'] = array( '#type' => 'fieldset',
+    '#title'=> t('Upload picture'),
+    '#prefix' => '<div id="file_upload_group">',
+    '#suffix' => '</div>');
+	_wysiwyg_imageupload_form_add_uploadfields($form,$form_id);	
+
+    return $form;
+}
+
+function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
+	$form['image_upload']['upload'] = array(
+      '#type' => 'file',
+      '#title' => t('Attach new file'),      
+      '#size' => 40,
+    );
+    $form['image_upload']['attach'] = array(
+      '#type' => 'submit',
+      '#value' => t('Upload image'),
+      '#name' => 'attach',
+      '#ahah' => array(
+        'path' => "ajax/wysiwyg_imgupl/upload/$form_id",
+        'wrapper' => 'file_upload_group',
+        'progress' => array('type' => 'bar', 'message' => t('Please wait...')),
+      ),
+    );
+}
+
+function _wysiwyg_imageupload_upload($form_build_id) {
+	$_POST['form_build_id'] = $form_build_id;
+	
+	  // Load the form from the Form API cache.
+	$cache = cache_get('form_'. $_POST['form_build_id'], 'cache_form');
+	$_POST['form_token'] = $cache->data['form_token']['#default_value'];
+	$_POST['form_id'] = $cache->data['form_id']['#value'];
+
+	$object = (object)array();
+	if (isset($cache->data['type']['#value'])) {
+		$object->type = $cache->data['type']['#value'];
+	}
+	
+	$form = $cache->data;
+	$form_state = array('values' => $_POST);
+	unset($form_state['values']['files']['upload']);
+	$imgDetails = array();
+	// Handle new uploads, and merge tmp files into node-files.	
+		
+	
+	$imgDetails = _wysiwyg_imageupload_upload_file($form_state);	
+	
+	//file_attach_form_submit($form, &$form_state);
+	dsm($form_state['values']['files']);
+	//dsm((array)$upl_file);
+	
+	$files = array();
+	if (isset($form_state['values']['files'])) {
+		foreach ($form_state['values']['files'] as $fid => $file) {
+		  $files[$fid] = (object)$file;
+		}
+	}
+	
+	$object->files = $files;
+	$form = _wysiwyg_imageupload_attach_form($object);
+
+	// Add the new element to the stored form state and resave.
+	$filesMerge = array_merge($cache->data['attachments']['wrapper']['files'], $form['files']);
+	$cache->data['attachments']['wrapper'] = array_merge($cache->data['attachments']['wrapper'], $form);
+	$cache->data['attachments']['wrapper']['files'] = $filesMerge;
+	cache_set('form_'. $_POST['form_build_id'], $cache->data, 'cache_form', $cache->expire);
+	
+	// remove all status messages
+	drupal_get_messages('status',true);
+	$output = theme('status_messages');
+	if(count($imgDetails)>0) {
+		$imgPath = $imgDetails['path'];
+		$title = $imgDetails['title'];
+		$img = "<img id='uploadedImage' title='$title' height='200px;border:1px solid black;margin:auto' src='$imgPath'>".$output;
+		$form = array();
+		$form['file_attach_more'] = array( '#type' => 'fieldset',
+		 '#title'=>'Bild hochladen',
+		 '#prefix' => '<div id="file_upload_group">',
+		 '#suffix' => '</div>'
+		);
+		$form['file_attach_more']['uploadedImage'] = array (
+			'#prefix' => '<div>',
+			'#suffix' => '</div>',
+			'#value' => $img
+		);
+		$form['file_attach_more']['title'] = array(
+		      '#type' => 'textfield',
+		      '#title' => t('Titel'),
+			  '#default_value' => $title
+	    );
+		$form['file_attach_more']['alignment'] = array(
+		      '#type' => 'select',
+		      '#title' => t('Textfluss'),    
+			  '#options' => array( 'none' => 'Kein Textfluss', 'left' => 'Textfluss rechts vom Bild','right' => 'Textfluss links vom Bild')			  
+	    );
+		$form['file_attach_more']['size'] = array(
+		      '#type' => 'select',
+		      '#title' => t('Größe'),    
+			  '#options' => array( 'none' => 'Klein', 'left' => 'Mittel','right' => 'Groß'),			  
+	    );
+		
+		$form_state = array('submitted' => FALSE);
+		$form = form_builder($form_build_id, $form, $form_state);
+		$output = drupal_render($form).$output;	
+	}
+	else {		
+		$form['file_attach_more'] = array( '#type' => 'fieldset',
+		 '#title'=>'Bild');
+		_wysiwyg_imageupload_form_add_uploadfields($form,$form_build_id);
+
+		$form_state = array('submitted' => FALSE);
+		$form = form_builder($form_build_id, $form, $form_state);
+		$output = drupal_render($form).$output;		
+	}
+	
+	print drupal_to_js(array('status' => TRUE, 'data' => $output));	
+	exit;
+}
+
+function _wysiwyg_imageupload_upload_file(&$form_state) {
+	global $user;
+	$imgDetails = array();
+	$validators = array( 'file_validate_is_image' => array() );
+	if (($user->uid == 1 || user_access('attach files')) && ($upload = file_save_upload('upload', $validators))) {
+	    $upl_file = (object)array('nosave' => TRUE);
+	    if (!file_node_save($upl_file, $upload)) {
+	      drupal_set_message(t("Error saving file %file. Please, contact site administrator.", array('%file' => $upload->filename)), 'error');
+	    }
+	    else {	
+	      // Find the next session id and save it with the uploaded file.
+	      // Remove 's_' when calculating next key.
+	      $upl_file->file->sid = 's_'. (!empty($_SESSION['file_attach_files']) ? max(array_map(create_function('$a', 'return substr($a, 2);'), array_keys($_SESSION['file_attach_files']))) + 1 : '0');
+		  $upl_file->file->list = 0;
+		  $upl_file->file->remove = 0;
+		  $upl_file->file->weight = isset($form_state['values']['files']) ? count($form_state['values']['files']) + 1 : 1;
+		
+		  $fid = isset($upl_file->file->sid) ? $upl_file->file->sid : 'n_'. $upl_file->nid;
+		  $_SESSION['file_attach_files'][$fid] = $upl_file->file;
+		  $form_state['values']['files'][$fid] = (array)$upl_file->file;
+		  $imgDetails['path'] =  "/".str_replace("://","/",$upl_file->file->uri);		
+		  $imgDetails['title'] =   $upl_file->file->name;
+	    }
+	}
+	
+	// Order the form according to the set file weight values.
+   if (!empty($form_state['values']['files'])) {
+	    $microweight = 0.001;
+	    foreach ($form_state['values']['files'] as $fid => $file) {
+	
+	      // For the attached saved files the user does not have permision to change
+	      // node name the form name element is dissabled and the name is not passed
+	      // in the $form_state. Have to merge back the default name.
+	      if (isset($file['nochange']) && $file['nochange'] == 1) {
+	        $node = node_load($file['nid']);
+	        $form_state['values']['files'][$fid]['name'] = isset($node->title) ? $node->title : '';
+	      }
+	
+	      $form_state['values']['files'][$fid]['#weight'] = $file['weight'] + $microweight;
+	      $microweight += 0.001;
+	    }
+	    uasort($form_state['values']['files'], 'element_sort');
+	}
+	
+	return $imgDetails;	
+}
+function _wysiwyg_imageupload_attach_form($object) {
+  $form = array(
+    '#theme' => 'file_attach_form_new',
+    //'#cache' => TRUE,
+  );
+
+  $form['files'] = array(
+    '#theme' => 'file_attach_form_current',
+    '#tree' => TRUE,
+  );
+
+  if (!empty($object->files)) {
+    foreach ($object->files as $fid => $file) {
+      $file = (object)$file;
+
+      // Nodes and comments are cached differently. Nodes
+      // needs #default_value', but comments - #value.
+      $value = isset($object->type) ? '#default_value' : '#value';
+      $form['files'][$fid] = array(
+        'nid'      => array('#type' => 'value', '#value' => $file->nid),
+        'vid'      => array('#type' => 'value', '#value' => $file->vid),
+        'sid'      => array('#type' => 'value', '#value' => isset($file->sid) ? $file->sid : NULL),
+        'uri'      => array('#type' => 'value', '#value' => $file->uri),
+        'name'     => array('#type' => 'textfield', $value => $file->name, '#size' => 40, '#maxlength' => 256, '#disabled' => isset($file->nochange) ? TRUE : FALSE),
+        'nochange' => array('#type' => 'value', '#value' => isset($file->nochange) ? $file->nochange : NULL),
+        'type'     => array('#type' => 'value', '#value' => $file->type),
+        'size'     => array('#type' => 'value', '#value' => $file->size),
+        'remove'   => array('#type' => 'checkbox', $value => !empty($file->remove)),
+        'list'     => array('#type' => 'checkbox', $value => $file->list),
+        'weight'   => array('#type' => 'weight', '#delta' => count($object->files), $value => $file->weight),
+      );
+    }
+  }
+
+  return $form;
+}
+
+function _wysiwyg_imageupload_rebuild_attachments_table($form_build_id) {
+	$cache = cache_get('form_'. $form_build_id, 'cache_form');
+	$form = $cache->data;
+	$object = (object)array();
+	if (isset($cache->data['type']['#value'])) {
+		$object->type = $cache->data['type']['#value'];
+	}
+	
+	$files = $form['attachments']['wrapper']['files'];
+	unset($files['#tree'],$files['#theme']);
+	
+	if (isset( $files )) {
+		$raw_files = array();
+		foreach ( $files as $fid => $file) {
+
+		  $f = new stdClass();
+		  $f->name = $file['name']['#default_value'];
+		  $f->nid = $file['nid']['#value'];
+		  $f->vid = $file['vid']['#value'];
+		  $f->sid = $file['sid']['#value'];
+		  $f->type = $file['type']['#value'];
+		  $f->size = $file['size']['#value'];
+		  $f->uri = $file['uri']['#value'];
+		  $f->list = $file['list']['#default_value'];
+		  $f->weight = $file['weight']['#default_value'];		  
+		  $raw_files[$fid] = $f;
+		}
+	}
+	
+	$object->files = $raw_files;
+	$form = _wysiwyg_imageupload_attach_form($object);
+	
+		// Render the form for output.
+	$form += array(
+	'#post' => $_POST,
+	'#programmed' => FALSE,
+	'#tree' => FALSE,
+	'#parents' => array(),
+	);
+	
+	// Remember file gallery page.
+	$form['attach_browse_url']['#value'] = $form_state['values']['attach_browse_url'];
+	
+	drupal_alter('form', $form, array(), 'file_attach_js');
+	$form_state = array('submitted' => FALSE);
+	$form = form_builder('file_attach_js', $form, $form_state);
+	$output = drupal_render($form);
+	//print drupal_to_js(array('status' => TRUE, 'data' => $output));
+	print $output;
+	exit;
+}
