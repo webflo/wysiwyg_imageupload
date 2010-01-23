@@ -1,0 +1,140 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WYSYIWG Image upload\n"
+"POT-Creation-Date: 2010-01-21 21:25+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Eugen Mayer <mayer@impressive-media.de>\n"
+"Language-Team: Eugen Mayer <mayer@impressive-media.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: plurales=(n!=1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+
+#: wysiwyg_imgupload.admin.inc:8
+msgid "Image style"
+msgstr "Gestaltung"
+
+#: wysiwyg_imgupload.admin.inc:9
+msgid "Define which CSS styles the user can chose when adding an image. Please do not define floating or size in that CSS classes, as this is handled seperately. You can give the style a descriptive name to let it handle more easily. The syntax is \"Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC..\" while imgupl_style_* is a css class"
+msgstr "Definieren Sie, welche Gestaltungsmöglichkeiten der Benutzer zur Auswahl hat. Bitte achten Sie darauf, dass Sie weder floating noch größe festlegen, die wird seperat gemacht. Die Syntax ist \"Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC..\" wähere imgupl_style_* eine CSS Klasse ist."
+
+#: wysiwyg_imageupload.module:96;100;119;185
+msgid "Upload image"
+msgstr "Bild hochladen"
+
+#: wysiwyg_imageupload.module:114
+msgid "Choose an image"
+msgstr "Wählen Sie ein Bild"
+
+#: wysiwyg_imageupload.module:124
+msgid "Please wait..."
+msgstr "Bitte warten.."
+
+#: wysiwyg_imageupload.module:177
+msgid "Select a file to upload first"
+msgstr "Wählen Sie erst ein Bild, das hochgeladen werden soll"
+
+#: wysiwyg_imageupload.module:201
+msgid "Update image"
+msgstr "Bild aktualisieren"
+
+#: wysiwyg_imageupload.module:229
+msgid "Upload picture"
+msgstr "Bild hochladen"
+
+#: wysiwyg_imageupload.module:240
+msgid "Title"
+msgstr "Titel"
+
+#: wysiwyg_imageupload.module:246
+msgid "Text floating"
+msgstr "Textfluss"
+
+#: wysiwyg_imageupload.module:248
+msgid "Below image (none)"
+msgstr "Unter dem Bild (keiner)"
+
+#: wysiwyg_imageupload.module:249
+msgid "Text right beside image"
+msgstr "Text fließt rechts vom Bild"
+
+#: wysiwyg_imageupload.module:250
+msgid "Text left beside image"
+msgstr "Text fließt links vom Bild"
+
+#: wysiwyg_imageupload.module:264
+msgid "Size"
+msgstr "Größe"
+
+#: wysiwyg_imageupload.module:273
+msgid "None"
+msgstr "Keine"
+
+#: wysiwyg_imageupload.module:276
+msgid "Style"
+msgstr "Gestaltung"
+
+#: wysiwyg_imageupload.module:321
+msgid "wysiwyg_imageupload"
+msgstr ""
+
+#: wysiwyg_imageupload.module:321
+msgid "Could not set permissons on destination file: %file"
+msgstr ""
+
+#: wysiwyg_imageupload.module:41
+#: wysiwyg_imageupload.info:0
+msgid "WYSIWYG Image upload"
+msgstr ""
+
+#: wysiwyg_imageupload.module:42
+msgid "Configuration options for the WYSIWYG Image upload module"
+msgstr "Konfiguration des WYSIWYG Image Upload Modules"
+
+#: wysiwyg_imageupload.info:0
+msgid "Image upload dialog for the most WYSIWYG Editors"
+msgstr ""
+
+#: wysiwyg_imageupload.info:0
+#: modules/jquery_ui_dialog/jquery_ui_dialog.info:0
+msgid "WYSIWYG"
+msgstr ""
+
+#: modules/jquery_ui_dialog/jquery_ui_dialog.info:0
+msgid "JQuery UI Dialog API"
+msgstr ""
+
+#: modules/jquery_ui_dialog/jquery_ui_dialog.info:0
+msgid "A slim API to support jquery ui dialogs in Drupal. Just provides an direct interface to the jquery-ui-dialog plugin"
+msgstr ""
+
+#: modules/jquery_ui_dialog/js/parent.js:0
+msgid "Loading..."
+msgstr "Lade..."
+
+#: plugins/imgupload.inc:5
+msgid "Image uploading"
+msgstr "Bildupload"
+
+#: plugins/imgupload.inc:8
+msgid "Insert or update an embedded image"
+msgstr "Fügen Sie ein Bild ein oder aktualisieren Sie dieses"
+
+#: plugins/imgupload/imgupload.js:0
+msgid "Insert"
+msgstr "Einfügen"
+
+#: plugins/imgupload/imgupload.js:0
+msgid "Please select an image to upload first"
+msgstr "Bitte wählen Sie zuvor ein Bild aus, das Sie hochladen wollen"
+
+#: plugins/imgupload/imgupload.js:0;0
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: plugins/imgupload/imgupload.js:0
+msgid "Update"
+msgstr "Aktualisieren"
+
