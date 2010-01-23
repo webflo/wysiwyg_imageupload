@@ -1,0 +1,28 @@
+img.imgupl_floating_none {
+  float:none;
+  display:block;  
+}
+
+
+img.imgupl_floating_left {
+  float:left;
+  padding-right:2px;
+}
+
+img.imgupl_floating_right {
+  float:right;
+  padding-left:2px;
+}
+
+img.imgupl_styles_spacing_5 {
+  padding:5px;
+}
+
+img.imgupl_styles_spacing_10 {
+  padding:10px;
+}
+
+img.imgupl_styles_black_boarder {
+  border:1px solid black;
+}
+

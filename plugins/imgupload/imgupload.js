@@ -1,12 +1,18 @@
 // $Id: img_assist.js,v 1.5 2009/06/13 01:17:21 sun Exp $
 
-Drupal.wysiwyg.plugins.imp_imgupload = {
+// Helper method.
+jQuery.fn.imguploadOuterHTML = function(s) {
+  return (s)
+  ? this.before(s).remove()
+      : jQuery("<p>").append(this.eq(0).clone()).html();
+};
 
+Drupal.wysiwyg.plugins.imgupload = {
   /**
    * Return whether the passed node belongs to this plugin.
    */
   isNode: function (node) {
-    return $(node).is('img.imp_imgupload');
+    return $(node).is('img.imgupload');
   },
 
   /**
@@ -14,134 +20,175 @@ Drupal.wysiwyg.plugins.imp_imgupload = {
    */
   invoke: function (data, settings, instanceId) {
     if (data.format == 'html') {
-      // captionTitle and captionDesc for backwards compatibility.
-      var options = {nid: '', title: '', captionTitle: '', desc: '', captionDesc: '', link: '', url: '', align: '', width: '', height: '', id: instanceId, action: 'insert'};
-      if ($(data.node).is('img.img-assist')) {
-        options.align = data.node.align;
+      // Default
+      var options = { title: '', src: '', align: '', width: '', height: '', id: instanceId, action: 'insert'};
+      // Is a img selected in the content, which we can edit?
+      if ($(data.node).is('img.imgupload')) {
+        options.floating = data.node.align;
         // Expand inline tag in alt attribute
-        data.node.alt = decodeURIComponent(data.node.alt);
-		data.node.title = decodeURIComponent(data.node.title);
-/*        var chunks = data.node.alt.split('|');
-        for (var i in chunks) {
-          chunks[i].replace(/([^=]+)=(.*)/g, function(o, property, value) {
-            options[property] = value;
-          });
-        }*/
-        options.captionTitle = options.title;
-        options.captionDesc = options.desc;
+        options.alt = decodeURIComponent(data.node.alt);
+        options.title = decodeURIComponent(data.node.title);
+        options.src = $(data.node).attr('src');
+        options.classes = $(data.node).attr('class');
         options.action = 'update';
       }
     }
     else {
       // @todo Plain text support.
     }
-    if (typeof options != 'undefined') {
-	  form_id =  $("form[id='node-form'] input[name='form_build_id']").val();	
-    var aurl = '/index.php?q=ajax/imp_imgupload/load/'+form_id+'&popup=1';
-	  btns = {
-	  		"Einfügen": function(){
-				// well lets test if an image has been selected
-		  		if ($('#modalframe-element').contents().find('#uploadedImage').size() === 0) {
-		  			alert("Please select an image to upload first");
-		  			return;
-		  		}
-		  		// else
-				imgUrl = $('#modalframe-element').contents().find('#uploadedImage').attr('src');
-				imgTitle = $('#modalframe-element').contents().find('#uploadedImage').attr('title');
-				imgAlign = $('#modalframe-element').contents().find('#edit-alignment :selected').val();
-				var args = {
-					url: imgUrl,
-					title: imgTitle,
-					align: imgAlign,
-					success: true,
-					form_id: form_id,
-					editor_id : instanceId
-				}								
-				Drupal.wysiwyg.plugins.imp_imgupload.createImageInContent(args);
-				Drupal.modalFrame.close();
-			}
-	  };
-			  
-	  btns.Abbrechen =  function() {	  	
-	  	Drupal.wysiwyg.plugins.imp_imgupload.updateAttachmentTable ({form_id: form_id}, 'Canceled'); 
-	  	$(this).dialog("close"); 
-		} ;
-	  Drupal.modalFrame.open({ url : aurl,autoFit:true, autoResize:true, draggable : false, width:500, height:200,buttons: btns, onSubmit:Drupal.wysiwyg.plugins.imp_imgupload.updateAttachmentTable});
+    // Add or update.
+    if (options.action == 'insert') {
+      Drupal.wysiwyg.plugins.imgupload.add_form(data, settings, instanceId);
     }
+    else if (options.action == 'update') {
+      Drupal.wysiwyg.plugins.imgupload.update_form(data, settings, instanceId,options);
+    }
+  },  
+  
+  /*
+   * Open a dialog and present the add-image form.
+   */
+  add_form: function (data,settings,instanceId) {
+    // We need the form ID to play with the cache of this form.
+    form_id =  $("form#node-form input[name='form_build_id']").val(); 
+    
+    // Location, where to fetch the dialog.
+    var aurl = Drupal.settings.basePath+'index.php?q=ajax/wysiwyg_imgupl/add/'+form_id;
+    
+    // Create the buttons
+    dialogIframe = Drupal.jqui_dialog.iframeSelector();
+    btns = {};    
+    btns[Drupal.t('Insert')] = function() {
+      // well lets test if an image has been selected
+      if ($(dialogIframe).contents().find('#uploadedImage').size() === 0) {
+        alert(Drupal.t("Please select an image to upload first"));
+        return;
+      }
+      // else
+      // Fetch all form-data settings
+      var args = {          
+          title     : $(dialogIframe).contents().find('#edit-title').val(),        
+          floating  : $(dialogIframe).contents().find('#edit-alignment :selected').val(),
+          style     : $(dialogIframe).contents().find('#edit-style :selected').val(),
+          preset    : $(dialogIframe).contents().find('#edit-preset :selected').val(),
+          cacheID   : $(dialogIframe).contents().find('#uploadedImage').attr('alt'),
+          form_id: form_id,
+          success   : true,
+          editor_id : instanceId
+      };
+      Drupal.wysiwyg.plugins.imgupload.createImageInContent(args);
+      $(this).dialog("close");
+    };
+        
+    btns[Drupal.t('Cancel')] =  function() {
+      $(this).dialog("close");
+    } ;
+    
+    // Open the dialog, load the form.
+    Drupal.jqui_dialog.open({url:aurl, buttons: btns,width:540});
   },
   
-  createImageInContent: function(args) {
-		var ed = tinyMCE.get(args.editor_id);		
-		img = "<img class='imp_imgupload' src='"+args.url+"' title='"+args.title+"' alt='Bild:"+args.title+"' align='"+args.align+"'>";		
-		ed.execCommand("mceBeginUndoLevel");    
-		ed.execCommand("mceInsertContent", false, img);
-		ed.execCommand("mceEndUndoLevel");
+  /*
+   * Open a image-details dialog, prefilled with the current settings of the
+   * selected image. 
+   */
+  update_form: function (data,settings,instanceId,options) {
+    // Fill in the values got from the <img> object. Mostly converting css classes.
+    options = Drupal.wysiwyg.plugins.imgupload.expand_options(options);
+    
+    // Location, where to fetch the dialog.
+    var aurl = Drupal.settings.basePath+'index.php?q=ajax/wysiwyg_imgupl/update/'+encodeURIComponent(options.title)+'/'+encodeURIComponent(options.preset)+'/'+encodeURIComponent(options.floating)+'/'+encodeURIComponent(options.style)+'&imagepath='+encodeURIComponent(options.alt);
+    
+    // Create buttons.
+    dialogIframe = Drupal.jqui_dialog.iframeSelector();
+    btns = {};
+    // Update button.
+    btns[Drupal.t('Update')] = function() {
+      // Fetch all form-data settings
+      var args = {          
+        title     : $(dialogIframe).contents().find('#edit-title').val(),        
+        floating  : $(dialogIframe).contents().find('#edit-alignment :selected').val(),
+        style     : $(dialogIframe).contents().find('#edit-style :selected').val(),
+        preset    : $(dialogIframe).contents().find('#edit-preset :selected').val(),
+        cacheID   : $(dialogIframe).contents().find('#uploadedImage').attr('alt'),
+        success   : true,
+        editor_id : instanceId
+      };
+      // Insert the image into the editor, replacing the old one
+      Drupal.wysiwyg.plugins.imgupload.updateImageInContent(args);
+      $(this).dialog("close");
+    };
+    // Cancel button    
+    btns[Drupal.t('Cancel')] =  function() {
+      $(this).dialog("close"); 
+    };
+    
+    // Finally open the dialog.
+    Drupal.jqui_dialog.open({url:aurl, buttons: btns,width:540});    
+  },
+  
+  /*
+   * Fetches the imagecache preset representitive and insert it all th way down into the current editor
+   */
+  createImageInContent: function(args) {		
+    var aurl = Drupal.settings.basePath+'index.php?q=ajax/wysiwyg_imgupl/showimage/'+args['cacheID']+'/'+encodeURI(args['preset']);
+    $.get(aurl,null,function(data,status) {
+      // Use some jquery foo to set th title and align		  
+      img = $(data)
+        .attr('title',args.title)	      
+        .addClass('imgupload')
+          .addClass(args.floating)
+          .addClass(args.style)
+          .imguploadOuterHTML();
+        Drupal.wysiwyg.plugins.imgupload.insertIntoEditor(img,args.editor_id);
+    });
+  },
+  
+  /*
+   * Updates the selected image. Yet, we just plainly replace it. 
+   */
+  updateImageInContent: function(args) {
+    Drupal.wysiwyg.plugins.imgupload.createImageInContent(args);    
+  },
+  
+  /*
+   * Thats the most critical part. Call the WYSIWYG API to insert this html into
+   * the current editor, no matter what editor it might be
+   */
+  insertIntoEditor: function (data,editor_id) {
+    // This is all the magic
+    Drupal.wysiwyg.instances[editor_id].insert(data);
+    
+    // TODO: It would be great to add those undo steps, but i guess we have to 
+    // wait for the WYSIWYG API to be more complete
+    /*
+    var ed = tinyMCE.get(editor_id);
+    ed.execCommand("mceBeginUndoLevel");    
+    ed.execCommand("mceInsertContent", false, data);
+    ed.execCommand("mceEndUndoLevel");*/
   },
   /*
-   * regenerating the attachment table of the main form
+   * Expands the options using some regexp. This is needed because floating and style is 
+   * Added as class and needs to be extracted as "option information"
    */
-  updateAttachmentTable: function(args, message) {
-  	form_id =  $("form[id='node-form'] input[name='form_build_id']").val();	
-  	var aurl = '/ajax/imp_imgupload/rebuildAttchedTable/'+form_id;
-  	$.get(aurl,null,function(data,status) {
-		// we have no table yet, so lets create it
-		if ($('#file-attachments').size() === 0) {
-			$('#file-attach-wrapper').prepend(data);			
-		}	
-	 	else{
-			// the table exist, we replace it completely
-			// as we generated the whole table, not just the part to append
-			$('#file-attachments').replaceWith(data);
-		}		
-	});
-  },
-  
-  
-  /**
-   * Replace inline tags in content with images.
-   */
-  attach: function (content, settings, instanceId) {
-    content = content.replace(/\[img_assist\|([^\[\]]+)\]/g, function(orig, match) {
-      var node = {}, chunks = match.split('|');
-      for (var i in chunks) {
-        chunks[i].replace(/([^=]+)=(.*)/g, function(o, property, value) {
-          node[property] = value;
-        });
-      }
-      // 'class' is a predefined token in JavaScript.
-      node['class'] = 'img-assist drupal-content';
-      node.src = Drupal.settings.basePath + 'index.php?q=image/view/' + node.nid;
-      node.alt = 'nid=' + node.nid + '|title=' + node.title + '|desc=' + node.desc;
-      if (node.link.indexOf(',') != -1) {
-        var link = node.link.split(',', 2);
-        node.alt += '|link=' + link[0] + '|url=' + link[1];
-      }
-      else {
-        node.alt += '|link=' + node.link;
-      }
-      if (typeof node.url != 'undefined') {
-        node.alt += '|url=' + node.url;
-      }
-      node.alt = encodeURIComponent(node.alt);
-      var element = '<img ';
-      for (var property in node) {
-        element += property + '="' + node[property] + '" ';
-      }
-      element += '/>';
-      return element;
-    });
-    return content;
-  },
-
-  /**
-   * Replace images with inline tags in content upon detaching editor.
-   */
-  detach: function (content, settings, instanceId) {
-    var $content = $('<div>' + content + '</div>'); // No .outerHTML() in jQuery :(
-    $('img.imp_imgupload', $content).each(function(node) {
-      var inlineTag = '[file:src='+this.src+'|nid='+this.nid+'|' + decodeURIComponent(this.alt) + '|align=' + this.align + '|width=' + this.width + '|height=' + this.height + ']';
-      $(this).replaceWith(inlineTag);
-    });
-    return $content.html();
-  }
+  expand_options: function(options) {
+    $(options.classes.split(' ')).each(function(){ 
+       match = this.match(/(imgupl_floating_.*)/i);
+       if (match != null) {
+         options.floating =  match[1];         
+       }     
+       
+       match = this.match(/(imgupl_styles_.*)/i);
+       if (match != null) {
+         options.style =  match[1];         
+       } 
+       
+       match = this.match(/imagecache[-](.*)/i);
+       if (match != null) {
+         options.preset =  match[1];
+       } 
+     }); 
+    
+    return options; 
+  }  
 };
