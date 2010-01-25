@@ -93,7 +93,6 @@ function _wysiwyg_imageupload_save(&$node) {
 
     // Create a new revision, or associate a new file needed.
     if (!empty($node->old_vid) || $file->new) {
-      dsm($node->nid.'VID:'.$node->vid);
       db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, list, description, weight) VALUES (%d, %d, %d, %d, '%s', %d)", $file->fid, $node->nid, $node->vid, $file->list, $file->description, $file->weight);
       file_set_status($file, FILE_STATUS_PERMANENT);
     }

@@ -1,4 +1,4 @@
-<?
+<?php
 function wysiwyg_imageupload_imgupload_plugin() {
   $plugins = array();
   $plugins['imgupload'] = array(

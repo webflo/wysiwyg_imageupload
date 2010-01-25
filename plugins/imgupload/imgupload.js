@@ -23,7 +23,13 @@ Drupal.wysiwyg.plugins.imgupload = {
       // Default
       var options = { title: '', src: '', align: '', width: '', height: '', id: instanceId, action: 'insert'};
       // Is a img selected in the content, which we can edit?
-      if ($(data.node).is('img.imgupload')) {
+      // We can use is.(img.imgupload) here, as some editors pass this node surrounded by a <p>
+      // tag
+      if (img.find('img')  /* all img descendants of the root element */
+          .andSelf()  /* and the root element itself */
+          .filter('img') /* but if the root is not an img we don't need it */
+          .length == 1) {
+        data.node = $(data.node).find('img.imgupload').get(0);
         options.floating = data.node.align;
         // Expand inline tag in alt attribute
         options.alt = decodeURIComponent(data.node.alt);
@@ -131,16 +137,21 @@ Drupal.wysiwyg.plugins.imgupload = {
    * Fetches the imagecache preset representitive and insert it all th way down into the current editor
    */
   createImageInContent: function(args) {		
-    var aurl = Drupal.settings.basePath+'index.php?q=ajax/wysiwyg_imgupl/showimage/'+args['cacheID']+'/'+encodeURI(args['preset']);
+    var aurl = Drupal.settings.basePath+'index.php?q=ajax/wysiwyg_imgupl/showimage/'+args['cacheID']+'/'+encodeURI(args['preset'])+ '/' +encodeURI(args.title);
+
     $.get(aurl,null,function(data,status) {
       // Use some jquery foo to set th title and align		  
-      img = $(data)
-        .attr('title',args.title)	      
-        .addClass('imgupload')
-          .addClass(args.floating)
-          .addClass(args.style)
-          .imguploadOuterHTML();
-        Drupal.wysiwyg.plugins.imgupload.insertIntoEditor(img,args.editor_id);
+      // Use some jquery foo to set the title and align
+      img = $(data);  /* the whole tree returned by template */
+      img.find('img')  /* all img descendants of the root element */
+      .andSelf()  /* and the root element itself */
+      .filter('img') /* but if the root is not an img we don't need it */
+      
+              .addClass('imgupload')
+              .addClass(args.floating)
+              .addClass(args.style);
+      img = img.imguploadOuterHTML();
+      Drupal.wysiwyg.plugins.imgupload.insertIntoEditor(img,args.editor_id);
     });
   },
   

@@ -2,6 +2,7 @@ name = WYSIWYG Image upload
 description = Image upload dialog for the most WYSIWYG Editors 
 dependencies[] = wysiwyg
 dependencies[] = jquery_ui
+dependencies[] = jquery_update
 dependencies[] = jquery_ui_dialog
 dependencies[] = imagecache
 package = WYSIWYG

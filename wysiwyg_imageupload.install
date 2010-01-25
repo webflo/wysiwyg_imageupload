@@ -75,6 +75,58 @@ function wysiwyg_imageupload_schema() {
     ),
   );
 
+  $schema['wysiwyg_imageupload_image_entry'] = array(
+    'description' => 'Stores the relation between uploaded images (files) and there parent nodes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Autoinc. field defining the entry id.',
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Image Entity Node of this image entry (Holding the filepath and META informations).',
+      ),
+      'preset' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Which preset to use with ImageCache',
+      ),
+      'styles' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Which styles are attached to that image entry',
+      ),
+      'ligthbox' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Should we provide a lightbox intgeration, if yes, this is the field which preset to show',
+      ),
+      'version' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => '0 means, use the news version, 1 means use this exact version of the image entity',
+      ),
+    ),
+    'primary key' => array('vid', 'fid'),
+    'indexes' => array(
+      'fid' => array('fid'),
+      'nid' => array('nid'),
+    ),
+  );
+
   return $schema;
 }
 
