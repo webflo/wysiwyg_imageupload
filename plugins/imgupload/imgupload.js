@@ -25,10 +25,10 @@ Drupal.wysiwyg.plugins.imgupload = {
       // Is a img selected in the content, which we can edit?
       // We can use is.(img.imgupload) here, as some editors pass this node surrounded by a <p>
       // tag
-      $node = $(data.node).find('img')  /* all img descendants of the root element */
-      .andSelf()  /* and the root element itself */
-      .filter('img'); /* but if the root is not an img we don't need it */
-      
+      $node = $(data.node)
+                .find('img')  /* all img descendants of the root element */
+                .andSelf()  /* and the root element itself */
+                .filter('img'); /* but if the root is not an img we don't need it */      
       
       if ($node.length == 1) {
         data.node = $node.get(0);

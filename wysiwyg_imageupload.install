@@ -19,9 +19,9 @@ function wysiwyg_imageupload_uninstall() {
 }
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
-  $count = db_result(db_query('select count(*) as count from {variable} where name="wysiwyg_imageupload_imgstyles"')) ;
+  $count = db_result(db_query("select COUNT(*) as count FROM {variable} WHERE name='wysiwyg_imageupload_imgstyles'")) ;
   if($count == 0) {
-    db_query('insert into {variable} (name,value) VALUES ("wysiwyg_imageupload_imgstyles",\'%s\')','s:113:"Black Border=imgupl_styles_black_boarder,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
+    db_query("insert into {variable} (name,value) VALUES ('wysiwyg_imageupload_imgstyles',\'%s\')",'s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
   }
 }
 /**
@@ -87,6 +87,7 @@ function wysiwyg_imageupload_schema() {
 
 function wysiwyg_imageupload_update_6104() {
   _wysiwyg_imageupload_install_styles_if_missing();
+  return array();
 }
 
 ?>

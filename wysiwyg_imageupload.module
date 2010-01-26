@@ -139,6 +139,17 @@ function _wysiwyg_imageupload_get_image_styles() {
  * Default image preset
  */
 function wysiwyg_imageupload_imagecache_default_presets() {
+  static $presets;
+  if (!isset($presets)) {
+    $presets = array();
+
+      // Only expose those presets if no presets in the system right now
+    $presets = imagecache_presets();
+    if(count($presets) > 0) {
+        return array();
+    }
+  }
+
   // Only expose those presets if no presets in the system right now
   $presets = imagecache_presets();
   if(count($presets) > 0) {

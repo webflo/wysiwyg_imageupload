@@ -13,7 +13,6 @@ function wysiwyg_imageupload_imgupload_plugin() {
         'height' => 300,
       ),
     ),
-    // @todo Use a more granular way to validate contents for input formats.
     'extended_valid_elements' => array('img[class|src|border=0|alt|title|width|height|align|name|style]'),
   );
   return $plugins;
