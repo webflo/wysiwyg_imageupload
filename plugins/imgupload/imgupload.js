@@ -25,11 +25,13 @@ Drupal.wysiwyg.plugins.imgupload = {
       // Is a img selected in the content, which we can edit?
       // We can use is.(img.imgupload) here, as some editors pass this node surrounded by a <p>
       // tag
-      if (img.find('img')  /* all img descendants of the root element */
-          .andSelf()  /* and the root element itself */
-          .filter('img') /* but if the root is not an img we don't need it */
-          .length == 1) {
-        data.node = $(data.node).find('img.imgupload').get(0);
+      $node = $(data.node).find('img')  /* all img descendants of the root element */
+      .andSelf()  /* and the root element itself */
+      .filter('img'); /* but if the root is not an img we don't need it */
+      
+      
+      if ($node.length == 1) {
+        data.node = $node.get(0);
         options.floating = data.node.align;
         // Expand inline tag in alt attribute
         options.alt = decodeURIComponent(data.node.alt);
@@ -141,15 +143,13 @@ Drupal.wysiwyg.plugins.imgupload = {
 
     $.get(aurl,null,function(data,status) {
       // Use some jquery foo to set th title and align		  
-      // Use some jquery foo to set the title and align
       img = $(data);  /* the whole tree returned by template */
       img.find('img')  /* all img descendants of the root element */
-      .andSelf()  /* and the root element itself */
-      .filter('img') /* but if the root is not an img we don't need it */
-      
-              .addClass('imgupload')
-              .addClass(args.floating)
-              .addClass(args.style);
+         .andSelf()  /* and the root element itself */
+         .filter('img') /* but if the root is not an img we don't need it */
+         .addClass('imgupload')
+         .addClass(args.floating)
+         .addClass(args.style);
       img = img.imguploadOuterHTML();
       Drupal.wysiwyg.plugins.imgupload.insertIntoEditor(img,args.editor_id);
     });
@@ -169,14 +169,6 @@ Drupal.wysiwyg.plugins.imgupload = {
   insertIntoEditor: function (data,editor_id) {
     // This is all the magic
     Drupal.wysiwyg.instances[editor_id].insert(data);
-    
-    // TODO: It would be great to add those undo steps, but i guess we have to 
-    // wait for the WYSIWYG API to be more complete
-    /*
-    var ed = tinyMCE.get(editor_id);
-    ed.execCommand("mceBeginUndoLevel");    
-    ed.execCommand("mceInsertContent", false, data);
-    ed.execCommand("mceEndUndoLevel");*/
   },
   /*
    * Expands the options using some regexp. This is needed because floating and style is 

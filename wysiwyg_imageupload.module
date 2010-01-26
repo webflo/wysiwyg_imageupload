@@ -5,13 +5,14 @@
 require_once('wysiwyg_imageupload.file.inc');
 require_once('wysiwyg_imageupload.form.inc');
 require_once('wysiwyg_imageupload.ajax.inc');
+
 function wysiwyg_imageupload_menu() {
   $items = array();
   $items['ajax/wysiwyg_imgupl/add/%'] = array(
 	  'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_upload_form', 3),
     'access callback' => 'user_access',
-    'access arguments' => array('use wysiyg image upload'),
+    'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
 
@@ -19,7 +20,7 @@ function wysiwyg_imageupload_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_update_form',3,4,5,6),
     'access callback' => 'user_access',
-    'access arguments' => array('use wysiyg image upload'),
+    'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
 
@@ -27,7 +28,7 @@ function wysiwyg_imageupload_menu() {
   	'page callback' => '_wysiwyg_imageupload_upload_js',
   	'page arguments' => array(3),
     'access callback' => 'user_access',
-    'access arguments' => array('use wysiyg image upload'),
+    'access arguments' => array('use wysiwyg image upload'),
   	'type' => MENU_CALLBACK,
   );
 
@@ -35,7 +36,7 @@ function wysiwyg_imageupload_menu() {
     'page callback' => '_wysiwyg_imageupload_show_image',
     'page arguments' => array(3,4,5),
     'access callback' => 'user_access',
-    'access arguments' => array('use wysiyg image upload'),
+    'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
 
@@ -89,7 +90,7 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
     break;
     case 'insert':
     case 'update':
-      if (user_access('use wysiyg image upload')) {
+      if (user_access('use wysiwyg image upload')) {
         _wysiwyg_imageupload_save($node);
       }
       break;
@@ -105,11 +106,14 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   // jquery_ui_dialog preconditions. The user might switch the editor on the node form
   // then we would need it
   if ($form['#id'] == 'node-form' ) {
-    jquery_ui_dialog_parent_js();
+    // Activate form caching is we will need it by AHAH later
+    $form['#cached'] = TRUE;
+     jquery_ui_dialog_parent_js();
     $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
   }
 
   if(strstr($form_state['post']['form_id'],'node_form')) {
+    $form['#cache'] = TRUE;
     jquery_ui_dialog_parent_js();
   }
 }
@@ -143,7 +147,7 @@ function wysiwyg_imageupload_imagecache_default_presets() {
 
   $presets = array();
   $presets['original'] = array (
-    'presetname' => t('Original size'),
+    'presetname' => t('Original'),
     'actions' => array (),
   );
   $presets['big'] = array (

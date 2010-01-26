@@ -1,6 +1,7 @@
 <?php
-
-
+/*
+ * Called on every node save
+ */
 function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
   // We need to do those that, otherwise our saved images in the cache
   // are not included in the node object when the nodeapi is called
@@ -70,7 +71,8 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
     $presets = imagecache_presets();
     $styles = array();
     foreach ($presets as $preset) {
-      $styles[$preset['presetid']] = t($preset['presetname']);
+      // We can use the presetid here (http://drupal.org/node/694188)
+      $styles[$preset['presetname']] = t($preset['presetname']);
     }
     $form['image_upload']['preset'] = array(
       '#type' => 'select',
@@ -78,23 +80,22 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
       '#options' => $styles,
       '#default_value' => $defaults['preset']
     );
-   }
+  }
 
-   // styles.
-   $styles = _wysiwyg_imageupload_get_image_styles();
-   if(count($styles) > 0) { // If any.
-      array_unshift($styles, t('None'));
-      $form['image_upload']['style'] = array(
-        '#type' => 'select',
-        '#title' => t('Style'),
-        '#options' => $styles,
-        '#default_value' => $defaults['style']
-      );
-   }
+  // styles.
+  $styles = _wysiwyg_imageupload_get_image_styles();
+  if(count($styles) > 0) { // If any.
+    array_unshift($styles, t('None'));
+    $form['image_upload']['style'] = array(
+      '#type' => 'select',
+      '#title' => t('Style'),
+      '#options' => $styles,
+      '#default_value' => $defaults['style']
+    );
+  }
 
-   return $form;
+  return $form;
 }
-
 
 /*
  * Returning the form elements for the image upload
@@ -117,8 +118,9 @@ function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
   );
 }
 
-
-
+/*
+ * Called when a image was selected and the details form should be shown.
+ */
 function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floating, $style) {
   jquery_ui_dialog_child_js();
   module_invoke('admin_menu', 'suppress');

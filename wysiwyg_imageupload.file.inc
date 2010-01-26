@@ -12,7 +12,7 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
   );
   $file = NULL;
-  if ( user_access('use wysiyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
+  if ( user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
     foreach (module_implements('file_insert') as $module) {
       $function =  $module .'_file_insert';
       $function($file);
@@ -23,16 +23,10 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     $file->weight = 0;
     $file->new = TRUE;
     $form['#node']->images[$file->fid] = $file;
-    $form_state['values']['images'][$file->fid] = (array)$file;
+    $form['#value']['images'][$file->fid] = $file;
 
     if (!@chmod($file->filepath, 0664)) {
       watchdog('wysiwyg_imageupload', 'Could not set permissons on destination file: %file', array('%file' => $file->filepath));
-    }
-  }
-
-  if (isset($form_state['values']['images'])) {
-    foreach ($form_state['values']['images'] as $fid => $file) {
-      $form_state['values']['images'][$fid]['new'] = !empty($form['#node']->images[$fid]->new);
     }
   }
 
