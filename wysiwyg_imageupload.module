@@ -148,37 +148,36 @@ function wysiwyg_imageupload_imagecache_default_presets() {
     if(count($presets) > 0) {
         return array();
     }
-  }
 
-  // Only expose those presets if no presets in the system right now
-  $presets = imagecache_presets();
-  if(count($presets) > 0) {
-    return array();
-  }
+    // Only expose those presets if no presets in the system right now
+    $presets = imagecache_presets();
+    if(count($presets) > 0) {
+      return array();
+    }
 
-  $presets = array();
-  $presets['original'] = array (
-    'presetname' => t('Original'),
-    'actions' => array (),
-  );
-  $presets['big'] = array (
-    'presetname' => t('Big'),
-    'actions' =>
-    array (
-      0 =>
+    $presets = array();
+    $presets['original'] = array (
+      'presetname' => t('Original'),
+      'actions' => array (),
+    );
+    $presets['big'] = array (
+      'presetname' => t('Big'),
+      'actions' =>
       array (
-        'weight' => '0',
-        'module' => 'imagecache',
-        'action' => 'imagecache_scale',
-        'data' =>
+        0 =>
         array (
-          'width' => '640',
-          'height' => '',
-          'upscale' => 0,
+          'weight' => '0',
+          'module' => 'imagecache',
+          'action' => 'imagecache_scale',
+          'data' =>
+          array (
+            'width' => '640',
+            'height' => '',
+            'upscale' => 0,
+          ),
         ),
       ),
-    ),
-  );
-
+    );
+  }
   return $presets;
 }
