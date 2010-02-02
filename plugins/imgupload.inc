@@ -1,4 +1,9 @@
 <?php
+// $Id$
+
+# Copyright (c) 2010 Impressive.media
+# Author: Eugen Mayer
+
 function wysiwyg_imageupload_imgupload_plugin() {
   $plugins = array();
   $plugins['imgupload'] = array(

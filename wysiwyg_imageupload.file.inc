@@ -1,4 +1,9 @@
 <?php
+// $Id$
+
+# Copyright (c) 2010 Impressive.media
+# Author: Eugen Mayer
+
 /*
  * Uploading a image and calling the file_insert hooks.
  */

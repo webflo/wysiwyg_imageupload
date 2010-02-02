@@ -1,4 +1,6 @@
 <?php
+// $Id$
+
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
 
@@ -138,6 +140,13 @@ function _wysiwyg_imageupload_get_image_styles() {
 /*
  * Default image preset
  */
+/*TODO: We can`t use the presets that way. The logic was, to remove the presets
+* when the user has created his own one. But actually all current images created
+* with those presets are invalid then. I can see a way arround this, so i dissable all presets
+* and it must be a part of the basic installation to create those.
+* /
+
+/*
 function wysiwyg_imageupload_imagecache_default_presets() {
   static $presets;
   if (!isset($presets)) {
@@ -180,4 +189,4 @@ function wysiwyg_imageupload_imagecache_default_presets() {
     );
   }
   return $presets;
-}
+}*/

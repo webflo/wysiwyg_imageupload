@@ -1,4 +1,9 @@
 <?php
+// $Id$
+
+# Copyright (c) 2010 Impressive.media
+# Author: Eugen Mayer
+
 /*
  * Called through ajax(AHAH), uploading an image and replacing
  * the upload form with an image-details form, if successfully uploaded
