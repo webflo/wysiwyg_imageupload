@@ -71,8 +71,11 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
 function _wysiwyg_imageupload_show_image($cacheID,$preset,$title) {
    if (module_exists('imagecache')) {
     $filepath = cache_get($cacheID,'cache');
+    dsm($filepath);
     $GLOBALS['devel_shutdown'] = FALSE;
-    print theme('imagecache',$preset,$filepath->data, $filepath->data,$title);
+    $output = theme('imagecache',$preset,$filepath->data, $filepath->data,$title);
+    dsm($output);
+    print $output;
     exit;
    }
 }

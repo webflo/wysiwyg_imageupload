@@ -12,7 +12,17 @@ Drupal.wysiwyg.plugins.imgupload = {
    * Return whether the passed node belongs to this plugin.
    */
   isNode: function (node) {
-    return $(node).is('img.imgupload');
+    //return $(node).is('img.imgupload');
+    $node = $(node)
+      .find('img.imgupload')  /* all img descendants of the root element */
+      .andSelf()  /* and the root element itself */
+      .filter('img.imgupload'); /* but if the root is not an img we don't need it */
+    
+    if ($node.length == 1) {
+      return true;
+    }
+    //else 
+    return false;   
   },
 
   /**
@@ -26,9 +36,9 @@ Drupal.wysiwyg.plugins.imgupload = {
       // We can use is.(img.imgupload) here, as some editors pass this node surrounded by a <p>
       // tag
       $node = $(data.node)
-                .find('img')  /* all img descendants of the root element */
+                .find('img.imgupload')  /* all img descendants of the root element */
                 .andSelf()  /* and the root element itself */
-                .filter('img'); /* but if the root is not an img we don't need it */      
+                .filter('img.imgupload'); /* but if the root is not an img we don't need it */      
       
       if ($node.length == 1) {
         data.node = $node.get(0);
