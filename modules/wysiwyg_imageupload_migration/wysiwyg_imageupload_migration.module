@@ -1,0 +1,51 @@
+<?php
+# Copyright (c) 2010 Impressive.media
+# Author: Eugen Mayer
+/*
+function wysiwyg_imageupload_migration_migrate_api() {
+  $api = array(
+    // Required - if it does not match the API version of the migrate
+    // module, your migrate hooks will not be invoked
+    'api' => 1,
+    // Optional path containing migration code - relative to the module directory,
+    // and defaults to the module directory. <mymodule>.migrate.inc will be
+    // included from this directory
+    //'path' => 'modules',
+    // Optional - if this module provides migration implementations on behalf of
+    // other modules, list them here and <module>.migrate.inc will be included
+    // from the path above
+    'integration modules' => array(
+      'imgassist'  => array(
+        'description' => t('Migrates images from img_assist'),
+      ),
+    ),
+  );
+  return $api;
+}*/
+
+function wysiwyg_imageupload_migration_migrate_prepare_node($node,$tblinfo,$row) {
+  dsm(drupal_get_path('module','img_assist').'/img_assist.module');
+  require_once(drupal_get_path('module','img_assist').'/img_assist.module');
+  dsm($node);
+  $text = $node->body;
+  foreach (img_assist_get_macros($text) as $unexpanded_macro => $macro) {
+    $expanded_macro = img_assist_render_image($macro);
+    $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
+    $processed      = TRUE;
+  }
+  $node->body = $text;
+}
+
+function phptemplate_img_assist_inline($node, $size, $attributes) {
+  global $base_path;
+
+  if($size['width'] != '') {
+    $width = " width='{$size['width']}'";
+  }
+
+  if($size['height'] != '') {
+    $height = " height='{$size['height']}'";
+  }
+  $output = "<img{$width}{$height} src='$base_path{$node->images['_original']}' alt=\"{$node->images['_original']}\" title=\"{$attributes['title']}\" class=\"imgupload imagecache imgupl_floating_{$attributes['align']}\">";
+  return $output;
+}
