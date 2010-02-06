@@ -24,9 +24,7 @@ function wysiwyg_imageupload_migration_migrate_api() {
 }*/
 
 function wysiwyg_imageupload_migration_migrate_prepare_node($node,$tblinfo,$row) {
-  dsm(drupal_get_path('module','img_assist').'/img_assist.module');
   require_once(drupal_get_path('module','img_assist').'/img_assist.module');
-  dsm($node);
   $text = $node->body;
   foreach (img_assist_get_macros($text) as $unexpanded_macro => $macro) {
     $expanded_macro = img_assist_render_image($macro);
