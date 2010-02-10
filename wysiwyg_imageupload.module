@@ -137,56 +137,6 @@ function _wysiwyg_imageupload_get_image_styles() {
   return $styles;
 }
 
-/*
- * Default image preset
- */
-/*TODO: We can`t use the presets that way. The logic was, to remove the presets
-* when the user has created his own one. But actually all current images created
-* with those presets are invalid then. I can see a way arround this, so i dissable all presets
-* and it must be a part of the basic installation to create those.
-* /
-
-/*
-function wysiwyg_imageupload_imagecache_default_presets() {
-  static $presets;
-  if (!isset($presets)) {
-    $presets = array();
-
-      // Only expose those presets if no presets in the system right now
-    $presets = imagecache_presets();
-    if(count($presets) > 0) {
-        return array();
-    }
-
-    // Only expose those presets if no presets in the system right now
-    $presets = imagecache_presets();
-    if(count($presets) > 0) {
-      return array();
-    }
-
-    $presets = array();
-    $presets['original'] = array (
-      'presetname' => t('Original'),
-      'actions' => array (),
-    );
-    $presets['big'] = array (
-      'presetname' => t('Big'),
-      'actions' =>
-      array (
-        0 =>
-        array (
-          'weight' => '0',
-          'module' => 'imagecache',
-          'action' => 'imagecache_scale',
-          'data' =>
-          array (
-            'width' => '640',
-            'height' => '',
-            'upscale' => 0,
-          ),
-        ),
-      ),
-    );
-  }
-  return $presets;
-}*/
+function _wysiwyg_imageupload_get_imageurl($fid) {
+  return db_result(db_query('select filepath from {files} where fid=%d',$fid));
+}
