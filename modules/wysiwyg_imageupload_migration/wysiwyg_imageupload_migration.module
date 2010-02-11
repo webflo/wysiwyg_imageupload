@@ -28,10 +28,12 @@ function wysiwyg_imageupload_migration_migrate_prepare_node($node,$tblinfo,$row)
   $text = $node->body;
   foreach (img_assist_get_macros($text) as $unexpanded_macro => $macro) {
     $expanded_macro = img_assist_render_image($macro);
+    // TODO: find out the fid and add it to our relation table
     $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
     $processed      = TRUE;
   }
   $node->body = $text;
+
 }
 
 function phptemplate_img_assist_inline($node, $size, $attributes) {
