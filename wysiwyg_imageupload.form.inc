@@ -10,8 +10,8 @@
 function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
   // We need to do those that, otherwise our saved images in the cache
   // are not included in the node object when the nodeapi is called
-  if(!empty($form['#node']->images) && is_array($form['#node']->images)) {
-    $form_state['values']['images'] = $form['#node']->images;
+  if(!empty($form['#node']->imgupload_images) && is_array($form['#node']->imgupload_images)) {
+    $form_state['values']['imgupload_images'] = $form['#node']->imgupload_images;
   }
 }
 

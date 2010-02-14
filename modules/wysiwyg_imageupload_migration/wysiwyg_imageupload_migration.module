@@ -1,42 +1,98 @@
 <?php
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
-/*
-function wysiwyg_imageupload_migration_migrate_api() {
-  $api = array(
-    // Required - if it does not match the API version of the migrate
-    // module, your migrate hooks will not be invoked
-    'api' => 1,
-    // Optional path containing migration code - relative to the module directory,
-    // and defaults to the module directory. <mymodule>.migrate.inc will be
-    // included from this directory
-    //'path' => 'modules',
-    // Optional - if this module provides migration implementations on behalf of
-    // other modules, list them here and <module>.migrate.inc will be included
-    // from the path above
-    'integration modules' => array(
-      'imgassist'  => array(
-        'description' => t('Migrates images from img_assist'),
-      ),
-    ),
-  );
-  return $api;
-}*/
 
-function wysiwyg_imageupload_migration_migrate_prepare_node($node,$tblinfo,$row) {
+function wysiwyg_imageupload_migration_menu() {
+  $items = array();
+  $items['admin/build/wysiwyg_imageupload/img_assist'] = array (
+    'title' => 'Migrate from img_assist',
+    'page callback' => '_wysiwyg_imageupload_migration_imageassist',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/build/wysiwyg_imageupload'] = array (
+    'title' => 'Wysiwyg imageupload migration',
+    'page callback' => '_wysiwyg_imageupload_migration_dashboard',
+    'access arguments' => array('administer site configuration'),
+  );
+
+  $items['admin/build/wysiwyg_imageupload/dashboad'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  return $items;
+}
+
+function _wysiwyg_imageupload_migration_dashboard() {
+  return 'This is the migration dashboard. Please chose a migration in the local tasks';
+}
+
+function _wysiwyg_imageupload_migration_imageassist() {
+
+  $result = db_query('select nid from node where type="qmdokument"');
+  $nodes = array();
+  while($row = db_fetch_object($result)) {
+    $nodes[] = node_load($row->nid);
+  }
+
+  foreach($nodes as $node) {
+    _wysiwyg_imageupload_migraion_imgassist_migratenode($node);
+  }
+  return t("Migration completed");
+}
+
+function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
+  if(!module_exists('img_assist')) {
+    dsm(t('You nee to have img_assist activated during migration'),'warning');
+    return '';
+  }
+
   require_once(drupal_get_path('module','img_assist').'/img_assist.module');
   $text = $node->body;
+  init_theme();
+  $reg = theme_get_registry();
+  $reg['img_assist_inline']['function'] = '_wysiwyg_imageupload_migraion_render_imgassist_img';
+  _theme_set_registry($reg);
+
   foreach (img_assist_get_macros($text) as $unexpanded_macro => $macro) {
     $expanded_macro = img_assist_render_image($macro);
-    // TODO: find out the fid and add it to our relation table
+    // get the file object which corresponds to this object and save it
+    // in our relation
+    $image_node = node_load($macro['nid']);
+    $file = _wysiwyg_imageupload_get_file($image_node->images['_original']);
+    $node->imgupload_images[$file->fid] = $file;
+
     $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
     $processed      = TRUE;
   }
   $node->body = $text;
 
+  // teaser
+  $text = $node->teaser;
+  foreach (img_assist_get_macros($text) as $unexpanded_macro => $macro) {
+    $expanded_macro = img_assist_render_image($macro);
+    // get the file object which corresponds to this object and save it
+    // in our relation
+    $image_node = node_load($macro['nid']);
+    $file = _wysiwyg_imageupload_get_file($image_node->images['_original']);
+    $node->imgupload_images[$file->fid] = $file;
+
+    $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
+    $processed      = TRUE;
+  }
+  $node->teaser = $text;
+  // Save the relation.. question is, if the node api is called anyway...
+  // in that case we dont need to call the handler manually but could wait for
+  // hook_nodeapi.
+  $m = drupal_get_path('module','wysiwyg_imageupload');
+  require_once("$m/wysiwyg_imageupload.file.inc");
+  node_save($node);
+  dsm("migrated: {$node->nid}");
 }
 
-function phptemplate_img_assist_inline($node, $size, $attributes) {
+function _wysiwyg_imageupload_migraion_render_imgassist_img($node, $size, $attributes) {
   global $base_path;
 
   if($size['width'] != '') {

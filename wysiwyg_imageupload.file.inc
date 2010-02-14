@@ -27,8 +27,8 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     $file->description = $file->filename;
     $file->weight = 0;
     $file->new = TRUE;
-    $form['#node']->images[$file->fid] = $file;
-    $form['#value']['images'][$file->fid] = $file;
+    $form['#node']->imgupload_images[$file->fid] = $file;
+    $form['#value']['imgupload_images'][$file->fid] = $file;
 
     if (!@chmod($file->filepath, 0664)) {
       watchdog('wysiwyg_imageupload', 'Could not set permissons on destination file: %file', array('%file' => $file->filepath));
@@ -63,11 +63,11 @@ function _wysiwyg_imageupload_load($node) {
  * relation is saved in the wysiwyg_imageupload table
  */
 function _wysiwyg_imageupload_save(&$node) {
-  if (empty($node->images) || !is_array($node->images)) {
+  if (empty($node->imgupload_images) || !is_array($node->imgupload_images)) {
     return;
   }
 
-  foreach ($node->images as $fid => $file) {
+  foreach ($node->imgupload_images as $fid => $file) {
     // Convert file to object for compatibility
     $file = (object)$file;
 
@@ -85,7 +85,7 @@ function _wysiwyg_imageupload_save(&$node) {
 
       // Remove it from the session in the case of new uploads,
       // that you want to disassociate before node submission.
-      unset($node->images[$fid]);
+      unset($node->imgupload_images[$fid]);
       // Move on, so the removed file won't be added to new revisions.
       continue;
     }

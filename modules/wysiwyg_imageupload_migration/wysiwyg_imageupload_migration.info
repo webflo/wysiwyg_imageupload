@@ -1,6 +1,6 @@
 name = WYSIWYG Image upload migration tool
 description = Migrates different image upload systems into wysiwyg_imageupload
-dependencies[] = migrate
+dependencies[] = wysiwyg_imageupload
 package = WYSIWYG
 version = "6.x-1.0"
 core = "6.x"

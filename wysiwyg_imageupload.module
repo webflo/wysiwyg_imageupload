@@ -42,7 +42,7 @@ function wysiwyg_imageupload_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['admin/settings/wysiwyg_imageupload/settings'] = array (
+  $items['admin/settings/wysiwyg_imageupload'] = array (
     'type' => MENU_NORMAL_ITEM,
     'title' => 'WYSIWYG Image upload',
     'description' => 'Configuration options for the WYSIWYG Image upload module',
@@ -87,7 +87,7 @@ function wysiwyg_imageupload_init() {
 function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
   switch ($op) {
     case 'load':
-      $output['images'] = _wysiwyg_imageupload_load($node);
+      $output['imgupload_images'] = _wysiwyg_imageupload_load($node);
       return $output;
     break;
     case 'insert':
@@ -139,4 +139,8 @@ function _wysiwyg_imageupload_get_image_styles() {
 
 function _wysiwyg_imageupload_get_imageurl($fid) {
   return db_result(db_query('select filepath from {files} where fid=%d',$fid));
+}
+
+function _wysiwyg_imageupload_get_file($path) {
+  return db_fetch_object(db_query('select * from {files} where filepath="%s"',$path));
 }
