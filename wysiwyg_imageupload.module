@@ -137,10 +137,14 @@ function _wysiwyg_imageupload_get_image_styles() {
   return $styles;
 }
 
-function _wysiwyg_imageupload_get_imageurl($fid) {
+function wysiwyg_imageupload_get_imageurl($fid) {
   return db_result(db_query('select filepath from {files} where fid=%d',$fid));
 }
 
-function _wysiwyg_imageupload_get_file($path) {
+function wysiwyg_imageupload_get_file($path) {
   return db_fetch_object(db_query('select * from {files} where filepath="%s"',$path));
+}
+
+function wysiwyg_imageupload_load_file($fid) {
+  return db_fetch_object(db_query('select * from {files} where fid="%d"',$fid));
 }

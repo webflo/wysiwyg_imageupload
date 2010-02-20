@@ -30,8 +30,7 @@ function _wysiwyg_imageupload_migration_dashboard() {
 }
 
 function _wysiwyg_imageupload_migration_imageassist() {
-
-  $result = db_query('select nid from node where type="qmdokument"');
+  $result = db_query('select nid from node');
   $nodes = array();
   while($row = db_fetch_object($result)) {
     $nodes[] = node_load($row->nid);
