@@ -109,12 +109,11 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   // then we would need it
   if ($form['#id'] == 'node-form' ) {
     // Activate form caching is we will need it by AHAH later
-    $form['#cached'] = TRUE;
-     jquery_ui_dialog_parent_js();
+    $form['#cache'] = TRUE;
+    jquery_ui_dialog_parent_js();
     $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
   }
-
-  if(strstr($form_state['post']['form_id'],'node_form')) {
+  else if(is_array($form_state['post']) && strstr($form_state['post']['form_id'],'node_form')) {
     $form['#cache'] = TRUE;
     jquery_ui_dialog_parent_js();
   }
