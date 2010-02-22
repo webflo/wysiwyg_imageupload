@@ -69,6 +69,9 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
  * If imagecache is installed, use the preset
  */
 function _wysiwyg_imageupload_show_image($cacheID,$preset,$title) {
+   $preset = check_plain($preset);
+   $title = check_plain($title);
+
    if (module_exists('imagecache')) {
     $filepath = cache_get($cacheID,'cache');
     $GLOBALS['devel_shutdown'] = FALSE;
