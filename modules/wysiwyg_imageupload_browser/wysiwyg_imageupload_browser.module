@@ -1,17 +1,24 @@
 <?php
 /*
- * Implementation of hook_install
+ * Implementation of hook_imagecache_default_presets
  */
-function wysiwyg_imageupload_browser_install() {
-  if (module_exists('imagecache')) {
-    $imagecachepreset = imagecache_preset_save(array('presetname' => 'wysiwyg_imageupload_browser'));
-    $imagecacheaction = new stdClass ();
-    $imagecacheaction->presetid = $imagecachepreset['presetid'];
-    $imagecacheaction->module = 'imagecache';
-    $imagecacheaction->action = 'imagecache_scale_and_crop';
-    $imagecacheaction->data = array('width' => '200', 'height' => '200' );
-    drupal_write_record('imagecache_action', $imagecacheaction);
-  }
+function wysiwyg_imageupload_browser_imagecache_default_presets() {
+  $presets = array();
+  $presets['wysiwyg_imageupload_browser'] = array (
+    'presetname' => 'wysiwyg_imageupload_browser',
+    'actions' => array (
+      0 => array (
+        'weight' => '0',
+        'module' => 'imagecache',
+        'action' => 'imagecache_scale_and_crop',
+        'data' => array (
+          'width' => '200',
+          'height' => '200',
+          'upscale' => 0,
+        ),
+    ),
+  ));
+  return $presets;
 }
 /*
  * Implementation of hook_menu
@@ -56,7 +63,7 @@ function wysiwyg_imageupload_browser_browser(){
   $result = db_query('Select fid, filepath from {files} where uid = %d LIMIT %d',$user->uid, variable_get('wysiwyg_imageupload_browser_itemcount', 6));
   while($row = db_fetch_array($result)){
     if (module_exists('imagecache')) {
-      $output .= l(theme('imagecache', 'wysiwyg_imageupload_browser', $row['filepath'], t('Insert this image')), 'ajax/wysiwyg_imgupl/update/Title/', array('html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));    
+      $output .= l(theme('imagecache', 'wysiwyg_imageupload_browser', $row['filepath'], t('Insert this image'), t('Insert this image')), 'ajax/wysiwyg_imgupl/update/Title/', array('html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));    
     }
     else {
       $output .= l('<img src="'.$base_url.'/'.$row['filepath'].'" width="400px" title="'.t('Insert this image').'" />', 'ajax/wysiwyg_imgupl/update/Title/', array('html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));    
