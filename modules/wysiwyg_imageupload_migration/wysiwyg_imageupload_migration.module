@@ -60,7 +60,7 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
     // get the file object which corresponds to this object and save it
     // in our relation
     $image_node = node_load($macro['nid']);
-    $file = _wysiwyg_imageupload_get_file($image_node->images['_original']);
+    $file = wysiwyg_imageupload_get_file($image_node->images['_original']);
     $node->imgupload_images[$file->fid] = $file;
 
     $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
