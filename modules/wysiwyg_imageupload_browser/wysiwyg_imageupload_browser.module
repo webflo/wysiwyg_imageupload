@@ -64,11 +64,14 @@ function wysiwyg_imageupload_browser_browser(){
   $result = db_query('Select fid, filepath from {files} where uid = %d LIMIT %d',$user->uid, variable_get('wysiwyg_imageupload_browser_itemcount', 6));
   while($row = db_fetch_array($result)){
     if (module_exists('imagecache')) {
-      $output .= l(theme('imagecache', 'wysiwyg_imageupload_browser', $row['filepath'], t('Insert this image'), t('Insert this image')), 'ajax/wysiwyg_imgupl/update/Title/', array('html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));
+      $imageHTML = theme('imagecache', 'wysiwyg_imageupload_browser', $row['filepath'], t('Insert this image'));
     }
     else {
-      $output .= l('<img src="'.$base_url.'/'.$row['filepath'].'" width="400px" title="'.t('Insert this image').'" />', 'ajax/wysiwyg_imgupl/update/Title/', array('html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));
+      $path = $base_url.'/'.$row['filepath'];
+      $imageHTML =  theme('image', $path, $path,t('Insert this image'), array('width' => '400px'));
     }
+    $output .= l($imageHTML, t('Insert this image'), 'ajax/wysiwyg_imgupl/update/Title/', array('html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));
   }
+  theme_image();
   return $output;
 }
