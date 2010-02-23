@@ -18,7 +18,7 @@ function wysiwyg_imageupload_migration_menu() {
   );
 
   $items['admin/build/wysiwyg_imageupload/dashboad'] = array(
-    'title' => 'Settings',
+    'title' => 'Dashboard',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
@@ -35,16 +35,16 @@ function _wysiwyg_imageupload_migration_imageassist() {
   while($row = db_fetch_object($result)) {
     $nodes[] = node_load($row->nid);
   }
-
+  $images = 0;
   foreach($nodes as $node) {
-    _wysiwyg_imageupload_migraion_imgassist_migratenode($node);
+    $images += _wysiwyg_imageupload_migraion_imgassist_migratenode($node);
   }
-  return t("Migration completed");
+  return t("Migration completed, overall $images images migrated");
 }
 
 function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
   if(!module_exists('img_assist')) {
-    dsm(t('You nee to have img_assist activated during migration'),'warning');
+    drupal_set_message(t('You nee to have img_assist activated during migration'),'warning');
     return '';
   }
 
@@ -61,6 +61,7 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
     // in our relation
     $image_node = node_load($macro['nid']);
     $file = wysiwyg_imageupload_get_file($image_node->images['_original']);
+    $file->new = 1;
     $node->imgupload_images[$file->fid] = $file;
 
     $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
@@ -75,7 +76,11 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
     // get the file object which corresponds to this object and save it
     // in our relation
     $image_node = node_load($macro['nid']);
+    if($image_node->images['_original'] == "") {
+	drupal_set_message("empty origin of image node {$image_node->nid}");
+    }
     $file = wysiwyg_imageupload_get_file($image_node->images['_original']);
+    $file->new = 1;
     $node->imgupload_images[$file->fid] = $file;
 
     $text           = str_replace($unexpanded_macro, $expanded_macro, $text);
@@ -88,7 +93,11 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
   $m = drupal_get_path('module','wysiwyg_imageupload');
   require_once("$m/wysiwyg_imageupload.file.inc");
   node_save($node);
-  dsm("migrated: {$node->nid}");
+  $images = count($node->imgupload_images);
+  if($images) {
+	  drupal_set_message("migrated node: {$node->nid} ($images images)");
+  }
+  return $images;
 }
 
 function _wysiwyg_imageupload_migraion_render_imgassist_img($node, $size, $attributes) {
