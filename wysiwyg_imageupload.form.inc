@@ -130,10 +130,10 @@ function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
 function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floating, $style) {
   // security
   $title = check_plain($title);
-  $imgpath = check_url(base_path() . $_GET['imagepath']);
+  $imgpath = check_url(urldecode($_GET['imagepath']));
 
-  if(!file_exists($imgpath)) {
-    drupal_set_message('The image does not exist','error');
+  if(!file_exists(realpath($imgpath))) {
+    drupal_set_message("The image does not exist ($imgpath)",'error');
     return array();
   }
 
@@ -144,10 +144,10 @@ function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floatin
   $cacheid = uniqid();
   cache_set($cacheid,$_GET['imagepath'],'cache',CACHE_TEMPORARY);
 
-  $img = "<img id='uploadedImage' title=\"$title\" alt='$cacheid' height='200px;border:1px solid black;margin:auto' src='".$imgpath."'>";
+  $img = "<img id='uploadedImage' title=\"$title\" alt='$cacheid' height='200px;border:1px solid black;margin:auto' src='".base_path().$imgpath."'>";
 
   $defaults = array (
-    'filepath' => check_plain(urldecode($_GET['imagepath'])),
+    'filepath' => $imgpath,
     'preset' => check_plain(urldecode($preset)),
     'floating' => check_plain(urldecode($floating)),
     'style' =>check_plain(urldecode($style)),
