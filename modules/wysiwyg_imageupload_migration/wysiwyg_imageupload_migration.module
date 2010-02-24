@@ -30,6 +30,10 @@ function _wysiwyg_imageupload_migration_dashboard() {
 }
 
 function _wysiwyg_imageupload_migration_imageassist() {
+  if(!module_exists('img_assist')) {
+    drupal_set_message(t('You nee to have img_assist activated during migration'),'warning');
+    return '';
+  }
   $result = db_query('select nid from node');
   $nodes = array();
   while($row = db_fetch_object($result)) {
@@ -43,11 +47,6 @@ function _wysiwyg_imageupload_migration_imageassist() {
 }
 
 function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
-  if(!module_exists('img_assist')) {
-    drupal_set_message(t('You nee to have img_assist activated during migration'),'warning');
-    return '';
-  }
-
   require_once(drupal_get_path('module','img_assist').'/img_assist.module');
   $text = $node->body;
   init_theme();
