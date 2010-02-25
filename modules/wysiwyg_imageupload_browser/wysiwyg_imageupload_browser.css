@@ -15,6 +15,11 @@
   margin:0 5px;
   padding:0 3px;
 }
+.wysiwyg_imageupload_browser_active li {
+  list-style-type:none;
+  margin:0;
+  padding:0;
+}
 .wysiwyg_imageupload_browser_active a:link,
 .wysiwyg_imageupload_browser_active a:visited,
 .wysiwyg_imageupload_browser_inactive a:link,
