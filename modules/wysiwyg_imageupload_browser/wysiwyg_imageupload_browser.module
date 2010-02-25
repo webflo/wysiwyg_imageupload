@@ -43,7 +43,7 @@ function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
     $tabs[] = '<a href="#">New Image</a>';
     $tabs[] = l(t('Browser'), 'ajax/wysiwyg_imageupload_browser/'.$form["#parameters"][2], array('title' => t('Choose a new image out of all your already uploaded ones')));
     $form['browse'] = array(
-      '#value' => wysiwyg_imageupload_browser_tabs($tabs,2),
+      '#value' => wysiwyg_imageupload_browser_tabs($tabs,1),
       '#weight' => 0,
     );
   }
@@ -67,7 +67,7 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $tabs = array();
   $tabs[] = l(t('New Image'), 'ajax/wysiwyg_imgupl/add/'.arg(2), array('title' => t('Go back to the upload form and upload a new image')));
   $tabs[] = '<a href="#">Browser</a>';
-  $output .= wysiwyg_imageupload_browser_tabs($tabs,1);
+  $output .= wysiwyg_imageupload_browser_tabs($tabs,2);
   $result = db_query('Select fid, filepath from {files} where uid = %d LIMIT %d',$user->uid, variable_get('wysiwyg_imageupload_browser_itemcount', 6));
   while($row = db_fetch_array($result)){
     $imageHTML = '<div style="float:left; width:200px; height:200px;">';
@@ -81,8 +81,8 @@ function wysiwyg_imageupload_browser_tabs($tabs,$active){
   $m = drupal_get_path('module', 'wysiwyg_imageupload_browser');
   drupal_add_css($m.'/wysiwyg_imageupload_browser.css');
   $i = 1;
-  $offset = 0;
-  $output .= '<div style="float:left; height:25px; width:100%;">';
+  $offset = 10;
+  $output .= '<div style="float:left; height:22px; width:100%; border-bottom:1px solid black;">';
   foreach($tabs as $tab){     
     if($i == $active){
       $output .= '<div style="position:absolute; z-index:2; height:20px; width:125px; top:0px; left:'.$offset.'px">';
@@ -95,7 +95,7 @@ function wysiwyg_imageupload_browser_tabs($tabs,$active){
     $output .= $tab;
     $output .= '</div></div>';
     $i++;
-    $offset += 90;
+    $offset += 125;
   }
   $output .= '</div>';
   return $output;

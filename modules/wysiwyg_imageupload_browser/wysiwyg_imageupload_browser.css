@@ -1,10 +1,13 @@
 .wysiwyg_imageupload_browser_active {
-  background:url("tab-active.gif") no-repeat center;
+  background:white;
+  border:1px solid black;
+  border-bottom:3px solid white;
   height:20px;
   z-index:2;
 }
 .wysiwyg_imageupload_browser_inactive {
-  background:url("tab-inactive.gif") no-repeat center;
+  background:#f2f2f2;
+  border:1px solid #ccc;
   height:20px;
   z-index:1;
 }
@@ -16,7 +19,7 @@
 .wysiwyg_imageupload_browser_inactive a:link,
 .wysiwyg_imageupload_browser_inactive a:visited {
   color:#222;
-  margin:5px 0 0 15px;
+  margin:5px auto;
   max-height:20px;
 }
 #wysiwyg-imageupload-upload-form #file_upload_group {
