@@ -3,16 +3,17 @@
   border:1px solid black;
   border-bottom:3px solid white;
   height:20px;
-  z-index:2;
+  float:left;
+  margin:0 5px;
+  padding:0 3px;
 }
 .wysiwyg_imageupload_browser_inactive {
   background:#f2f2f2;
   border:1px solid #ccc;
   height:20px;
-  z-index:1;
-}
-.wysiwyg_imageupload_browser_active a{
-  z-index:3;
+  float:left;
+  margin:0 5px;
+  padding:0 3px;
 }
 .wysiwyg_imageupload_browser_active a:link,
 .wysiwyg_imageupload_browser_active a:visited,

@@ -82,21 +82,13 @@ function wysiwyg_imageupload_browser_tabs($tabs,$active){
   drupal_add_css($m.'/wysiwyg_imageupload_browser.css');
   $i = 1;
   $offset = 10;
-  $output .= '<div style="float:left; height:22px; width:100%; border-bottom:1px solid black; margin-bottom:3px;">';
+  $output .= '<ul style="float:left; height:22px; width:100%; border-bottom:1px solid black;">';
   foreach($tabs as $tab){     
-    if($i == $active){
-      $output .= '<div style="position:absolute; z-index:2; height:20px; width:125px; top:0px; left:'.$offset.'px">';
-      $output .= '<div class="wysiwyg_imageupload_browser_active">';
-    }
-    else{
-      $output .= '<div style="position:absolute; z-index:1; height:20px; width:125px; top:0px; left:'.$offset.'px">';
-      $output .= '<div class="wysiwyg_imageupload_browser_inactive">';     
-    }
-    $output .= $tab;
-    $output .= '</div></div>';
+    if($i == $active){$class = 'active';}else{$class = 'inactive';}
+    $output .= '<li class="wysiwyg_imageupload_browser_'.$class.'">'.$tab.'</li>';
     $i++;
-    $offset += 125;
+    $offset += 130;
   }
-  $output .= '</div>';
+  $output .= '</ul>';
   return $output;
 }
