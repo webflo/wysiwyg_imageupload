@@ -82,7 +82,7 @@ function wysiwyg_imageupload_browser_tabs($tabs,$active){
   drupal_add_css($m.'/wysiwyg_imageupload_browser.css');
   $i = 1;
   $offset = 10;
-  $output .= '<div style="float:left; height:22px; width:100%; border-bottom:1px solid black;">';
+  $output .= '<div style="float:left; height:22px; width:100%; border-bottom:1px solid black; margin-bottom:3px;">';
   foreach($tabs as $tab){     
     if($i == $active){
       $output .= '<div style="position:absolute; z-index:2; height:20px; width:125px; top:0px; left:'.$offset.'px">';
