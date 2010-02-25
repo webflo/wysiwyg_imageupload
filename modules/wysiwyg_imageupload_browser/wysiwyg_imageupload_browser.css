@@ -1,5 +1,24 @@
-.wysiwyg_imageupload_browser_taba {
-  background:url("tab-active.png");
-  height:30px;
-  width:145px;
+.wysiwyg_imageupload_browser_active {
+  background:url("tab-active.gif") no-repeat center;
+  height:20px;
+  z-index:2;
+}
+.wysiwyg_imageupload_browser_inactive {
+  background:url("tab-inactive.gif") no-repeat center;
+  height:20px;
+  z-index:1;
+}
+.wysiwyg_imageupload_browser_active a{
+  z-index:3;
+}
+.wysiwyg_imageupload_browser_active a:link,
+.wysiwyg_imageupload_browser_active a:visited,
+.wysiwyg_imageupload_browser_inactive a:link,
+.wysiwyg_imageupload_browser_inactive a:visited {
+  color:#222;
+  margin:5px 0 0 15px;
+  max-height:20px;
+}
+#wysiwyg-imageupload-upload-form #file_upload_group {
+  float:left;
 }
