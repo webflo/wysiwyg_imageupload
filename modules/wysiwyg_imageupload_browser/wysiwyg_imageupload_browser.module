@@ -20,6 +20,7 @@ function wysiwyg_imageupload_browser_imagecache_default_presets() {
   ));
   return $presets;
 }
+
 /*
  * Implementation of hook_menu
  */
@@ -34,6 +35,7 @@ function wysiwyg_imageupload_browser_menu() {
   );
   return $items;
 }
+
 /*
  * Implementation of hook_form_alter
  */
@@ -43,7 +45,7 @@ function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
     $tabs[] = '<a href="#">New Image</a>';
     $tabs[] = l(t('Browser'), 'ajax/wysiwyg_imageupload_browser/'.$form["#parameters"][2], array('title' => t('Choose a new image out of all your already uploaded ones')));
     $form['browse'] = array(
-      '#value' => wysiwyg_imageupload_browser_tabs($tabs,1),
+      '#value' => wysiwyg_imageupload_browser_tabs($tabs,0),
       '#weight' => 0,
     );
   }
@@ -61,33 +63,43 @@ function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
  * Generate the Browser
  */
 function wysiwyg_imageupload_browser_browser($form_id){
+  global $user, $base_url;
   jquery_ui_dialog_child_js();
   module_invoke('admin_menu', 'suppress');
-  global $user, $base_url;
+
+  // Adding tabs.
   $tabs = array();
   $tabs[] = l(t('New Image'), 'ajax/wysiwyg_imgupl/add/'.arg(2), array('title' => t('Go back to the upload form and upload a new image')));
-  $tabs[] = '<a href="#">Browser</a>';
-  $output .= wysiwyg_imageupload_browser_tabs($tabs,2);
+  $tabs[] = '<a href="#">'.t('Browser').'</a>';
+  $output .= wysiwyg_imageupload_browser_tabs($tabs,1);
+
   $result = db_query('Select fid, filepath from {files} where uid = %d LIMIT %d',$user->uid, variable_get('wysiwyg_imageupload_browser_itemcount', 6));
+  $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
   while($row = db_fetch_array($result)){
-    $imageHTML = '<div style="float:left; width:200px; height:200px;">';
+    $imageHTML = '<div class="browser_image">';
     $imageHTML .= theme('imagecache', 'wysiwyg_imageupload_browser', $row['filepath'], t('Insert this image'));
     $imageHTML .= '</div>';
-    $output .= l($imageHTML, 'ajax/wysiwyg_imgupl/update/Title/', array('title' => t('Insert this image'),'html' => 'true', 'absolute' => TRUE, 'query' => array('imagepath' => $row['filepath'])));
+    $output .= l($imageHTML, 'ajax/wysiwyg_imgupl/update/Title/', array(
+      'title' => t('Insert this image'),
+      'html' => 'true',
+      'absolute' => TRUE,
+      'query' => array(
+        'imagepath' => $row['filepath'])
+      )
+    );
   }
+  $output .= '</div>';
+
   return $output;
 }
 function wysiwyg_imageupload_browser_tabs($tabs,$active){
   $m = drupal_get_path('module', 'wysiwyg_imageupload_browser');
   drupal_add_css($m.'/wysiwyg_imageupload_browser.css');
-  $i = 1;
-  $offset = 10;
-  $output .= '<ul style="float:left; height:22px; width:100%; border-bottom:1px solid black;">';
-  foreach($tabs as $tab){     
-    if($i == $active){$class = 'active';}else{$class = 'inactive';}
-    $output .= '<li class="wysiwyg_imageupload_browser_'.$class.'">'.$tab.'</li>';
-    $i++;
-    $offset += 130;
+
+  $output .= '<ul class="wysiwyg_imageupload_tabs">';
+  foreach($tabs as $index => $tab){
+    if($index == $active){$class = 'active';}else{$class = 'inactive';}
+    $output .= '<li class="wysiwyg_imageupload_tab wysiwyg_imageupload_tab_'.$class.'">'.$tab.'</li>';
   }
   $output .= '</ul>';
   return $output;
