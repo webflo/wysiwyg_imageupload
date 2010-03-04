@@ -113,7 +113,7 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
     jquery_ui_dialog_parent_js();
     $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
   }
-  else if(is_array($form_state['post']) && strstr($form_state['post']['form_id'],'node_form')) {
+  else if(isset($form_state['post']) && is_array($form_state['post']) && strstr($form_state['post']['form_id'],'node_form')) {
     $form['#cache'] = TRUE;
     jquery_ui_dialog_parent_js();
   }

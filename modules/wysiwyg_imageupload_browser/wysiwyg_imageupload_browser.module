@@ -30,7 +30,7 @@ function wysiwyg_imageupload_browser_menu() {
     'page callback' => 'wysiwyg_imageupload_browser_browser',
     'page arguments' => array(2),
     'access callback' => 'user_access',
-    'access arguments' => array('use wysiyg image upload'),
+    'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
   return $items;
