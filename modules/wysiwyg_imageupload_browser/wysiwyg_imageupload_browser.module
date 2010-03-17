@@ -73,18 +73,18 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= wysiwyg_imageupload_browser_tabs($tabs,1);
 
-  $result = db_query('Select fid, filepath from {files} where uid = %d LIMIT %d',$user->uid, variable_get('wysiwyg_imageupload_browser_itemcount', 6));
+  $images = wysiwyg_imageupload_get_user_images(variable_get('wysiwyg_imageupload_browser_itemcount', 6),$user->uid);
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
-  while($row = db_fetch_array($result)){
+  foreach($images as $image){
     $imageHTML = '<div class="browser_image">';
-    $imageHTML .= theme('imagecache', 'wysiwyg_imageupload_browser', $row['filepath'], t('Insert this image'));
+    $imageHTML .= theme('imagecache', 'wysiwyg_imageupload_browser', $image['filepath'], t('Insert this image'));
     $imageHTML .= '</div>';
     $output .= l($imageHTML, 'ajax/wysiwyg_imgupl/update/Title/', array(
       'title' => t('Insert this image'),
       'html' => 'true',
       'absolute' => TRUE,
       'query' => array(
-        'imagepath' => $row['filepath'])
+        'imagepath' => $image['filepath'])
       )
     );
   }
