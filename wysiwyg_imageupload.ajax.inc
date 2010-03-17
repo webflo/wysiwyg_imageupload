@@ -56,7 +56,7 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
       '#suffix' => '</div>');
     _wysiwyg_imageupload_form_add_uploadfields($form,$form_id);
     $form = form_builder('wysiwyg_imageupload_upload', $form, $form_state);
-    $output = $output.drupal_render($form);
+    $output .= $output.drupal_render($form);
   }
   // As we are an AHAH callback, lets convert to JSON.
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
