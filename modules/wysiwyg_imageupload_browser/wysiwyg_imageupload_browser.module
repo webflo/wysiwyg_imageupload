@@ -73,7 +73,7 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= wysiwyg_imageupload_browser_tabs($tabs,1);
 
-  $images = wysiwyg_imageupload_get_user_images(variable_get('wysiwyg_imageupload_browser_itemcount', 6),$user->uid);
+  $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 6),$user->uid);
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
   foreach($images as $image){
     $imageHTML = '<div class="browser_image">';
