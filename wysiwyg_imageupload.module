@@ -49,7 +49,7 @@ function wysiwyg_imageupload_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_admin_settings'),
     'access arguments' => array('administer site configuration'),
-    'file' => 'wysiwyg_imgupload.admin.inc'
+    'file' => 'wysiwyg_imagupload.admin.inc'
    );
 
   return $items;
