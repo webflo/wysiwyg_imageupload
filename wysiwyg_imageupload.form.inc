@@ -83,8 +83,8 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
     $form['image_upload']['preset'] = array(
       '#type' => 'select',
       '#title' => t('Size'),
+      '#default_value' => $defaults['preset'],
       '#options' => $styles,
-      '#default_value' => $defaults['preset']
     );
   }
 
