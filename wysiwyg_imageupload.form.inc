@@ -70,23 +70,16 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
       'imgupl_floating_left' => t('Text right beside image'),
       'imgupl_floating_right' => t('Text left beside image')
     ),
-    '#default_value' => $defaults['floating']);
+    '#default_value' => $defaults['floating']
+  );
 
-   // ImageCache support.
-  if (module_exists('imagecache')) {
-    $presets = imagecache_presets();
-    $styles = array();
-    foreach ($presets as $preset) {
-      // We can use the presetid here (http://drupal.org/node/694188)
-      $styles[$preset['presetname']] = t($preset['presetname']);
-    }
-    $form['image_upload']['preset'] = array(
-      '#type' => 'select',
-      '#title' => t('Size'),
-      '#default_value' => $defaults['preset'],
-      '#options' => $styles,
-    );
-  }
+
+  $form['image_upload']['preset'] = array(
+    '#type' => 'select',
+    '#title' => t('Size'),
+    '#default_value' => $defaults['preset'],
+    '#options' => _wysiwyg_imagegupload_allowed_presets(),
+  );
 
   // styles.
   $styles = _wysiwyg_imageupload_get_image_styles();
@@ -96,7 +89,7 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
       '#type' => 'select',
       '#title' => t('Style'),
       '#options' => $styles,
-      '#default_value' => $defaults['style']
+      '#default_value' => $defaults['style'],
     );
   }
 
@@ -157,4 +150,23 @@ function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floatin
   $form = _wysiwyg_imageupload_details_form($title,$img,$defaults);
 
   return $form;
+}
+
+function _wysiwyg_imagegupload_allowed_presets() {
+  $presets = imagecache_presets();
+  $defaults = array();
+  foreach ($presets as $preset) {
+    // We can use the presetid here (http://drupal.org/node/694188).
+    $styles[$preset['presetname']] = t($preset['presetname']);
+  }
+  $presets = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
+
+  foreach($presets as $key => $value) {
+    // Disabled.
+    if($value == 0) {
+      unset($presets[$key]);
+    }
+  }
+
+  return $presets;
 }
