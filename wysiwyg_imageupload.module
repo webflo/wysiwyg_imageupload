@@ -8,6 +8,9 @@ require_once('wysiwyg_imageupload.file.inc');
 require_once('wysiwyg_imageupload.form.inc');
 require_once('wysiwyg_imageupload.ajax.inc');
 
+/*
+ * Implementes hook_menu
+ */
 function wysiwyg_imageupload_menu() {
   $items = array();
   $items['ajax/wysiwyg_imgupl/add/%'] = array(
@@ -136,18 +139,36 @@ function _wysiwyg_imageupload_get_image_styles() {
   return $styles;
 }
 
+/*
+ * API: returns the filepath of a file
+ * @fid: the file id
+ */
 function wysiwyg_imageupload_get_imageurl($fid) {
   return db_result(db_query('select filepath from {files} where fid=%d',$fid));
 }
 
+/*
+ * API: loads a file-object using the path as key
+ * @path: the path of the file
+ */
 function wysiwyg_imageupload_get_file($path) {
   return db_fetch_object(db_query('select * from {files} where filepath="%s"',$path));
 }
 
+/*
+ * API: Returns the file-object
+ * @fid: the file-id
+ */
 function wysiwyg_imageupload_load_file($fid) {
   return db_fetch_object(db_query('select * from {files} where fid="%d"',$fid));
 }
 
+/*
+ * API: Use this method to get uploaded images as a 'list'.
+ * Images are sorted by date (youngest first).
+ * @limit: limit the result set to a specific number
+ * @uid: Only images uploaded by that user are returned
+ */
 function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
  if($limit != NULL) {
   $limit = " LIMIT $limit";
@@ -168,4 +189,25 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
  }
  // else
  return array();
+}
+
+/*
+ * Computes the array with all allowed presets
+*/
+function _wysiwyg_imagegupload_allowed_presets() {
+  $defaults = array();
+  foreach (imagecache_presets() as $preset) {
+    // We cant use the presetid here (http://drupal.org/node/694188).
+    $defaults[$preset['presetname']] = t($preset['presetname']);
+  }
+  $presets_whitelist = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
+  // Get all disabled keys (value === 0).
+  $disabled_presets = array_keys($presets_whitelist,0, true);
+
+  // Remove those keys from the result.
+  foreach($disabled_presets as $value) {
+    unset($presets_whitelist[$value]);
+  }
+
+  return $presets_whitelist;
 }

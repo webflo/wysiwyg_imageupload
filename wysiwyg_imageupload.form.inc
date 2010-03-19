@@ -73,12 +73,11 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
     '#default_value' => $defaults['floating']
   );
 
-
   $form['image_upload']['preset'] = array(
     '#type' => 'select',
     '#title' => t('Size'),
     '#default_value' => $defaults['preset'],
-    '#options' => _wysiwyg_imagegupload_allowed_presets(),
+    '#options' => _wysiwyg_imagegupload_allowed_presets,
   );
 
   // styles.
@@ -153,20 +152,19 @@ function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floatin
 }
 
 function _wysiwyg_imagegupload_allowed_presets() {
-  $presets = imagecache_presets();
   $defaults = array();
-  foreach ($presets as $preset) {
-    // We can use the presetid here (http://drupal.org/node/694188).
-    $styles[$preset['presetname']] = t($preset['presetname']);
+  foreach (imagecache_presets() as $preset) {
+    // We cant use the presetid here (http://drupal.org/node/694188).
+    $defaults[$preset['presetname']] = t($preset['presetname']);
   }
-  $presets = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
+  $presets_whitelist = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
+  // Get all disabled keys (value === 0).
+  $disabled_presets = array_keys($presets_whitelist,0, true);
 
-  foreach($presets as $key => $value) {
-    // Disabled.
-    if($value == 0) {
-      unset($presets[$key]);
-    }
+  // Remove those keys from the result.
+  foreach($disabled_presets as $value) {
+    unset($presets_whitelist[$value]);
   }
 
-  return $presets;
+  return $presets_whitelist;
 }

@@ -29,7 +29,7 @@ function wysiwyg_imageupload_admin_settings() {
 
  $form['wysiwyg_imageupload_allow_presets']['wysiwyg_imageupload_presets_whitelist'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Preset'),
+    '#title' => t('Presets'),
     '#default_value' => variable_get('wysiwyg_imageupload_presets_whitelist', $styles),
     '#options' => $styles
   );
