@@ -77,7 +77,7 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
     '#type' => 'select',
     '#title' => t('Size'),
     '#default_value' => $defaults['preset'],
-    '#options' => _wysiwyg_imagegupload_allowed_presets,
+    '#options' => _wysiwyg_imagegupload_allowed_presets(),
   );
 
   // styles.

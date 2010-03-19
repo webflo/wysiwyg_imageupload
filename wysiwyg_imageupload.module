@@ -196,7 +196,8 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
 */
 function _wysiwyg_imagegupload_allowed_presets() {
   $defaults = array();
-  foreach (imagecache_presets() as $preset) {
+  $presets = imagecache_presets();
+  foreach ($presets as $preset) {
     // We cant use the presetid here (http://drupal.org/node/694188).
     $defaults[$preset['presetname']] = t($preset['presetname']);
   }
