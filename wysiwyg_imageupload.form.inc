@@ -150,21 +150,3 @@ function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floatin
 
   return $form;
 }
-
-function _wysiwyg_imagegupload_allowed_presets() {
-  $defaults = array();
-  foreach (imagecache_presets() as $preset) {
-    // We cant use the presetid here (http://drupal.org/node/694188).
-    $defaults[$preset['presetname']] = t($preset['presetname']);
-  }
-  $presets_whitelist = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
-  // Get all disabled keys (value === 0).
-  $disabled_presets = array_keys($presets_whitelist,0, true);
-
-  // Remove those keys from the result.
-  foreach($disabled_presets as $value) {
-    unset($presets_whitelist[$value]);
-  }
-
-  return $presets_whitelist;
-}
