@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: wysiwyg_imageupload.install,v 1.1.2.25 2010/03/19 11:20:43 eugenmayer Exp $
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -20,6 +20,7 @@ function wysiwyg_imageupload_uninstall() {
 }
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
+  // TODO use: variable_get() / variable_set()
   $count = db_result(db_query("select COUNT(*) as count FROM {variable} WHERE name='wysiwyg_imageupload_imgstyles'")) ;
   if($count == 0) {
     db_query("INSERT INTO {variable} (name,value) VALUES ('wysiwyg_imageupload_imgstyles','%s')",'s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
@@ -53,6 +54,13 @@ function wysiwyg_imageupload_schema() {
         'default' => 0,
         'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
       ),
+      'cid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {comment}.cid associated with the uploaded file.',
+      ),
       'description' => array(
         'type' => 'varchar',
         'length' => 255,
@@ -76,10 +84,11 @@ function wysiwyg_imageupload_schema() {
         'description' => 'Weight of this upload in relation to other uploads in this node.',
       ),
     ),
-    'primary key' => array('vid', 'fid'),
+    'primary key' => array('vid', 'cid', 'fid'),
     'indexes' => array(
       'fid' => array('fid'),
       'nid' => array('nid'),
+      'cid' => array('cid'),
     ),
   );
 

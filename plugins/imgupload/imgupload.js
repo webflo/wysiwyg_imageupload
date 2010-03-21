@@ -1,4 +1,4 @@
-// $Id: img_assist.js,v 1.5 2009/06/13 01:17:21 sun Exp $
+// $Id: imgupload.js,v 1.1.2.25 2010/03/19 11:20:43 eugenmayer Exp $
 // Helper method.
 jQuery.fn.imguploadOuterHTML = function (s) {
   return (s) ? this.before(s).remove() : jQuery("<p>").append(this.eq(0).clone()).html();
@@ -78,6 +78,9 @@ Drupal.wysiwyg.plugins.imgupload = {
   add_form: function (data, settings, instanceId) {
     // We need the form ID to play with the cache of this form.
     form_id = $("form#node-form input[name='form_build_id']").val();
+    // alert(form_id);
+    form_id = Drupal.settings.wysiwyg_imageupload.current_form;
+    // alert(form_id);
 
     // Location, where to fetch the dialog.
     var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/add/' + form_id;

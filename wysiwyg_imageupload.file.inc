@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: wysiwyg_imageupload.file.inc,v 1.1.2.18 2010/03/19 11:20:43 eugenmayer Exp $
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -28,7 +28,6 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     $file->weight = 0;
     $file->new = TRUE;
     $form['#node']->imgupload_images[$file->fid] = $file;
-    $form['#value']['imgupload_images'][$file->fid] = $file;
 
     if (!@chmod($file->filepath, 0664)) {
       watchdog('wysiwyg_imageupload', 'Could not set permissons on destination file: %file', array('%file' => $file->filepath));
@@ -63,6 +62,12 @@ function _wysiwyg_imageupload_load($node) {
  * relation is saved in the wysiwyg_imageupload table
  */
 function _wysiwyg_imageupload_save(&$node) {
+  // TODO we might need to rename $node to $object
+  if(!is_object($node)) {
+    // comments might be submitted as array
+    $node = (object)$node;
+  }
+  dsm($node);
   if (empty($node->imgupload_images) || !is_array($node->imgupload_images)) {
     return;
   }
@@ -90,8 +95,12 @@ function _wysiwyg_imageupload_save(&$node) {
       continue;
     }
 
+    // It's a comment
+    if (is_array($node) && $node['form_id']=='comment_form') {
+      db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, cid, list, description, weight) VALUES (%d, %d, %d, %d, '%s', %d)", $file->fid, $node->nid, $node->vid, $node->cid, $file->list, $file->description, $file->weight);
+    }
     // Create a new revision, or associate a new file needed.
-    if (!empty($node->old_vid) || $file->new) {
+    else if (!empty($node->old_vid) || $file->new) {
       db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, list, description, weight) VALUES (%d, %d, %d, %d, '%s', %d)", $file->fid, $node->nid, $node->vid, $file->list, $file->description, $file->weight);
       file_set_status($file, FILE_STATUS_PERMANENT);
     }

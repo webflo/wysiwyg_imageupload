@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: wysiwyg_imageupload.ajax.inc,v 1.1.2.20 2010/03/19 11:20:43 eugenmayer Exp $
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -15,6 +15,15 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
   $form_state = array();
 
   $cached_form = form_get_cache($node_form_build_id, $cached_form_state);
+  dsm($node_form_build_id);
+  dsm($cached_form);
+  if (!$cached_form) {
+    // no cached form for e.g. comment, use custom cache using cache_set/get
+    $cached_form = array();
+    $cached_form['#no_cache'] = TRUE;
+    // #node is our transport item for upload file data - in any case
+    $cached_form['#node'] = new stdClass();
+  }
 
   // Handle new uploads, and merge tmp files into node-files.
   $imgDetails = _wysiwyg_imageupload_upload_file($cached_form,$form_state);
@@ -22,7 +31,17 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
   // remove all status messages
   //drupal_get_messages('status',true);
   if($imgDetails->filepath != "") {
-    form_set_cache($node_form_build_id, $cached_form, $cached_form_state);
+    dsm($cached_form);
+    if ($cached_form['#no_cache'] === TRUE) {
+      $cache_id = 'wysiwyg_imageupload_'.$node_form_build_id;
+      dsm($cache_id);
+      cache_set($cache_id, $cached_form['#node']->imgupload_images, 'cache', CACHE_TEMPORARY);
+      dsm(cache_get($cache_id));
+    }
+    else {
+      form_set_cache($node_form_build_id, $cached_form, $cached_form_state);
+    }
+
     // We save the fielpath in our cache, so we dont need to pass it later as a GET variable.
     // (when we let the html object generate using ajax).
     $cacheid = uniqid();
