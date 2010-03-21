@@ -7,7 +7,7 @@
 /*
  * Uploading a image and calling the file_insert hooks.
  */
-function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
+function _wysiwyg_imageupload_upload_file() {
   global $user;
 
   $dest = file_directory_path();
@@ -27,7 +27,6 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     $file->description = $file->filename;
     $file->weight = 0;
     $file->new = TRUE;
-    $form['#node']->imgupload_images[$file->fid] = $file;
 
     if (!@chmod($file->filepath, 0664)) {
       watchdog('wysiwyg_imageupload', 'Could not set permissons on destination file: %file', array('%file' => $file->filepath));
@@ -54,6 +53,23 @@ function _wysiwyg_imageupload_load($node) {
 
   return $files;
 }
+
+/*
+ * Share from the upload.module
+ * Loading all files of the node
+ */
+function _wysiwyg_imageupload_commment_load($cid) {
+  $files = array();
+
+  $result = db_query('SELECT * FROM {files} f INNER JOIN {wysiwyg_imageupload} r ON f.fid = r.fid WHERE r.cid = %d ORDER BY r.weight, f.fid', $cid);
+  while ($file = db_fetch_object($result)) {
+    $files[$file->fid] = $file;
+  }
+
+  return $files;
+}
+
+
 
 /*
  * Share from the upload.module
