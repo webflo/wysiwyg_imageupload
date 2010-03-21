@@ -37,7 +37,7 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
 
     drupal_add_js(array('wysiwyg_imageupload' => array('current_form' => $form['form_build_id']['#value'])), 'setting');
     jquery_ui_dialog_parent_js();
-    $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
+    $form['#validate'][] = 'wysiwyg_imageupload_form_validate';
   }
 }
 
@@ -59,7 +59,7 @@ function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
 /*
  * Called on every node save
  */
-function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
+function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
   // We need to do those that, otherwise our saved images in the cache
   // are not included in the node object when the nodeapi is called
   if(!empty($form['#node']->imgupload_images) && is_array($form['#node']->imgupload_images)) {
@@ -71,7 +71,6 @@ function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
     $value = cache_get($cache_id, 'cache');
 
     $form_state['values']['imgupload_images'] = $value->data;
-    $form_state($value);
     dsm('submitted images added to form state:');
     dsm($form_state['values']['imgupload_images']);
   }
