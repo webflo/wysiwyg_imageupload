@@ -62,8 +62,6 @@ function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
 function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
   // We need to do those that, otherwise our saved images in the cache
   // are not included in the node object when the nodeapi is called
-  dsm($form);
-  dsm($form_state);
   if(!empty($form['#node']->imgupload_images) && is_array($form['#node']->imgupload_images)) {
     $form_state['values']['imgupload_images'] = $form['#node']->imgupload_images;
   }
@@ -71,9 +69,11 @@ function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
     // inactive form cache for broken items such as comment
     $cache_id = 'wysiwyg_imageupload_' . $form_state['values']['form_build_id'];
     $value = cache_get($cache_id, 'cache');
-    dsm('submitid:'.$form_state['values']['form_build_id']);
-    dsm($value);
+
     $form_state['values']['imgupload_images'] = $value->data;
+    $form_state($value);
+    dsm('submitted images added to form state:');
+    dsm($form_state['values']['imgupload_images']);
   }
 }
 
