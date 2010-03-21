@@ -9,19 +9,8 @@ Drupal.wysiwyg.plugins.imgupload = {
    * Return whether the passed node belongs to this plugin.
    */
   isNode: function (node) {
-    //return $(node).is('img.imgupload');
-    $node = $(node).find('img.imgupload')
-    /* all img descendants of the root element */
-    .andSelf()
-    /* and the root element itself */
-    .filter('img.imgupload');
-    /* but if the root is not an img we don't need it */
+    return $(node).is('img.imgupload');
 
-    if ($node.length == 1) {
-      return true;
-    }
-    //else 
-    return false;
   },
 
   /**
@@ -39,18 +28,8 @@ Drupal.wysiwyg.plugins.imgupload = {
         id: instanceId,
         action: 'insert'
       };
-      // Is a img selected in the content, which we can edit?
-      // We can use is.(img.imgupload) here, as some editors pass this node surrounded by a <p>
-      // tag
-      $node = $(data.node).find('img.imgupload')
-      /* all img descendants of the root element */
-      .andSelf()
-      /* and the root element itself */
-      .filter('img.imgupload');
-      /* but if the root is not an img we don't need it */
 
-      if ($node.length == 1) {
-        data.node = $node.get(0);
+      if (data.node) {
         options.floating = data.node.align;
         // Expand inline tag in alt attribute
         options.alt = decodeURIComponent(data.node.alt);
@@ -124,7 +103,7 @@ Drupal.wysiwyg.plugins.imgupload = {
 
   /*
    * Open a image-details dialog, prefilled with the current settings of the
-   * selected image. 
+   * selected image.
    */
   update_form: function (data, settings, instanceId, options) {
     // Fill in the values got from the <img> object. Mostly converting css classes.
@@ -152,7 +131,7 @@ Drupal.wysiwyg.plugins.imgupload = {
       Drupal.wysiwyg.plugins.imgupload.updateImageInContent(args);
       $(this).dialog("close");
     };
-    // Cancel button    
+    // Cancel button
     btns[Drupal.t('Cancel')] = function () {
       $(this).dialog("close");
     };
@@ -172,7 +151,7 @@ Drupal.wysiwyg.plugins.imgupload = {
     var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/showimage/' + args['cacheID'] + '/' + encodeURI(args['preset']) + '/' + encodeURI(args.title);
 
     $.get(aurl, null, function (data, status) {
-      // Use some jquery foo to set th title and align      
+      // Use some jquery foo to set th title and align
       img = $(data);
       /* the whole tree returned by template */
       img.find('img')
@@ -188,7 +167,7 @@ Drupal.wysiwyg.plugins.imgupload = {
   },
 
   /*
-   * Updates the selected image. Yet, we just plainly replace it. 
+   * Updates the selected image. Yet, we just plainly replace it.
    */
   updateImageInContent: function (args) {
     Drupal.wysiwyg.plugins.imgupload.createImageInContent(args);
@@ -203,7 +182,7 @@ Drupal.wysiwyg.plugins.imgupload = {
     Drupal.wysiwyg.instances[editor_id].insert(data);
   },
   /*
-   * Expands the options using some regexp. This is needed because floating and style is 
+   * Expands the options using some regexp. This is needed because floating and style is
    * Added as class and needs to be extracted as "option information"
    */
   expand_options: function (options) {

@@ -48,7 +48,7 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
     cache_set($cacheid,$imgDetails->filepath,'cache',CACHE_TEMPORARY);
 
     // Save the main form in the cache, adding the file.
-    $output = theme('status_messages');
+//    $output = theme('status_messages');
     // No errors, so lets replace the upload widget with the image details
     $title = $imgDetails->filename;
 

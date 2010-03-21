@@ -112,6 +112,7 @@ function wysiwyg_imageupload_comment(&$a1, $op) {
     case 'insert':
     case 'update':
       $comment = $a1;
+      dsm($comment);
       if (user_access('use wysiwyg image upload')) {
         _wysiwyg_imageupload_save($comment);
       }

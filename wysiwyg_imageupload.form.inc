@@ -14,63 +14,66 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   // Even if the wysiwyg_imageupload button is not activate, we need to load the
   // jquery_ui_dialog preconditions. The user might switch the editor on the node form
   // then we would need it
-  dsm($form_state);
-  dsm($form_id);
-  // Check, if thats a Preview. Because every preview generates a new form_build_id
-  if(is_array($form_state)) {
-    $old_form_build_id = $form_state['post']['form_build_id'];
-    $new_form_build_id = $form_state['post']['form_build_id'];
-    // Lets get the old cache and set it to the new cache
-    $old = cache_get('wysiwyg_imageupload_'.$old_form_build_id);
-    // Now apply it using the new from_build_id
-    cache_set('wysiwyg_imageupload_'.$new_form_build_id,$old->data,'cache',CACHE_TEMPORARY);
-  }
 
-  if ($form['#id'] == 'node-form' ) {
-    // Activate form caching is we will need it by AHAH later
-    // case: node form + node preview submit
-    dsm($form);
-    $form['#cache'] = TRUE;
-    drupal_add_js(array('wysiwyg_imageupload' => array('current_form' => $form['form_build_id']['#value'])), 'setting');
-    jquery_ui_dialog_parent_js();
-    $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
-  }
-  else if(isset($form_state['post']) && is_array($form_state['post']) && strstr($form_state['post']['form_id'],'node_form')) {
-    // TODO: check when does this match?
-    $form['#cache'] = TRUE;
-    drupal_add_js(array('wysiwyg_imageupload' => array('current_form' => $form['form_build_id']['#value'])), 'setting');
-    jquery_ui_dialog_parent_js();
-  }
-  else if ($form['#id'] == 'comment-form' ) {
-    dsm($form);
+  // Check, if thats a Preview. Because every preview generates a new form_build_id
+
+
+  if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
+    // We need $form_state['post']['form_build_id'] != "" as a additional condition, as there are cases that
+    // post is an empty array but it has not been submitted ( no preview, no save).
+    if(isset($form_state['post']) && is_array($form_state['post']) && $form_state['post']['form_build_id'] != '') {
+      dsm($form_state['post']);
+      dsm('transfer cache');
+      _wysiwyg_imageupload_transfer_cache($form, $form_state);
+    }
     // Comment form is incompatible with form caching see
     // http://drupal.org/node/644222
+    if($form['#id'] != 'comment-form') {
+      // Activate form caching is we will need it by AHAH later
+      // case: node form + node preview submit
+      dsm('activating cache');
+      $form['#cache'] = TRUE;
+    }
+
     drupal_add_js(array('wysiwyg_imageupload' => array('current_form' => $form['form_build_id']['#value'])), 'setting');
     jquery_ui_dialog_parent_js();
     $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
   }
-/*
-      && ($form_state['submitted'] === false)     // submitted: if submitted is true and we are still triggering form_alter its preview, so dont lock once again
-*/
 }
+
+function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
+  $old_form_build_id = $form_state['post']['form_build_id'];
+  $new_form_build_id = $form['#build_id'];
+  dsm($old_form_build_id);
+  dsm($new_form_build_id);
+  // Lets get the old cache and set it to the new cache
+  $old = cache_get('wysiwyg_imageupload_'.$old_form_build_id);
+  // Now apply it using the new from_build_id
+  dsm($old->data);
+  cache_set('wysiwyg_imageupload_'.$new_form_build_id,$old->data,'cache',CACHE_TEMPORARY);
+  $d = cache_get('wysiwyg_imageupload_'.$new_form_build_id);
+  dsm('new data:');
+  dsm($d->data);
+}
+
 /*
  * Called on every node save
  */
 function wysiwyg_imageupload_form_submit(&$form, &$form_state) {
   // We need to do those that, otherwise our saved images in the cache
   // are not included in the node object when the nodeapi is called
+  dsm($form);
   dsm($form_state);
   if(!empty($form['#node']->imgupload_images) && is_array($form['#node']->imgupload_images)) {
     $form_state['values']['imgupload_images'] = $form['#node']->imgupload_images;
   }
-  else if (!empty($form['#build_id'])) {
+  else if ($form_state['submitted'] == true) {
     // inactive form cache for broken items such as comment
-    $cache_id = 'wysiwyg_imageupload_' . $form['#build_id'];
+    $cache_id = 'wysiwyg_imageupload_' . $form_state['values']['form_build_id'];
     $value = cache_get($cache_id, 'cache');
-    if ($value) {
-    }
+    dsm('submitid:'.$form_state['values']['form_build_id']);
+    dsm($value);
     $form_state['values']['imgupload_images'] = $value->data;
-
   }
 }
 
