@@ -99,3 +99,11 @@ function wysiwyg_imageupload_update_6104() {
   _wysiwyg_imageupload_install_styles_if_missing();
   return array();
 }
+
+function wysiwyg_imageupload_update_6108() {
+  // added cid column to imageupload mapping table
+  db_query('ALTER TABLE {wysiwyg_imageupload} ADD `cid` INT NOT NULL AFTER `vid`');
+  db_query('ALTER TABLE {wysiwyg_imageupload} DROP PRIMARY KEY, ADD PRIMARY KEY ( `vid` , `fid` , `cid` )');
+  return array();
+}
+
