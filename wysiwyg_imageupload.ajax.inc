@@ -71,18 +71,15 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
 
 /*
  * Ajax callback.
- * Using the cacheID to determine the filepath and returns a html image object
- * If imagecache is installed, use the preset
+ * Using the cacheID to determine the filepath and returns a html image object.
+ * Renders the image using imagecache.
  */
 function _wysiwyg_imageupload_show_image($cacheID,$preset,$title) {
-   $preset = check_plain($preset);
-   $title = check_plain($title);
-
-   if (module_exists('imagecache')) {
-    $filepath = cache_get($cacheID,'cache');
-    $GLOBALS['devel_shutdown'] = FALSE;
-    $output = theme('imagecache',$preset,$filepath->data, $filepath->data,$title);
-    print $output;
-    exit;
-   }
+  $preset = check_plain($preset);
+  $title = check_plain($title);
+  $filepath = cache_get($cacheID,'cache');
+  $GLOBALS['devel_shutdown'] = FALSE;
+  $output = theme('imagecache',$preset,$filepath->data, $filepath->data,$title);
+  print $output;
+  exit;
 }

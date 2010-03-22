@@ -6,6 +6,7 @@
 
 /*
  * Uploading a image and calling the file_insert hooks.
+ * @return: Returns the uploaded file as an object
  */
 function _wysiwyg_imageupload_upload_file() {
   global $user;
@@ -38,8 +39,7 @@ function _wysiwyg_imageupload_upload_file() {
 
 
 /*
- * Share from the upload.module
- * Loading all files of the node
+ * Loading all files uploaded to a node
  */
 function _wysiwyg_imageupload_load($node) {
   $files = array();
@@ -55,8 +55,7 @@ function _wysiwyg_imageupload_load($node) {
 }
 
 /*
- * Share from the upload.module
- * Loading all files of the node
+ * Loading all files uploaded to a comment
  */
 function _wysiwyg_imageupload_commment_load($cid) {
   $files = array();
@@ -69,8 +68,6 @@ function _wysiwyg_imageupload_commment_load($cid) {
   return $files;
 }
 
-
-
 /*
  * Share from the upload.module
  * Adds, removes or updates files in the image property.
@@ -78,7 +75,6 @@ function _wysiwyg_imageupload_commment_load($cid) {
  * relation is saved in the wysiwyg_imageupload table
  */
 function _wysiwyg_imageupload_save(&$node) {
-  // TODO we might need to rename $node to $object
   if(!is_object($node)) {
     // comments might be submitted as array
     $node = (object)$node;
@@ -119,7 +115,8 @@ function _wysiwyg_imageupload_save(&$node) {
       else {
         db_query("UPDATE {wysiwyg_imageupload} SET list = %d, description = '%s', weight = %d WHERE fid = %d AND cid = %d", $file->list, $file->description, $file->weight, $file->fid, $node->cid);
       }
-      return;
+      // Skip the other steps, as its a comment - not a node
+      continue;
     }
 
     // Its a node

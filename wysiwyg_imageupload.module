@@ -14,7 +14,7 @@ require_once('wysiwyg_imageupload.ajax.inc');
 function wysiwyg_imageupload_menu() {
   $items = array();
   $items['ajax/wysiwyg_imgupl/add/%'] = array(
-	  'page callback' => 'drupal_get_form',
+    'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_upload_form', 3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
@@ -30,11 +30,11 @@ function wysiwyg_imageupload_menu() {
   );
 
   $items['ajax/wysiwyg_imgupl/upload/%'] = array(
-  	'page callback' => '_wysiwyg_imageupload_upload_js',
-  	'page arguments' => array(3),
+    'page callback' => '_wysiwyg_imageupload_upload_js',
+    'page arguments' => array(3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
-  	'type' => MENU_CALLBACK,
+    'type' => MENU_CALLBACK,
   );
 
   $items['ajax/wysiwyg_imgupl/showimage/%'] = array(

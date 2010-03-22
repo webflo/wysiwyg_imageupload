@@ -8,23 +8,27 @@
 
 /*
  * Implementation of hook_form_alter
- * Adding jquery_ui_dialog javascript / css definitions to the form
+ * Adding jquery_ui_dialog javascript / css definitions to the form.
  */
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
     // We need $form_state['post']['form_build_id'] != "" as a additional condition, as there are cases that
     // post is an empty array but it has not been submitted ( no preview, no save).
     if(isset($form_state['post']) && is_array($form_state['post']) && $form_state['post']['form_build_id'] != '') {
+      // The form has been saved or is preview, transfer the cache to the new form_build_id
       _wysiwyg_imageupload_transfer_cache($form, $form_state);
     }
     else {
+      // Load already existing files and put them in the array before the form is shown.
+      // This must be done when nodes or comments are edited, to ensure that already uploaded images
+      // are in the cache.
       if (
-        $form['#id'] == 'comment-form' &&   // Should only match, if we have a comment formular
-        $form['cid']['#value'] != NULL      // If its a creation of a new comment, we dont need to load any files
+        $form['#id'] == 'comment-form' &&   // Should only match, if we have a comment formular.
+        $form['cid']['#value'] != NULL      // If its a creation of a new comment, we dont need to load any files.
       ) {
         // We need this special case, as there is no "op=load" in the hook_comment hook_comment
         // so we cant load extra data like our files. We only call this on the first load of the edit form
-        // so on a preview or similar, we already have written this cache and only load (transfer) it
+        // so on a preview or similar, we already have written this cache and only load (transfer) it.
         $files = _wysiwyg_imageupload_commment_load($form['cid']['#value']);
       }
       else if (
@@ -34,25 +38,30 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
       ) {
         $files = $form['#node']->imgupload_images;
       }
-      // Save them in the cache, if there are any
+      // Save them in the cache, if there are any.
       if(is_array($files) && count($files) > 0) {
         cache_set('wysiwyg_imageupload_'.$form['#build_id'],$files,'cache',CACHE_TEMPORARY);
       }
     }
-    // Comment form is incompatible with form caching see
-    // http://drupal.org/node/644222
+    // Comment form is incompatible with form caching see http://drupal.org/node/644222
     if($form['#id'] != 'comment-form') {
-      // Activate form caching is we will need it by AHAH later
-      // case: node form + node preview submit
+      // Thats is not mandatory anymore, as we handle or cache ourselfs
       $form['#cache'] = TRUE;
     }
 
     drupal_add_js(array('wysiwyg_imageupload' => array('current_form' => $form['form_build_id']['#value'])), 'setting');
     jquery_ui_dialog_parent_js();
+
     $form['#validate'][] = 'wysiwyg_imageupload_form_validate';
   }
 }
 
+/*
+ * This method transfers the cache of the old from_build_id to a new cache setting
+ * using the new form_build_id. This is need due every preview and save of a non cached form
+ * is causing the form_build_id to change and therefor we could later not load our uploaded files
+ * for making them persisten.
+ */
 function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
   $old_form_build_id = $form_state['post']['form_build_id'];
   $new_form_build_id = $form['#build_id'];
@@ -63,7 +72,9 @@ function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
 }
 
 /*
- * Called on every node save
+ * Called on every node or comment save
+ * This method will load the cache and put the loaded files into the comment-object for use in insert/update
+ * where those files will be made persistent and added to the relation table.
  */
 function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
   if ($form_state['submitted'] == true) {
