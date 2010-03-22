@@ -20,10 +20,9 @@ function wysiwyg_imageupload_uninstall() {
 }
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
-  // TODO use: variable_get() / variable_set()
-  $count = db_result(db_query("select COUNT(*) as count FROM {variable} WHERE name='wysiwyg_imageupload_imgstyles'")) ;
-  if($count == 0) {
-    db_query("INSERT INTO {variable} (name,value) VALUES ('wysiwyg_imageupload_imgstyles','%s')",'s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
+  $value = variable_get('wysiwyg_imageupload_imgstyles',false);
+  if($value !== false) {
+    variable_set('wysiwyg_imageupload_imgstyles','s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
   }
 }
 /**
@@ -95,15 +94,11 @@ function wysiwyg_imageupload_schema() {
   return $schema;
 }
 
-function wysiwyg_imageupload_update_6104() {
-  _wysiwyg_imageupload_install_styles_if_missing();
-  return array();
-}
-
 function wysiwyg_imageupload_update_6108() {
   // added cid column to imageupload mapping table
   db_query('ALTER TABLE {wysiwyg_imageupload} ADD `cid` INT NOT NULL AFTER `vid`');
   db_query('ALTER TABLE {wysiwyg_imageupload} DROP PRIMARY KEY, ADD PRIMARY KEY ( `vid` , `fid` , `cid` )');
+  _wysiwyg_imageupload_install_styles_if_missing();
   return array();
 }
 
