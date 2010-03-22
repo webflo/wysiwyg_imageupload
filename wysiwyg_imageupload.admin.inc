@@ -1,8 +1,9 @@
 <?php
-// $Id: wysiwyg_imageupload.admin.inc,v 1.1.2.5 2010/03/19 11:20:43 eugenmayer Exp $
+// $Id:$
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
+
 /*
  * Providing a administration interface for tagging.
  */

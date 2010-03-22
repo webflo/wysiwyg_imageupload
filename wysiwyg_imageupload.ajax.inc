@@ -1,27 +1,26 @@
 <?php
-// $Id: wysiwyg_imageupload.ajax.inc,v 1.1.2.20 2010/03/19 11:20:43 eugenmayer Exp $
+// $Id:$
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
 
 /*
  * Called through ajax(AHAH), uploading an image and replacing
- * the upload form with an image-details form, if successfully uploaded
- * Some of the code is shared from the upload.module
+ * the upload form with an image-details form, if successfully uploaded.
  */
 function _wysiwyg_imageupload_upload_js($node_form_build_id) {
-  // Load the cache which includes the currently allready uploaded files
+  // Load the cache which includes the currently allready uploaded files.
   $cached_files = cache_get('wysiwyg_imageupload_'.$node_form_build_id);
 
-  // Yet no file, initialize the array
+  // Yet no file, initialize the array.
   if(empty($cached_files)) {
     $cached_files = new stdClass();
     $cached_files->data = array();
   }
-
   $cached_files = $cached_files->data;
 
-  // Handle new uploads, and merge tmp files into node-files.
+  // Handle new uploads. Create the files in the files table and make them temperory.
+  // The will need to be made persistend on form submit in the hook_comment or hook_nodeapi
   $imgDetails = _wysiwyg_imageupload_upload_file();
 
   // remove all status messages
@@ -60,11 +59,11 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
       '#title'=> t('Upload image'),
       '#prefix' => '<div id="file_upload_group">',
       '#suffix' => '</div>');
-    _wysiwyg_imageupload_form_add_uploadfields($form,$form_id);
+    _wysiwyg_imageupload_form_add_uploadfields($form,$node_form_build_id);
     $form = form_builder('wysiwyg_imageupload_upload', $form, $form_state);
     $output .= $output.drupal_render($form);
   }
-  // As we are an AHAH callback, lets convert to JSON.
+  // As this is an AHAH callback, lets convert to JSON and return.
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
   exit;
 }
