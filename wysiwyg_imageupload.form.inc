@@ -17,16 +17,27 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
     if(isset($form_state['post']) && is_array($form_state['post']) && $form_state['post']['form_build_id'] != '') {
       _wysiwyg_imageupload_transfer_cache($form, $form_state);
     }
-    else if (
-      $form['#id'] == 'comment-form' &&   // Should only match, if we have a comment formular
-      $form['cid']['#value'] != NULL      // If its a creation of a new comment, we dont need to load any files
-    ) {
-      // We need this special case, as there is no "op=load" in the hook_comment hook_comment
-      // so we cant load extra data like our files. We only call this on the first load of the edit form
-      // so on a preview or similar, we already have written this cache and only load (transfer) it
-      $files = _wysiwyg_imageupload_commment_load($form['#comment']->cid);
-      // Save them in the cache
-      cache_set('wysiwyg_imageupload_'.$form['#build_id'],$files,'cache',CACHE_TEMPORARY);
+    else {
+      if (
+        $form['#id'] == 'comment-form' &&   // Should only match, if we have a comment formular
+        $form['cid']['#value'] != NULL      // If its a creation of a new comment, we dont need to load any files
+      ) {
+        // We need this special case, as there is no "op=load" in the hook_comment hook_comment
+        // so we cant load extra data like our files. We only call this on the first load of the edit form
+        // so on a preview or similar, we already have written this cache and only load (transfer) it
+        $files = _wysiwyg_imageupload_commment_load($form['cid']['#value']);
+      }
+      else if (
+        $form['#id'] == 'node-form' &&
+        $form['#node']->nid != NULL &&
+        !empty($form['#node']->imgupload_images)
+      ) {
+        $files = $form['#node']->imgupload_images;
+      }
+      // Save them in the cache, if there are any
+      if(is_array($files) && count($files) > 0) {
+        cache_set('wysiwyg_imageupload_'.$form['#build_id'],$files,'cache',CACHE_TEMPORARY);
+      }
     }
     // Comment form is incompatible with form caching see
     // http://drupal.org/node/644222

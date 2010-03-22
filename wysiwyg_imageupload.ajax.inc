@@ -10,15 +10,17 @@
  * Some of the code is shared from the upload.module
  */
 function _wysiwyg_imageupload_upload_js($node_form_build_id) {
-  // Load the form from the Form API cache.
-  $cached_form_state = array();
-  $form_state = array();
   // Load the cache which includes the currently allready uploaded files
   $cached_files = cache_get('wysiwyg_imageupload_'.$node_form_build_id);
+
   // Yet no file, initialize the array
   if(empty($cached_files)) {
-    $cached_files = array();
+    $cached_files = new stdClass();
+    $cached_files->data = array();
   }
+
+  $cached_files = $cached_files->data;
+
   // Handle new uploads, and merge tmp files into node-files.
   $imgDetails = _wysiwyg_imageupload_upload_file();
 
@@ -26,29 +28,27 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
   //drupal_get_messages('status',true);
   if($imgDetails->filepath != "") {
     $cached_files[$imgDetails->fid] = $imgDetails;
-    $cache_id = 'wysiwyg_imageupload_'.$node_form_build_id;
-    cache_set($cache_id, $cached_files, 'cache', CACHE_TEMPORARY);
+    cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_TEMPORARY );
 
-    // We save the fielpath in our cache, so we dont need to pass it later as a GET variable.
+    // We save the filepath in our cache, so we dont need to pass it later as a GET variable.
     // (when we let the html object generate using ajax).
     $cacheid = uniqid();
-    cache_set($cacheid,$imgDetails->filepath,'cache',CACHE_TEMPORARY);
+    cache_set($cacheid , $imgDetails->filepath, 'cache',CACHE_TEMPORARY );
 
     // Save the main form in the cache, adding the file.
-    $output = theme('status_messages');
     // No errors, so lets replace the upload widget with the image details
     $title = $imgDetails->filename;
 
     // This is our thumbnail. It also saves the cacheid in alt. We will inject this into the details form.
-    // TODO: maybe really generate a small thumbnail and not reuse / resize the original using the browser,
-    $img = "<img id='uploadedImage' title='$title' alt='$cacheid' height='200px;border:1px solid black;margin:auto' src='". base_path() . $imgDetails->filepath ."'>".$output;
+    // TODO: maybe really generate a small thumbnail and not reuse / resize the original using the browser.
+    $img = "<img id='uploadedImage' title='$title' alt='$cacheid' height='200px;border:1px solid black;margin:auto' src='". base_path() . $imgDetails->filepath ."'>";
 
     // Create the form image detail form.
     $form = array();
     $form_state = array();
     $form = _wysiwyg_imageupload_details_form($title,$img);
     $form = form_builder('wysiwyg_imageupload_detailsform', $form, $form_state);
-    $output = drupal_render($form).$output;
+    $output = theme('status_messages').drupal_render($form);
   }
   else {
     drupal_set_message(t('Select a file to upload first'),'error');

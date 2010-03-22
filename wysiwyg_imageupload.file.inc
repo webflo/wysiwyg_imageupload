@@ -83,7 +83,7 @@ function _wysiwyg_imageupload_save(&$node) {
     // comments might be submitted as array
     $node = (object)$node;
   }
-  dsm($node);
+
   if (empty($node->imgupload_images) || !is_array($node->imgupload_images)) {
     return;
   }
@@ -112,11 +112,19 @@ function _wysiwyg_imageupload_save(&$node) {
     }
 
     // It's a comment
-    if (is_array($node) && $node['form_id']=='comment_form') {
-      db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, cid, list, description, weight) VALUES (%d, %d, %d, %d, '%s', %d)", $file->fid, $node->nid, $node->vid, $node->cid, $file->list, $file->description, $file->weight);
+    if (!empty($node->cid) && $node->cid > 0) {
+      if($file->new == true) {
+        db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, cid, list, description, weight) VALUES (%d, %d, %d,%d, %d, '%s', %d)", $file->fid, $node->nid, 0, $node->cid, $file->list, $file->description, $file->weight);
+      }
+      else {
+        db_query("UPDATE {wysiwyg_imageupload} SET list = %d, description = '%s', weight = %d WHERE fid = %d AND cid = %d", $file->list, $file->description, $file->weight, $file->fid, $node->cid);
+      }
+      return;
     }
+
+    // Its a node
     // Create a new revision, or associate a new file needed.
-    else if (!empty($node->old_vid) || $file->new) {
+    if (!empty($node->old_vid) || $file->new) {
       db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, list, description, weight) VALUES (%d, %d, %d, %d, '%s', %d)", $file->fid, $node->nid, $node->vid, $file->list, $file->description, $file->weight);
       file_set_status($file, FILE_STATUS_PERMANENT);
     }

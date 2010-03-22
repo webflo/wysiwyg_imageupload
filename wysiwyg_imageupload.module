@@ -108,12 +108,10 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
  * implementation of hook_comment().
  */
 function wysiwyg_imageupload_comment(&$a1, $op) {
-  dsm("comment hook $op");
   switch ($op) {
     case 'insert':
     case 'update':
       $comment = $a1;
-      dsm($comment);
       if (user_access('use wysiwyg image upload')) {
         _wysiwyg_imageupload_save($comment);
       }
