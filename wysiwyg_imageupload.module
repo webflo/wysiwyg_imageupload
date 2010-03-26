@@ -79,9 +79,9 @@ function wysiwyg_imageupload_perm() {
 /*
  * implementation of hook_init
  */
-function wysiwyg_imageupload_init() {
+function wysiwyg_imageupload_init() {F
   $m = drupal_get_path('module', 'wysiwyg_imageupload');
-  drupal_add_css($m.'/plugins/imgupload/imgupload.css');
+  drupal_add_css($m.'/plugins/imgupload/wysiwyg_imageupload_dialog.css');
 }
 
 /*
