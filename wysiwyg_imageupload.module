@@ -174,7 +174,7 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
   $limit = " LIMIT $limit";
  }
  if($uid != NULL) {
-  $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
+  $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {wysiwyg_imageupload} as w INNER JOIN {files} AS f on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
  }
  else {
   $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
