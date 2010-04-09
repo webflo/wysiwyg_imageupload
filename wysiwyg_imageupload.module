@@ -210,3 +210,12 @@ function _wysiwyg_imagegupload_allowed_presets() {
 
   return $presets_whitelist;
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function wysiwyg_imageupload_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
