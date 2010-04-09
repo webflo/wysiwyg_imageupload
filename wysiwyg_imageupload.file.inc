@@ -18,7 +18,7 @@ function _wysiwyg_imageupload_upload_file() {
     // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
   );
   $file = NULL;
-  if ( user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
+  if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
     foreach (module_implements('file_insert') as $module) {
       $function =  $module .'_file_insert';
       $function($file);
@@ -75,7 +75,7 @@ function _wysiwyg_imageupload_commment_load($cid) {
  * relation is saved in the wysiwyg_imageupload table
  */
 function _wysiwyg_imageupload_save(&$node) {
-  if(!is_object($node)) {
+  if (!is_object($node)) {
     // comments might be submitted as array
     $node = (object)$node;
   }

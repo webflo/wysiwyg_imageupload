@@ -168,23 +168,23 @@ function wysiwyg_imageupload_load_file($fid) {
  * @uid: Only images uploaded by that user are returned
  */
 function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
- if ($limit != NULL) {
-  $limit = " LIMIT $limit";
- }
- if ($uid != NULL) {
-  $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
- }
- else {
-  $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
- }
+  if ($limit != NULL) {
+    $limit = " LIMIT $limit";
+  }
+  if ($uid != NULL) {
+    $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
+  }
+  else {
+    $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
+  }
 
- if ($result != false) {
-   $images = array();
-   while($row = db_fetch_array($result)) {
-    $images[] = $row;
-   };
-   return $images;
- }
+  if ($result != false) {
+    $images = array();
+    while ($row = db_fetch_array($result)) {
+      $images[] = $row;
+    };
+    return $images;
+  }
  // else
  return array();
 }

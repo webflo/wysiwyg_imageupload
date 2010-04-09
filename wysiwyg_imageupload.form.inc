@@ -150,7 +150,7 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
 
   // styles.
   $styles = _wysiwyg_imageupload_get_image_styles();
-  if(count($styles) > 0) { // If any.
+  if (count($styles) > 0) { // If any.
     array_unshift($styles, t('None'));
     $form['image_upload']['style'] = array(
       '#type' => 'select',
@@ -196,7 +196,7 @@ function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floatin
   module_invoke('admin_menu', 'suppress');
   drupal_set_title(t('Update image'));
 
-  if(!file_exists(realpath($imgpath))) {
+  if (!file_exists(realpath($imgpath))) {
     drupal_set_message("The image does not exist ($imgpath)",'error');
     return array();
   }

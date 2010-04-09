@@ -25,7 +25,7 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
 
   // remove all status messages
   //drupal_get_messages('status',true);
-  if($imgDetails->filepath != "") {
+  if ($imgDetails->filepath != "") {
     $cached_files[$imgDetails->fid] = $imgDetails;
     cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_TEMPORARY );
 
@@ -47,7 +47,7 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
     $form_state = array();
     $form = _wysiwyg_imageupload_details_form($title,$img);
     $form = form_builder('wysiwyg_imageupload_detailsform', $form, $form_state);
-    $output = theme('status_messages').drupal_render($form);
+    $output = theme('status_messages') . drupal_render($form);
   }
   else {
     drupal_set_message(t('Select a file to upload first'),'error');
@@ -55,13 +55,14 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
 
     $form_state = array();
     $form = array();
-    $form['image_upload'] = array( '#type' => 'fieldset',
+    $form['image_upload'] = array(
+      '#type' => 'fieldset',
       '#title'=> t('Upload image'),
       '#prefix' => '<div id="file_upload_group">',
       '#suffix' => '</div>');
     _wysiwyg_imageupload_form_add_uploadfields($form,$node_form_build_id);
     $form = form_builder('wysiwyg_imageupload_upload', $form, $form_state);
-    $output .= $output.drupal_render($form);
+    $output .= $output . drupal_render($form);
   }
   // As this is an AHAH callback, lets convert to JSON and return.
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
