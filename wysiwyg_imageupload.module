@@ -9,7 +9,7 @@ require_once('wysiwyg_imageupload.form.inc');
 require_once('wysiwyg_imageupload.ajax.inc');
 
 /*
- * Implementes hook_menu
+ * Implementes hook_menu().
  */
 function wysiwyg_imageupload_menu() {
   $items = array();
@@ -59,7 +59,7 @@ function wysiwyg_imageupload_menu() {
 }
 
 /*
- * Implementing the hook_wysiwyg_include_directory
+ * Implementing the hook_wysiwyg_include_directory().
  * This is needed to register our WYSIWYG Plugin
  */
 function wysiwyg_imageupload_wysiwyg_include_directory($type) {
@@ -70,14 +70,14 @@ function wysiwyg_imageupload_wysiwyg_include_directory($type) {
 }
 
 /*
- * Implementation of hook_perm
+ * Implementation of hook_perm().
  */
 function wysiwyg_imageupload_perm() {
   return array('use wysiwyg image upload');
 }
 
 /*
- * implementation of hook_init
+ * implementation of hook_init().
  */
 function wysiwyg_imageupload_init() {
   $m = drupal_get_path('module', 'wysiwyg_imageupload');
