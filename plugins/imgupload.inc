@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: imgupload.inc,v 1.1.2.18 2010/03/19 11:20:43 eugenmayer Exp $
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer

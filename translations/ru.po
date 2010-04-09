@@ -1,4 +1,4 @@
-# $Id$
+# $Id: ru.po,v 1.1.2.21 2010/03/19 11:20:43 eugenmayer Exp $
 #
 # LANGUAGE translation of Drupal (general)
 # Copyright 2010 Phil Krylov <phil.krylov@gmail.com>
