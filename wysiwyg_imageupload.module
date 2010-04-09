@@ -127,8 +127,8 @@ function _wysiwyg_imageupload_get_image_styles() {
   // Must have the format: Descriptive=css_style,Descriptive2=css_style2..
   $settings = variable_get('wysiwyg_imageupload_imgstyles', '');
   $styles = array();
-  if($settings != '') {
-    foreach(explode(',',$settings) as $style) {
+  if ($settings != '') {
+    foreach (explode(',', $settings) as $style) {
       $style = explode('=',$style);
       $styles[$style[1]] = t($style[0]);
     }
@@ -168,17 +168,17 @@ function wysiwyg_imageupload_load_file($fid) {
  * @uid: Only images uploaded by that user are returned
  */
 function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
- if($limit != NULL) {
+ if ($limit != NULL) {
   $limit = " LIMIT $limit";
  }
- if($uid != NULL) {
+ if ($uid != NULL) {
   $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
  }
  else {
   $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
  }
 
- if($result != false) {
+ if ($result != false) {
    $images = array();
    while($row = db_fetch_array($result)) {
     $images[] = $row;
