@@ -178,7 +178,7 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
     $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
   }
 
-  if ($result != false) {
+  if ($result != FALSE) {
     $images = array();
     while ($row = db_fetch_array($result)) {
       $images[] = $row;
@@ -201,7 +201,7 @@ function _wysiwyg_imagegupload_allowed_presets() {
   }
   $presets_whitelist = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
   // Get all disabled keys (value === 0).
-  $disabled_presets = array_keys($presets_whitelist,0, true);
+  $disabled_presets = array_keys($presets_whitelist,0, TRUE);
 
   // Remove those keys from the result.
   foreach($disabled_presets as $value) {
