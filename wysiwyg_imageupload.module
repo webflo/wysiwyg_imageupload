@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id:$
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -14,7 +14,7 @@ require_once('wysiwyg_imageupload.ajax.inc');
 function wysiwyg_imageupload_menu() {
   $items = array();
   $items['ajax/wysiwyg_imgupl/add/%'] = array(
-	  'page callback' => 'drupal_get_form',
+    'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_upload_form', 3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
@@ -30,11 +30,11 @@ function wysiwyg_imageupload_menu() {
   );
 
   $items['ajax/wysiwyg_imgupl/upload/%'] = array(
-  	'page callback' => '_wysiwyg_imageupload_upload_js',
-  	'page arguments' => array(3),
+    'page callback' => '_wysiwyg_imageupload_upload_js',
+    'page arguments' => array(3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
-  	'type' => MENU_CALLBACK,
+    'type' => MENU_CALLBACK,
   );
 
   $items['ajax/wysiwyg_imgupl/showimage/%'] = array(
@@ -85,6 +85,8 @@ function wysiwyg_imageupload_init() {
 }
 
 /*
+ * Implementation of hook_nodeapi().
+ *
  * Shared with the upload module
  */
 function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
@@ -103,24 +105,20 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
 }
 
 /*
- * Implementation of hook_form_alter
- * Adding jquery_ui_dialog javascript / css definitions to the form
+ * implementation of hook_comment().
  */
-function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
-  // Even if the wysiwyg_imageupload button is not activate, we need to load the
-  // jquery_ui_dialog preconditions. The user might switch the editor on the node form
-  // then we would need it
-  if ($form['#id'] == 'node-form' ) {
-    // Activate form caching is we will need it by AHAH later
-    $form['#cache'] = TRUE;
-    jquery_ui_dialog_parent_js();
-    $form['#submit'][] = 'wysiwyg_imageupload_form_submit';
-  }
-  else if(isset($form_state['post']) && is_array($form_state['post']) && strstr($form_state['post']['form_id'],'node_form')) {
-    $form['#cache'] = TRUE;
-    jquery_ui_dialog_parent_js();
+function wysiwyg_imageupload_comment(&$a1, $op) {
+  switch ($op) {
+    case 'insert':
+    case 'update':
+      $comment = $a1;
+      if (user_access('use wysiwyg image upload')) {
+        _wysiwyg_imageupload_save($comment);
+      }
+      break;
   }
 }
+
 
 /*
  * Returns all the image styles to show in the selection
@@ -211,4 +209,13 @@ function _wysiwyg_imagegupload_allowed_presets() {
   }
 
   return $presets_whitelist;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function wysiwyg_imageupload_views_api() {
+  return array(
+    'api' => 2.0,
+  );
 }
