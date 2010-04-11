@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id:$
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -17,12 +17,15 @@ function wysiwyg_imageupload_uninstall() {
   // Remove tables.
   drupal_uninstall_schema('wysiwyg_imageupload');
   _wysiwyg_imageupload_install_styles_if_missing();
+  // Remove variables.
+  db_query("DELETE FROM {variable} WHERE name LIKE 'wysiwyg_imageupload_%%'");
+
 }
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
-  $count = db_result(db_query("select COUNT(*) as count FROM {variable} WHERE name='wysiwyg_imageupload_imgstyles'")) ;
-  if($count == 0) {
-    db_query("INSERT INTO {variable} (name,value) VALUES ('wysiwyg_imageupload_imgstyles','%s')",'s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
+  $value = variable_get('wysiwyg_imageupload_imgstyles',FALSE);
+  if ($value !== FALSE) {
+    variable_set('wysiwyg_imageupload_imgstyles','s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
   }
 }
 /**
@@ -53,6 +56,13 @@ function wysiwyg_imageupload_schema() {
         'default' => 0,
         'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
       ),
+      'cid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {comment}.cid associated with the uploaded file.',
+      ),
       'description' => array(
         'type' => 'varchar',
         'length' => 255,
@@ -76,17 +86,22 @@ function wysiwyg_imageupload_schema() {
         'description' => 'Weight of this upload in relation to other uploads in this node.',
       ),
     ),
-    'primary key' => array('vid', 'fid'),
+    'primary key' => array('vid', 'cid', 'fid'),
     'indexes' => array(
       'fid' => array('fid'),
       'nid' => array('nid'),
+      'cid' => array('cid'),
     ),
   );
 
   return $schema;
 }
 
-function wysiwyg_imageupload_update_6104() {
+function wysiwyg_imageupload_update_6108() {
+  // added cid column to imageupload mapping table
+  db_query('ALTER TABLE {wysiwyg_imageupload} ADD `cid` INT NOT NULL AFTER `vid`');
+  db_query('ALTER TABLE {wysiwyg_imageupload} DROP PRIMARY KEY, ADD PRIMARY KEY ( `vid` , `fid` , `cid` )');
   _wysiwyg_imageupload_install_styles_if_missing();
   return array();
 }
+

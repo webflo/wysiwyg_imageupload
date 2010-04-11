@@ -1,13 +1,14 @@
 <?php
-// $Id$
+// $Id:$
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
 
 /*
  * Uploading a image and calling the file_insert hooks.
+ * @return: Returns the uploaded file as an object
  */
-function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
+function _wysiwyg_imageupload_upload_file() {
   global $user;
 
   $dest = file_directory_path();
@@ -17,7 +18,7 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
   );
   $file = NULL;
-  if ( user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
+  if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
     foreach (module_implements('file_insert') as $module) {
       $function =  $module .'_file_insert';
       $function($file);
@@ -27,8 +28,6 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
     $file->description = $file->filename;
     $file->weight = 0;
     $file->new = TRUE;
-    $form['#node']->imgupload_images[$file->fid] = $file;
-    $form['#value']['imgupload_images'][$file->fid] = $file;
 
     if (!@chmod($file->filepath, 0664)) {
       watchdog('wysiwyg_imageupload', 'Could not set permissons on destination file: %file', array('%file' => $file->filepath));
@@ -40,8 +39,7 @@ function _wysiwyg_imageupload_upload_file(&$form,&$form_state) {
 
 
 /*
- * Share from the upload.module
- * Loading all files of the node
+ * Loading all files uploaded to a node
  */
 function _wysiwyg_imageupload_load($node) {
   $files = array();
@@ -57,12 +55,31 @@ function _wysiwyg_imageupload_load($node) {
 }
 
 /*
+ * Loading all files uploaded to a comment
+ */
+function _wysiwyg_imageupload_commment_load($cid) {
+  $files = array();
+
+  $result = db_query('SELECT * FROM {files} f INNER JOIN {wysiwyg_imageupload} r ON f.fid = r.fid WHERE r.cid = %d ORDER BY r.weight, f.fid', $cid);
+  while ($file = db_fetch_object($result)) {
+    $files[$file->fid] = $file;
+  }
+
+  return $files;
+}
+
+/*
  * Share from the upload.module
  * Adds, removes or updates files in the image property.
  * This is actually the place where a file object get attached to a node, the
  * relation is saved in the wysiwyg_imageupload table
  */
 function _wysiwyg_imageupload_save(&$node) {
+  if (!is_object($node)) {
+    // comments might be submitted as array
+    $node = (object)$node;
+  }
+
   if (empty($node->imgupload_images) || !is_array($node->imgupload_images)) {
     return;
   }
@@ -90,6 +107,19 @@ function _wysiwyg_imageupload_save(&$node) {
       continue;
     }
 
+    // It's a comment
+    if (!empty($node->cid) && $node->cid > 0) {
+      if($file->new == true) {
+        db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, cid, list, description, weight) VALUES (%d, %d, %d,%d, %d, '%s', %d)", $file->fid, $node->nid, 0, $node->cid, $file->list, $file->description, $file->weight);
+      }
+      else {
+        db_query("UPDATE {wysiwyg_imageupload} SET list = %d, description = '%s', weight = %d WHERE fid = %d AND cid = %d", $file->list, $file->description, $file->weight, $file->fid, $node->cid);
+      }
+      // Skip the other steps, as its a comment - not a node
+      continue;
+    }
+
+    // Its a node
     // Create a new revision, or associate a new file needed.
     if (!empty($node->old_vid) || $file->new) {
       db_query("INSERT INTO {wysiwyg_imageupload} (fid, nid, vid, list, description, weight) VALUES (%d, %d, %d, %d, '%s', %d)", $file->fid, $node->nid, $node->vid, $file->list, $file->description, $file->weight);
