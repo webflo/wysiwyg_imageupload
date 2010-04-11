@@ -29,7 +29,7 @@
           action: 'insert'
         };
 
-        if (data.node) {
+        if (data.node && $(data.node).is('img.imgupload')) {
           $n = $(data.node);
           options.floating = data.node.align;
           // Expand inline tag in alt attribute
