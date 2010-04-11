@@ -77,14 +77,6 @@ function wysiwyg_imageupload_perm() {
 }
 
 /*
- * implementation of hook_init().
- */
-function wysiwyg_imageupload_init() {
-  $m = drupal_get_path('module', 'wysiwyg_imageupload');
-  drupal_add_css($m.'/plugins/imgupload/wysiwyg_imageupload_dialog.css');
-}
-
-/*
  * Implementation of hook_nodeapi().
  *
  * Shared with the upload module
