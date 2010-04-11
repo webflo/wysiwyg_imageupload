@@ -130,7 +130,7 @@ function _wysiwyg_imageupload_get_image_styles() {
   if ($settings != '') {
     foreach (explode(',', $settings) as $style) {
       $style = explode('=',$style);
-      $styles[$style[1]] = t($style[0]);
+      $styles[$style[1]] = t("!style",array('!style' => $style[0]));
     }
   }
   drupal_alter('wysiwyg_imageupload_image_styles', $styles);
@@ -197,7 +197,7 @@ function _wysiwyg_imagegupload_allowed_presets() {
   $presets = imagecache_presets();
   foreach ($presets as $preset) {
     // We cant use the presetid here (http://drupal.org/node/694188).
-    $defaults[$preset['presetname']] = t($preset['presetname']);
+    $defaults[$preset['presetname']] = t("!preset",array('!preset' =>$preset['presetname']));
   }
   $presets_whitelist = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
   // Get all disabled keys (value === 0).

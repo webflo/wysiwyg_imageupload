@@ -1,4 +1,4 @@
-// $Id: imgupload.js,v 1.1.2.25 2010/03/19 11:20:43 eugenmayer Exp $
+// $Id:$
 // Helper method.
 (function($) {
   $.fn.imguploadOuterHTML = function (s) {

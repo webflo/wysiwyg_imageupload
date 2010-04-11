@@ -43,7 +43,7 @@ function _wysiwyg_imageupload_migration_imageassist() {
   foreach($nodes as $node) {
     $images += _wysiwyg_imageupload_migraion_imgassist_migratenode($node);
   }
-  return t("Migration completed, overall $images images migrated");
+  return t("Migration completed, overall !images images migrated", array('!images' => $images));
 }
 
 function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {

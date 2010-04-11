@@ -50,7 +50,7 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
     $output = theme('status_messages') . drupal_render($form);
   }
   else {
-    drupal_set_message(t('Select a file to upload first'),'error');
+    drupal_set_message(t('Select an image to upload first'),'error');
     $output = theme('status_messages');
 
     $form_state = array();
