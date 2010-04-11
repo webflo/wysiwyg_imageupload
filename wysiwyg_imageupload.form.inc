@@ -91,7 +91,6 @@ function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
 function wysiwyg_imageupload_upload_form(&$form_state,$form_id) {
   $form_id = check_plain($form_id);
   jquery_ui_dialog_child_js();
-  module_invoke('admin_menu', 'suppress');
   drupal_set_title(t('Upload image'));
   $form = array();
   $form['#attributes'] = array('enctype' => "multipart/form-data");
@@ -193,7 +192,6 @@ function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floatin
   $imgpath = check_url(urldecode($_GET['imagepath']));
 
   jquery_ui_dialog_child_js();
-  module_invoke('admin_menu', 'suppress');
   drupal_set_title(t('Update image'));
 
   if (!file_exists(realpath($imgpath))) {

@@ -14,67 +14,67 @@ msgstr ""
 
 #: wysiwyg_imgupload.admin.inc:8
 msgid "Image style"
-msgstr "Gestaltung"
+msgstr "Présentation"
 
 #: wysiwyg_imgupload.admin.inc:9
 msgid "Define which CSS styles the user can chose when adding an image. Please do not define floating or size in that CSS classes, as this is handled seperately. You can give the style a descriptive name to let it handle more easily. The syntax is \"Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC..\" while imgupl_style_* is a css class"
-msgstr "Definieren Sie, welche Gestaltungsmöglichkeiten der Benutzer zur Auswahl hat. Bitte achten Sie darauf, dass Sie weder floating noch größe festlegen, die wird seperat gemacht. Die Syntax ist \"Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC..\" wähere imgupl_style_* eine CSS Klasse ist."
+msgstr "Définissez le choix de l'utilisateur de possibilités de présentation. Veuillez éviter toute définition de floating ou de taille dans les classes CSS, ceci sera traité séparément. Vous pouvez attribuer au style un nom descriptif afin de le traiter plus facilement. La sytaxe est \"Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC..\" en tenant compte que imgupl_style_* est une classe CSS."
 
 #: wysiwyg_imageupload.module:96;100;119;185
 msgid "Upload image"
-msgstr "Bild hochladen"
+msgstr "Télécharger la photo"
 
 #: wysiwyg_imageupload.module:114
 msgid "Choose an image"
-msgstr "Wählen Sie ein Bild"
+msgstr "Choisissez une photo"
 
 #: wysiwyg_imageupload.module:124
 msgid "Please wait..."
-msgstr "Bitte warten.."
+msgstr "Veullez attendre ..."
 
 #: wysiwyg_imageupload.module:177
 msgid "Select a file to upload first"
-msgstr "Wählen Sie erst ein Bild, das hochgeladen werden soll"
+msgstr "Choisissez d'abord une photo devant être télécharger"
 
 #: wysiwyg_imageupload.module:201
 msgid "Update image"
-msgstr "Bild aktualisieren"
+msgstr "Actualiser la photo"
 
 #: wysiwyg_imageupload.module:229
 msgid "Upload picture"
-msgstr "Bild hochladen"
+msgstr "Télécharger la photo"
 
 #: wysiwyg_imageupload.module:240
 msgid "Title"
-msgstr "Titel"
+msgstr "Titre"
 
 #: wysiwyg_imageupload.module:246
 msgid "Text floating"
-msgstr "Textfluss"
+msgstr "Placement du texte"
 
 #: wysiwyg_imageupload.module:248
 msgid "Below image (none)"
-msgstr "Unter dem Bild (oder kein Text)"
+msgstr "Sous la photo (ou sans texte)"
 
 #: wysiwyg_imageupload.module:249
 msgid "Text right beside image"
-msgstr "Text fließt rechts vom Bild"
+msgstr "Texte coulant à droite de la photo"
 
 #: wysiwyg_imageupload.module:250
 msgid "Text left beside image"
-msgstr "Text fließt links vom Bild"
+msgstr "Texte coulant à gauche de la photo"
 
 #: wysiwyg_imageupload.module:264
 msgid "Size"
-msgstr "Größe"
+msgstr "Taille"
 
 #: wysiwyg_imageupload.module:273
 msgid "None"
-msgstr "Keine"
+msgstr "aucun/e"
 
 #: wysiwyg_imageupload.module:276
 msgid "Style"
-msgstr "Gestaltung"
+msgstr "Présentation"
 
 #: wysiwyg_imageupload.module:321
 msgid "wysiwyg_imageupload"
@@ -87,15 +87,15 @@ msgstr ""
 #: wysiwyg_imageupload.module:41
 #: wysiwyg_imageupload.info:0
 msgid "WYSIWYG Image upload"
-msgstr "WYSIWYG Bild hochladen"
+msgstr "WYSIWYG télécharger une photo"
 
 #: wysiwyg_imageupload.module:42
 msgid "Configuration options for the WYSIWYG Image upload module"
-msgstr "Konfiguration des WYSIWYG Bild-hochlad-Modules"
+msgstr "Options de configuration du module de téléchargement de photo WYSIWYG"
 
 #: wysiwyg_imageupload.info:0
 msgid "Image upload dialog for the most WYSIWYG Editors"
-msgstr "Dialog zum Bild-hochladen für die meisten WYSIWYG Editoren"
+msgstr "Dialogue de téléchargement de photo pour la plupart des éditeurs WYSIWYG"
 
 #: wysiwyg_imageupload.info:0
 #: modules/jquery_ui_dialog/jquery_ui_dialog.info:0
@@ -112,29 +112,28 @@ msgstr "A slim API to support jquery ui dialogs in Drupal. Just provides an dire
 
 #: modules/jquery_ui_dialog/js/parent.js:0
 msgid "Loading..."
-msgstr "Lade..."
+msgstr "en train de télécharger..."
 
 #: plugins/imgupload.inc:5
 msgid "Image uploading"
-msgstr "Bild hochladen"
+msgstr "Télécharger une photo"
 
 #: plugins/imgupload.inc:8
 msgid "Insert or update an embedded image"
-msgstr "Fügen Sie ein Bild ein oder aktualisieren Sie dieses"
+msgstr "Insérez une photo ou actualisez celle-ci"
 
 #: plugins/imgupload/imgupload.js:0
 msgid "Insert"
-msgstr "Einfügen"
+msgstr "Insérer"
 
 #: plugins/imgupload/imgupload.js:0
 msgid "Please select an image to upload first"
-msgstr "Bitte wählen Sie zuvor ein Bild aus, das Sie hochladen wollen"
+msgstr "Veuillez d'abord choisir une photo que vous voulez télécharger"
 
 #: plugins/imgupload/imgupload.js:0;0
 msgid "Cancel"
-msgstr "Abbrechen"
+msgstr "Annuler"
 
 #: plugins/imgupload/imgupload.js:0
 msgid "Update"
-msgstr "Aktualisieren"
-
+msgstr "Mise-à-jour"
