@@ -69,6 +69,10 @@ function wysiwyg_imageupload_wysiwyg_include_directory($type) {
   }
 }
 
+function wysiwyg_imageupload_init() {
+  drupal_add_css(drupal_get_path('module','wysiwyg_imageupload').'/plugins/imgupload/imgupload.css');
+}
+
 /*
  * Implementation of hook_perm().
  */
