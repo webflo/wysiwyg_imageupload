@@ -34,7 +34,7 @@ function _wysiwyg_imageupload_migration_imageassist() {
     drupal_set_message(t('You nee to have img_assist activated during migration'),'warning');
     return '';
   }
-  $result = db_query('select nid from node');
+  $result = db_query('select nid from {node}');
   $nodes = array();
   while($row = db_fetch_object($result)) {
     $nodes[] = node_load($row->nid);
@@ -76,7 +76,7 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
     // in our relation
     $image_node = node_load($macro['nid']);
     if($image_node->images['_original'] == "") {
-	drupal_set_message("empty origin of image node {$image_node->nid}");
+      drupal_set_message("empty origin of image node {$image_node->nid}");
     }
     $file = wysiwyg_imageupload_get_file($image_node->images['_original']);
     $file->new = 1;

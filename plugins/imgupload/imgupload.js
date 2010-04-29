@@ -16,7 +16,6 @@
 
     /* We need this due all the special cases in the editors */
     getRepresentitiveNode: function(node) {
-
       if(node.$) {
         // This case is for the CKeditor, where
         // $(node) != $(node.$)
