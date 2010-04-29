@@ -10,7 +10,21 @@
     * Return whether the passed node belongs to this plugin.
     */
     isNode: function (node) {
-      return $(node).is('img.imgupload');
+      $node = this.getRepresentitiveNode(node);
+      return $node.is('img.imgupload');
+    },
+
+    /* We need this due all the special cases in the editors */
+    getRepresentitiveNode: function(node) {
+
+      if(node.$) {
+        // This case is for the CKeditor, where
+        // $(node) != $(node.$)
+        return $(node.$);
+      }
+      // else
+      // This would be for the TinyMCE and hopefully others
+      return $(node)
     },
 
     /**
@@ -28,8 +42,12 @@
           id: instanceId,
           action: 'insert'
         };
+        var $node = null;
+        if (data.node) {
+          $node = this.getRepresentitiveNode(data.node);
+        }
 
-        if (data.node && $(data.node).is('img.imgupload')) {
+        if ($node != null && $node.is('img') && $node.hasClass('imgupload')) {
           $n = $(data.node);
           options.floating = data.node.align;
           // Expand inline tag in alt attribute
