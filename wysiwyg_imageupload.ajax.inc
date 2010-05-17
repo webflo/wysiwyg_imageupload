@@ -79,7 +79,7 @@ function _wysiwyg_imageupload_show_image($cacheID,$preset,$title) {
   $title = check_plain($title);
   $filepath = cache_get($cacheID,'cache');
   $GLOBALS['devel_shutdown'] = FALSE;
-  $output = theme('imagecache',$preset,$filepath->data, $filepath->data,$title);
+  $output = theme('imagecache', $preset, $filepath->data, $filepath->data, $title, NULL, TRUE, FALSE);
   print $output;
   exit;
 }
