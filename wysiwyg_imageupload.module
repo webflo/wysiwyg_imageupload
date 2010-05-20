@@ -58,31 +58,6 @@ function wysiwyg_imageupload_menu() {
   return $items;
 }
 
-function wysiwyg_imageupload() {
-  return array(
-    'wysiwyg_imageupload_render_image' => array(
-      'imgage_obj',
-      'arguments' => array(),
-    ),
-  );
-}
-
-function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
-  // If the use set custom sizes
-  if($arguments['width'] != '') {
-    $width = " width='{$size['width']}'";
-  }
-  if($arguments['height'] != '') {
-    $height = " height='{$size['height']}'";
-  }
-  $inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
-  $attributes = array(
-    'class' => 'imgupload',
-  );
-  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
-  return $output;
-}
-
 /*
  * Implementing the hook_wysiwyg_include_directory().
  * This is needed to register our WYSIWYG Plugin

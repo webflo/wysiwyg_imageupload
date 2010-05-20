@@ -79,7 +79,13 @@ function wysiwyg_imageupload_schema() {
     ),
   );
 
- $schema['wysiwyg_imageupload_inline'] = array(
+  _wysiwyg_imageupload_inline_table($schema);
+
+  return $schema;
+}
+
+function _wysiwyg_imageupload_inline_table(&$schema) {
+  $schema['wysiwyg_imageupload_inline'] = array(
     'description' => 'Stores the inlnie arguments for a specific image used inline',
     'fields' => array(
       'iid' => array(
@@ -148,8 +154,6 @@ function wysiwyg_imageupload_schema() {
     'primary key' => array('iid')
 
   );
-
-  return $schema;
 }
 
 function wysiwyg_imageupload_update_6108() {
@@ -161,6 +165,8 @@ function wysiwyg_imageupload_update_6108() {
 }
 
 function wysiwyg_imageupload_update_6200() {
-
+  $schema = array();
+  _wysiwyg_imageupload_inline_table($schema);
+ return $schema;
 }
 
