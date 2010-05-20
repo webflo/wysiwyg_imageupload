@@ -86,13 +86,14 @@ function wysiwyg_imageupload_schema() {
 
 function _wysiwyg_imageupload_inline_table(&$schema) {
   $schema['wysiwyg_imageupload_inline'] = array(
-    'description' => 'Stores the inlnie arguments for a specific image used inline',
+    'description' => 'Stores the inline arguments for a specific image used inline',
     'fields' => array(
       'iid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => 'Inline-id - defines the use of one image inline',
+        'description' => 'The inline ID of the field, defined by the database.',
+        'no export' => TRUE,
       ),
       'fid' => array(
         'type' => 'int',
@@ -127,32 +128,30 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'Description of the uploaded file.',
+        'description' => 'Current selected imagecache preset',
       ),
       'style' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'Description of the uploaded file.',
+        'description' => 'Current selected style to show the image with.',
       ),
       'title' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'Description of the uploaded file.',
+        'description' => 'Image title.',
       ),
       'lightbox' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'type' => 'int',
         'not null' => TRUE,
-        'default' => '',
-        'description' => 'Description of the uploaded file.',
+        'default' => 0,
+        'description' => 'Use lightbox integration or not',
       ),
     ),
     'primary key' => array('iid')
-
   );
 }
 
@@ -165,8 +164,10 @@ function wysiwyg_imageupload_update_6108() {
 }
 
 function wysiwyg_imageupload_update_6200() {
-  $schema = array();
-  _wysiwyg_imageupload_inline_table($schema);
- return $schema;
+ $schema = array();
+ _wysiwyg_imageupload_inline_table($schema);
+ $ret = array();
+ db_create_table($ret, 'wysiwyg_imageupload_inline', $schema['wysiwyg_imageupload_inline']);
+ return $ret;
 }
 
