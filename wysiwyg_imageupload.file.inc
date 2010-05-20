@@ -132,3 +132,12 @@ function _wysiwyg_imageupload_save(&$node) {
     }
   }
 }
+
+function _wysiwyg_imageupload_load_inline($iid) {
+  $result = db_query('SELECT * FROM wysiwyg_imageupload_inline AS inl LEFT JOIN wyswiyg_imageupload AS wif on inl.fid=wif.fid AND inl.nid=wif.nid AND inl.vid=wif.vid AND inl.cid=wif.cid LEFT JOIN files AS f ON inl.fid=f.fid LIMIT 1');
+  if($result !== false) {
+          return db_fetch_object($result);
+  }
+  // else
+  return false;
+}

@@ -70,21 +70,6 @@ function wysiwyg_imageupload_schema() {
         'default' => '',
         'description' => 'Description of the uploaded file.',
       ),
-      'list' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => 'Whether the file should be visibly listed on the node: yes(1) or no(0).',
-      ),
-      'weight' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => 'Weight of this upload in relation to other uploads in this node.',
-      ),
     ),
     'primary key' => array('vid', 'cid', 'fid'),
     'indexes' => array(
@@ -92,6 +77,76 @@ function wysiwyg_imageupload_schema() {
       'nid' => array('nid'),
       'cid' => array('cid'),
     ),
+  );
+
+ $schema['wysiwyg_imageupload_inline'] = array(
+    'description' => 'Stores the inlnie arguments for a specific image used inline',
+    'fields' => array(
+      'iid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Inline-id - defines the use of one image inline',
+      ),
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {files}.fid.',
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {node}.nid associated with the uploaded file.',
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
+      ),
+      'cid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {comment}.cid associated with the uploaded file.',
+      ),
+      'imagecache' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Description of the uploaded file.',
+      ),
+      'style' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Description of the uploaded file.',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Description of the uploaded file.',
+      ),
+      'lightbox' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Description of the uploaded file.',
+      ),
+    ),
+    'primary key' => array('iid')
+
   );
 
   return $schema;
@@ -103,5 +158,9 @@ function wysiwyg_imageupload_update_6108() {
   db_query('ALTER TABLE {wysiwyg_imageupload} DROP PRIMARY KEY, ADD PRIMARY KEY ( `vid` , `fid` , `cid` )');
   _wysiwyg_imageupload_install_styles_if_missing();
   return array();
+}
+
+function wysiwyg_imageupload_update_6200() {
+
 }
 
