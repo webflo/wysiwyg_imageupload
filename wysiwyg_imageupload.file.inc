@@ -19,8 +19,8 @@ function _wysiwyg_imageupload_upload_file() {
   );
   $file = NULL;
   if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
-    foreach (module_implements('file_insert') as $module) {
-      $function =  $module .'_file_insert';
+    foreach (module_implements('wysiwyg_imageupload_image_uploaded') as $module) {
+      $function =  $module .'_wysiwyg_imageupload_image_uploaded';
       $function($file);
     }
 
@@ -134,10 +134,20 @@ function _wysiwyg_imageupload_save(&$node) {
 }
 
 function _wysiwyg_imageupload_load_inline($iid) {
-  $result = db_query('SELECT * FROM wysiwyg_imageupload_inline AS inl LEFT JOIN wyswiyg_imageupload AS wif on inl.fid=wif.fid AND inl.nid=wif.nid AND inl.vid=wif.vid AND inl.cid=wif.cid LEFT JOIN files AS f ON inl.fid=f.fid LIMIT 1');
+  $result = db_query('SELECT * FROM wysiwyg_imageupload_entity AS inl LEFT JOIN files AS f ON inl.fid=f.fid WHERE iid=%d LIMIT 1', $iid);
   if($result !== false) {
           return db_fetch_object($result);
   }
   // else
   return false;
+}
+
+function _wysiwyg_imageupload_craete_inline_entity($file,$temporary = true) {
+  $record = array(
+    'fid' => $file->fid,
+    'temporary' => $temporary,
+  );
+  drupal_write_record('wysiwyg_imageupload_entity',$record);
+
+  return $record['iid'];
 }

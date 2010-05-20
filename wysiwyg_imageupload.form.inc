@@ -1,9 +1,8 @@
 <?php
 // $Id:$
 
-# Copyright (c) 2010 Impressive.media
+# Copyright (c) 2010 KontextWork GbR
 # Author: Eugen Mayer
-
 
 
 /*
@@ -98,38 +97,62 @@ function wysiwyg_imageupload_upload_form(&$form_state,$form_id) {
     '#type' => 'fieldset',
     '#title'=> t('Upload image'),
     '#prefix' => '<div id="file_upload_group">',
-    '#suffix' => '</div>');
+    '#suffix' => '</div>'
+  );
   _wysiwyg_imageupload_form_add_uploadfields($form,$form_id);
 
   return $form;
+}
+
+function wysiwyg_imageupload_upload_form_submit($form, $state) {
+  $update = array(
+    'iid'
+  );
+  $record = array(
+    'style' => $state['values']['style'],
+    'imagecache' => $state['values']['preset'],
+    'alignment' => $state['values']['alignment'],
+    'title' => $state['values']['title'],
+    'iid' => $state['values']['iid']
+  );
+
+  drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
+  print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
+  exit();
+}
+
+function wysiwyg_imageupload_edit_form_submit($form, $state) {
+  print drupal_to_js(array('status' => TRUE, 'data' => 'fail'));
+  exit();
+  wysiwyg_imageupload_upload_form_submit($form, $state);
 }
 
 /*
  * Return the form to be presented as image details form.
  * Title, floating description and so forth
  */
-function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
+function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
   // TODO: would love to add some drupal_alter stuff here, but we will need to
   // have something similar on the javascript side.
   $form = array();
-  $form['image_upload'] = array( '#type' => 'fieldset',
+  $form['image_upload_details'] = array( '#type' => 'fieldset',
     '#title'=> t('Upload image'),
     '#prefix' => '<div id="file_upload_group">',
     '#suffix' => '</div>'
   );
-  $form['image_upload']['uploadedImage'] = array (
+  $form['image_upload_details']['uploadedImage'] = array (
     '#prefix' => '<div>',
     '#suffix' => '</div>',
     '#value' => $img
   );
-  $form['image_upload']['title'] = array(
+  $form['image_upload_details']['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#default_value' => $title,
+    '#default_value' => $defaults['title'],
     '#size' => 50
   );
 
-  $form['image_upload']['alignment'] = array(
+  $form['image_upload_details']['alignment'] = array(
     '#type' => 'select',
     '#title' => t('Image alignment'),
     '#options' => array(
@@ -137,13 +160,13 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
       'imgupl_floating_left' => t('Image on left, text on right'),
       'imgupl_floating_right' => t('Image on right, text on left')
     ),
-    '#default_value' => $defaults['floating']
+    '#default_value' => $defaults['alignment']
   );
 
-  $form['image_upload']['preset'] = array(
+  $form['image_upload_details']['preset'] = array(
     '#type' => 'select',
     '#title' => t('Size'),
-    '#default_value' => $defaults['preset'],
+    '#default_value' => $defaults['imagecache'],
     '#options' => _wysiwyg_imagegupload_allowed_presets(),
   );
 
@@ -151,13 +174,19 @@ function _wysiwyg_imageupload_details_form($title,$img,$defaults = array()){
   $styles = _wysiwyg_imageupload_get_image_styles();
   if (count($styles) > 0) { // If any.
     array_unshift($styles, t('None'));
-    $form['image_upload']['style'] = array(
+    $form['image_upload_details']['style'] = array(
       '#type' => 'select',
       '#title' => t('Style'),
       '#options' => $styles,
       '#default_value' => $defaults['style'],
     );
   }
+
+  $form['image_upload_details']['iid'] = array(
+    '#type' => 'value',
+    '#value' => $iid,
+    '#default_value' => $iid
+  );
 
   return $form;
 }
@@ -186,34 +215,26 @@ function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
 /*
  * Called when a image was selected and the details form should be shown.
  */
-function wysiwyg_imageupload_update_form(&$form_state, $title, $preset, $floating, $style) {
-  // security
-  $title = check_plain($title);
-  $imgpath = check_url(urldecode($_GET['imagepath']));
-
+function wysiwyg_imageupload_edit_form($form_id,$iid) {
   jquery_ui_dialog_child_js();
   drupal_set_title(t('Update image'));
-
-  if (!file_exists(realpath($imgpath))) {
-    drupal_set_message(t("The image does not exist (!path)",$imgpath),'error');
-    return array();
-  }
-
-  // Save the image path in the cache to get it back later
-  $cacheid = uniqid();
-  cache_set($cacheid,$_GET['imagepath'],'cache',CACHE_TEMPORARY);
-
-  $img = "<img id='uploadedImage' title=\"$title\" alt='$cacheid' height='200px;border:1px solid black;margin:auto' src='".base_path().$imgpath."'>";
-
+  $img_obj = _wysiwyg_imageupload_load_inline($iid);
   $defaults = array (
-    'filepath' => $imgpath,
-    'preset' => check_plain(urldecode($preset)),
-    'floating' => check_plain(urldecode($floating)),
-    'style' =>check_plain(urldecode($style)),
+    'filepath' => $img_obj->filepath,
+    'imagecache' => $img_obj->imagecache,
+    'alignment' => $img_obj->alignment,
+    'style' => $img_obj->style,
+    'title' => $img_obj->title,
   );
-
+  $attributes = array(
+    'class' => 'wysiwyg_imageupload_preview',
+  );
+  $img = theme('imagecache', 'wysiwyg_imageupload_preview', $defaults['filepath'], $iid, $defaults['title'], $attributes, TRUE, FALSE);
   // Create the form image detail form.
-  $form = _wysiwyg_imageupload_details_form($title,$img,$defaults);
+  $form['#cache'] = TRUE;
+  $form = _wysiwyg_imageupload_details_form($img,$iid,$defaults);
+  //$form_state = array('submitted' => false);
+  //$form = form_builder('wysiwyg_imageupload_edit_form',$form,$form_state);
 
   return $form;
 }

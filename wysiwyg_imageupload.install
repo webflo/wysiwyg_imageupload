@@ -85,7 +85,7 @@ function wysiwyg_imageupload_schema() {
 }
 
 function _wysiwyg_imageupload_inline_table(&$schema) {
-  $schema['wysiwyg_imageupload_inline'] = array(
+  $schema['wysiwyg_imageupload_entity'] = array(
     'description' => 'Stores the inline arguments for a specific image used inline',
     'fields' => array(
       'iid' => array(
@@ -123,6 +123,13 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
         'default' => 0,
         'description' => 'Primary Key: The {comment}.cid associated with the uploaded file.',
       ),
+      'temporary' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Is this file temporary.',
+      ),
       'imagecache' => array(
         'type' => 'varchar',
         'length' => 255,
@@ -144,6 +151,13 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
         'default' => '',
         'description' => 'Image title.',
       ),
+      'alignment' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Defines the alignment of the image',
+      ),
       'lightbox' => array(
         'type' => 'int',
         'not null' => TRUE,
@@ -163,11 +177,11 @@ function wysiwyg_imageupload_update_6108() {
   return array();
 }
 
-function wysiwyg_imageupload_update_6200() {
+function wysiwyg_imageupload_update_6201() {
  $schema = array();
  _wysiwyg_imageupload_inline_table($schema);
  $ret = array();
- db_create_table($ret, 'wysiwyg_imageupload_inline', $schema['wysiwyg_imageupload_inline']);
+ db_create_table($ret, 'wysiwyg_imageupload_entity', $schema['wysiwyg_imageupload_entity']);
  return $ret;
 }
 

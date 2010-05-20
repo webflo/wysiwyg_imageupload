@@ -7,6 +7,7 @@
 require_once('wysiwyg_imageupload.file.inc');
 require_once('wysiwyg_imageupload.form.inc');
 require_once('wysiwyg_imageupload.ajax.inc');
+require_once('wysiwyg_imageupload.filter.inc');
 
 /*
  * Implementes hook_menu().
@@ -20,26 +21,26 @@ function wysiwyg_imageupload_menu() {
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
-
-  $items['ajax/wysiwyg_imgupl/update/%'] = array(
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_update_form',3,4,5,6),
-    'access callback' => 'user_access',
-    'access arguments' => array('use wysiwyg image upload'),
-    'type' => MENU_CALLBACK,
-  );
-
+  // Handle upload
   $items['ajax/wysiwyg_imgupl/upload/%'] = array(
-    'page callback' => '_wysiwyg_imageupload_upload_js',
+    'page callback' => '_wysiwyg_imageupload_entity_upload_js',
     'page arguments' => array(3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
-
-  $items['ajax/wysiwyg_imgupl/showimage/%'] = array(
-    'page callback' => '_wysiwyg_imageupload_show_image',
+  // Render for WYSIWYG
+  $items['ajax/wysiwyg_imgupl/render_wysiwyg/%'] = array(
+    'page callback' => '_wysiwyg_imageupload_render_wysiwyg',
     'page arguments' => array(3,4,5),
+    'access callback' => 'user_access',
+    'access arguments' => array('use wysiwyg image upload'),
+    'type' => MENU_CALLBACK,
+  );
+  // Form for editing an image
+  $items['ajax/wysiwyg_imgupl/edit/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('wysiwyg_imageupload_edit_form',3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
@@ -183,6 +184,88 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
   }
  // else
  return array();
+}
+
+
+
+function wysiwyg_imageupload_theme() {
+  return array(
+    'wysiwyg_imageupload_render_image' => array(
+      'imgage_obj',
+      'arguments' => array(),
+    ),
+    'wysiwyg_imageupload_render_image_wysiwyg' => array(
+      'imgage_obj',
+      'arguments' => array(),
+    ),
+  );
+}
+
+function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
+  // If the use set custom sizes
+  if($arguments['width'] != '') {
+    $width = " width='{$size['width']}'";
+  }
+  if($arguments['height'] != '') {
+    $height = " height='{$size['height']}'";
+  }
+  $inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+  $attributes = array(
+    'class' => 'imgupload',
+  );
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  return $output;
+}
+
+function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = array()) {
+  // If the use set custom sizes
+  if($arguments['width'] != '') {
+    $width = " width='{$size['width']}'";
+  }
+  if($arguments['height'] != '') {
+    $height = " height='{$size['height']}'";
+  }
+  $inline_args = join('|', array($img_obj->iid));
+  $attributes = array(
+    'class' => 'imgupload',
+  );
+
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  return $output;
+}
+
+
+function wysiwyg_imageupload_imagecache_default_presets() {
+  $presets = array();
+  $presets['wysiwyg_imageupload_preview'] = array (
+  'presetname' => 'wysiwyg_imageupload_preview',
+  'actions' => array (
+    0 => array (
+      'weight' => '0',
+      'module' => 'imagecache',
+      'action' => 'imagecache_scale',
+      'data' => array (
+        'height' => '150',
+        'width' => '250',
+        'upscale' => 1,
+      ),
+    ),
+  ));
+  $presets['wysiwyg_imageupload_browser_preview'] = array (
+  'presetname' => 'wysiwyg_imageupload_browser_preview',
+  'actions' => array (
+    0 => array (
+      'weight' => '0',
+      'module' => 'imagecache',
+      'action' => 'imagecache_scale_and_crop',
+      'data' => array (
+        'width' => '50',
+        'height' => '50',
+        'upscale' => 1,
+      ),
+    ),
+  ));
+  return $presets;
 }
 
 /*
