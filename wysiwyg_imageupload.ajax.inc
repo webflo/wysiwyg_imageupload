@@ -76,6 +76,9 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
   exit;
 }
 
+/**
+ * Ajax callback to render a image for the wysiwyg editor
+ */
 function _wysiwyg_imageupload_render_wysiwyg($iid) {
   $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
 
@@ -84,6 +87,9 @@ function _wysiwyg_imageupload_render_wysiwyg($iid) {
   exit();
 }
 
+/**
+ * Ajax callback to render some images for the wysiwyg editor
+ */
 function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id) {
   $iids = split(',',$iids);
   $output = array();
@@ -95,6 +101,9 @@ function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id
   exit();
 }
 
+/**
+ * Helper to convert a inline-image into a backend tag
+ */
 function _wysiwyg_imageupload_render_backend($iid,$arguments = "") {
   $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
   return "[[wysiwyg_imageupload:$iid:$arguments]]";

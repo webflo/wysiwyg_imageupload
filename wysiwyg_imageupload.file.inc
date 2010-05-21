@@ -171,6 +171,9 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
 
 }
 
+/*
+ * Updates or revision table for inline images and adds a new revision
+ */
 function _wysiwyg_imageupload_create_revision($iid,$vid) {
     $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));
 
@@ -187,6 +190,9 @@ function _wysiwyg_imageupload_create_revision($iid,$vid) {
     return true;
 }
 
+/*
+ * Loads the inline-image object with all its details
+ */
 function _wysiwyg_imageupload_load_inline_entity($iid) {
   $result = db_query('SELECT * FROM wysiwyg_imageupload_entity AS inl LEFT JOIN files AS f ON inl.fid=f.fid WHERE iid=%d LIMIT 1', $iid);
   if($result !== false) {
@@ -196,6 +202,9 @@ function _wysiwyg_imageupload_load_inline_entity($iid) {
   return false;
 }
 
+/*
+ * Create a basic / dummy inline-image entity which will be filled later
+ */
 function _wysiwyg_imageupload_craete_inline_entity($file,$temporary = true) {
   $record = array(
     'fid' => $file->fid,

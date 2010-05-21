@@ -80,6 +80,9 @@ function wysiwyg_imageupload_wysiwyg_include_directory($type) {
   }
 }
 
+/*
+ * Adding general styles like floating and default style
+ */
 function wysiwyg_imageupload_init() {
   drupal_add_css(drupal_get_path('module','wysiwyg_imageupload').'/plugins/imgupload/imgupload.css');
 }
@@ -93,8 +96,6 @@ function wysiwyg_imageupload_perm() {
 
 /*
  * Implementation of hook_nodeapi().
- *
- * Shared with the upload module
  */
 function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
   switch ($op) {
@@ -199,6 +200,11 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
  return array();
 }
 
+/*
+ * Implementation of hook_theme
+ * wysiwyg_imageupload_render_image: renders the image for the node view
+ * wysiwyg_imageupload_render_image_wysiwyg: renders the view for the wysiwyg editor. DONT CHANGE THIS
+ */
 function wysiwyg_imageupload_theme() {
   return array(
     'wysiwyg_imageupload_render_image' => array(
@@ -211,7 +217,9 @@ function wysiwyg_imageupload_theme() {
     ),
   );
 }
-
+/*
+ * wysiwyg_imageupload_render_image: renders the image for the node view
+ */
 function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   // If the use set custom sizes
   if($arguments['width'] != '') {
@@ -230,6 +238,9 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   return $output;
 }
 
+/*
+ * wysiwyg_imageupload_render_image_wysiwyg: renders the view for the wysiwyg editor. DONT CHANGE THIS
+ */
 function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = array()) {
   // If the use set custom sizes
   if($arguments['width'] != '') {
@@ -247,7 +258,9 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
   return $output;
 }
 
-
+/*
+ *  Those presets are needed for the browser and the details form
+ */
 function wysiwyg_imageupload_imagecache_default_presets() {
   $presets = array();
   $presets['wysiwyg_imageupload_preview'] = array (
@@ -303,6 +316,9 @@ function _wysiwyg_imagegupload_allowed_presets() {
   return $presets_whitelist;
 }
 
+/*
+ * Checks if the current node has revisioning activated
+ */
 function _wysiwyg_imagegupload_revisions_activated($type) {
   // Is this content even in moderatation?
   $var = variable_get( "node_options_$type", array(0));

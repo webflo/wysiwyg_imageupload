@@ -57,6 +57,9 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   }
 }
 
+/*
+ * Inlcude all js libs and css we need for the form
+ */
 function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
   drupal_add_js('misc/jquery.form.js');
 
@@ -120,6 +123,11 @@ function wysiwyg_imageupload_upload_form(&$form_state,$form_id) {
   return $form;
 }
 
+/*
+ * Handles the submit of the details form, which has been injected
+ * into the upload form before.
+ * Adds the details into the database for the inline-id
+ */
 function wysiwyg_imageupload_upload_form_submit($form, $state) {
   $update = array(
     'iid'
@@ -137,6 +145,9 @@ function wysiwyg_imageupload_upload_form_submit($form, $state) {
   exit();
 }
 
+/*
+ * Handles edits on inline-images
+ */
 function wysiwyg_imageupload_edit_form_submit($form, $state) {
   // create a new inline entity with the same file if we are actually
   if($_POST['revisions'] == 1) {

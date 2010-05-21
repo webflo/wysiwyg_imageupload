@@ -148,7 +148,7 @@ function wysiwyg_imageupload_update_6108() {
   return array();
 }
 
-function wysiwyg_imageupload_update_6206() {
+function wysiwyg_imageupload_update_6200() {
   $schema = array();
   _wysiwyg_imageupload_inline_table($schema);
   $ret = array();
