@@ -122,8 +122,6 @@ function wysiwyg_imageupload_upload_form_submit($form, $state) {
 }
 
 function wysiwyg_imageupload_edit_form_submit($form, $state) {
-  print drupal_to_js(array('status' => TRUE, 'data' => 'fail'));
-  exit();
   wysiwyg_imageupload_upload_form_submit($form, $state);
 }
 
@@ -215,7 +213,8 @@ function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
 /*
  * Called when a image was selected and the details form should be shown.
  */
-function wysiwyg_imageupload_edit_form($form_id,$iid) {
+function wysiwyg_imageupload_edit_form($form_state,$iid) {
+
   jquery_ui_dialog_child_js();
   drupal_set_title(t('Update image'));
   $img_obj = _wysiwyg_imageupload_load_inline($iid);
@@ -232,9 +231,10 @@ function wysiwyg_imageupload_edit_form($form_id,$iid) {
   $img = theme('imagecache', 'wysiwyg_imageupload_preview', $defaults['filepath'], $iid, $defaults['title'], $attributes, TRUE, FALSE);
   // Create the form image detail form.
   $form['#cache'] = TRUE;
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
   $form = _wysiwyg_imageupload_details_form($img,$iid,$defaults);
-  //$form_state = array('submitted' => false);
-  //$form = form_builder('wysiwyg_imageupload_edit_form',$form,$form_state);
-
+  if(is_array($form_state['post']) && count($form_state['post']) > 0) {
+    $form['#post'] = $_POST;
+  }
   return $form;
 }

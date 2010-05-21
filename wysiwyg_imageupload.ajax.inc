@@ -23,36 +23,23 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
   // The will need to be made persistend on form submit in the hook_comment or hook_nodeapi
   $imgDetails = _wysiwyg_imageupload_upload_file();
 
-  // remove all status messages
-  //drupal_get_messages('status',true);
   if ($imgDetails->filepath != "") {
+    // save the fid as used inline and generate a iid (inline id)
+    $iid = _wysiwyg_imageupload_craete_inline_entity($imgDetails,true);
+    // we store the iid in the file object, so we can use it on submit of the node form
+    // to update the inline-entry to be static and not temporary
+    $imgDetails->iid = $iid;
     $cached_files[$imgDetails->fid] = $imgDetails;
     cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_TEMPORARY );
 
-    // We save the filepath in our cache, so we dont need to pass it later as a GET variable.
-    // (when we let the html object generate using ajax).
-    $cacheid = uniqid();
-    cache_set($cacheid , $imgDetails->filepath, 'cache',CACHE_TEMPORARY );
-
-
-    // This is our thumbnail. It also saves the cacheid in alt. We will inject this into the details form.
-    // TODO: maybe really generate a small thumbnail and not reuse / resize the original using the browser.
-    $iid = _wysiwyg_imageupload_craete_inline_entity($imgDetails,true);
-
-    // Save the main form in the cache, adding the file.
-    // No errors, so lets replace the upload widget with the image details
     $title = $imgDetails->filename;
-
     $attributes = array(
       'class' => 'wysiwyg_imageupload_preview',
     );
 
     $img = theme('imagecache', 'wysiwyg_imageupload_preview', $imgDetails->filepath, $iid, $title, $attributes, TRUE, FALSE);
 
-    // Create the form image detail form.
-
-
-    // load the old upload form, so we can extend it
+    // load the old upload form, so we can extend it with the new fields
     $cached_form_state = array();
     $form = form_get_cache($_POST['form_build_id'], $cached_form_state);
 
@@ -61,7 +48,7 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
     $form += $details;
     form_set_cache($_POST['form_build_id'], $form, $cached_form_state );
 
-    // Render the form for output.
+    // Render the new partial form for output.
     $form_state = array('submitted' => FALSE);
     $form = array(
       '#post' => $_POST,
@@ -90,10 +77,20 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
 }
 
 function _wysiwyg_imageupload_render_wysiwyg($iid) {
-
   $image_obj = _wysiwyg_imageupload_load_inline($iid);
 
   $output = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
+  print drupal_to_js(array('status' => TRUE, 'data' => $output));
+  exit();
+}
+
+function _wysiwyg_imageupload_render_wysiwyg_images($iids) {
+  $iids = split(',',$iids);
+  $output = array();
+  foreach($iids as $iid) {
+    $image_obj = _wysiwyg_imageupload_load_inline($iid);
+    $output[$iid] = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
+  }
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
   exit();
 }

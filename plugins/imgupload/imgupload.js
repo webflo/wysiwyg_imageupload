@@ -11,7 +11,7 @@
     */
     isNode: function (node) {
       $node = this.getRepresentitiveNode(node);
-      return $node.is('img.imgupload');
+      return $node.is('img.wysiwyg_imageupload');
     },
 
     /* We need this due all the special cases in the editors */
@@ -41,7 +41,7 @@
           $node = this.getRepresentitiveNode(data.node);
         }
 
-        if ($node != null && $node.is('img') && $node.hasClass('imgupload')) {
+        if ($node != null && $node.is('img') && $node.hasClass('wysiwyg_imageupload')) {
           $n = $(data.node);
           options.iid = decodeURIComponent(data.node.getAttribute('alt'));
           options.action = 'update';
@@ -118,6 +118,7 @@
         $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').ajaxSubmit({
           dataType : 'json',
           method: 'post',
+          data: { submit: 'submit', op: 'Save' },
           async: false,
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;
@@ -149,17 +150,7 @@
     * Fetches the imagecache preset representitive and insert it all th way down into the current editor
     */
     createImageInContent: function (iid,editor_id) {
-      var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/render_wysiwyg/' + iid;
-
-      $.get(
-          aurl,
-          null,
-          function (data, status) {
-            img = $(data.data).imguploadOuterHTML();
-            Drupal.wysiwyg.plugins.imgupload.insertIntoEditor(img,editor_id);
-          },
-          'json'
-      );
+      Drupal.wysiwyg.plugins.imgupload.insertIntoEditor(this.get_rendered_wysiwyg_image(iid),editor_id);
     },
 
     /*
@@ -169,6 +160,84 @@
     insertIntoEditor: function (data, editor_id) {
       // This is all the magic
       Drupal.wysiwyg.instances[editor_id].insert(data);
+    },
+
+    attach: function(content, pluginSettings, id) {
+      var plugin = this;
+      var iids = [];
+      content = content.replace(/\[\[wysiwyg_imageupload:([^:]*?):([^\]]*?)\]\]/g, function(orig, match) {
+        iids.push(match);
+        return orig;
+      });
+
+      if (iids.length === 0) {
+        return content;
+      }
+
+      iids = plugin.uniqueArray(iids);
+      var images = plugin.get_rendered_wysiwyg_images(iids);
+
+      content = content.replace(
+        /\[\[wysiwyg_imageupload:([^:]*?):([^\]]*?)\]\]/g,
+        function(orig, iid) {
+          return images[iid];
+        }
+      );
+      return content;
+    },
+
+    detach: function (content, pluginSettings, id)  {
+      var plugin = this;
+      content = '<div>'+content+'</div>';
+      $content = $(content);
+      $content.find('img.wysiwyg_imageupload').map(
+        function(i, img) {
+          var inlineTag = $(img).attr('alt');
+          $(img, $content).replaceWith('[[wysiwyg_imageupload:'+inlineTag+':]]');
+        }
+      );
+      content = $content.html();
+      $content.remove();
+      return content;
+    },
+
+    get_rendered_wysiwyg_image: function(iid) {
+       result = '';
+       $.ajax( {
+          url: Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/render_wysiwyg/' + iid,
+          async: false,
+          success: function (data, status) {
+            result = $(data.data).imguploadOuterHTML();
+          },
+          dataType: 'json'
+        }
+      );
+      return result;
+    },
+
+    get_rendered_wysiwyg_images: function(iids) {
+      result = [];
+      $.ajax( {
+          url: Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/render_wysiwyg_images/' + iids.join(','),
+          async: false,
+          success: function (data, status) {
+            result = data.data;
+          },
+          dataType: 'json'
+        }
+      );
+      return result;
+    },
+    uniqueArray: function (a) {
+      var r = new Array();
+      o: for (var i = 0, n = a.length; i < n; i++) {
+          for (var x = 0, y = r.length; x < y; x++) {
+              if (r[x] == a[i])
+                  continue o;
+          }
+          r[r.length] = a[i];
+      }
+      return r;
     },
   };
 })(jQuery);

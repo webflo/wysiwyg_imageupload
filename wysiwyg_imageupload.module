@@ -29,9 +29,19 @@ function wysiwyg_imageupload_menu() {
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
+
   // Render for WYSIWYG
   $items['ajax/wysiwyg_imgupl/render_wysiwyg/%'] = array(
     'page callback' => '_wysiwyg_imageupload_render_wysiwyg',
+    'page arguments' => array(3,4,5),
+    'access callback' => 'user_access',
+    'access arguments' => array('use wysiwyg image upload'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // return multiple rendered images
+  $items['ajax/wysiwyg_imgupl/render_wysiwyg_images/%'] = array(
+    'page callback' => '_wysiwyg_imageupload_render_wysiwyg_images',
     'page arguments' => array(3,4,5),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
@@ -211,7 +221,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   }
   $inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
   $attributes = array(
-    'class' => 'imgupload',
+    'class' => 'wysiwyg_imageupload',
   );
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
   return $output;
@@ -227,7 +237,7 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
   }
   $inline_args = join('|', array($img_obj->iid));
   $attributes = array(
-    'class' => 'imgupload',
+    'class' => 'wysiwyg_imageupload',
   );
 
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
