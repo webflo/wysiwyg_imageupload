@@ -32,48 +32,7 @@ function _wysiwyg_imageupload_install_styles_if_missing() {
  * Implementation of hook_schema().
  */
 function wysiwyg_imageupload_schema() {
-  $schema['wysiwyg_imageupload'] = array(
-    'description' => 'Stores the relation between uploaded images (files) and their parent nodes.',
-    'fields' => array(
-      'fid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {files}.fid.',
-      ),
-      'nid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The {node}.nid associated with the uploaded file.',
-      ),
-      'cid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {comment}.cid associated with the uploaded file.',
-      ),
-      'description' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'Description of the uploaded file.',
-      ),
-    ),
-    'primary key' => array('vid', 'cid', 'fid'),
-    'indexes' => array(
-      'fid' => array('fid'),
-      'nid' => array('nid'),
-      'cid' => array('cid'),
-    ),
-  );
-
   _wysiwyg_imageupload_inline_table($schema);
-
   return $schema;
 }
 

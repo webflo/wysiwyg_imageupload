@@ -304,7 +304,6 @@ function _wysiwyg_imagegupload_allowed_presets() {
 function _wysiwyg_imagegupload_revisions_activated($type) {
   // Is this content even in moderatation?
   $var = variable_get( "node_options_$type", array(0));
-  dsm($var);
   if( array_search('revision',$var) ) {
     return 1;
   }

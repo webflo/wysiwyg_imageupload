@@ -126,7 +126,6 @@ function _wysiwyg_imageupload_save(&$node) {
 
     // Its a node
     // Create a new revision, or associate a new file needed.
-    dsm($node);
     $data = array(
       'nid' => $node->nid,
       'cid' => 0,
