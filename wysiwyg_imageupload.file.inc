@@ -171,8 +171,6 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
 
 }
 
-
-
 function _wysiwyg_imageupload_create_revision($iid,$vid) {
     $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));
 

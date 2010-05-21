@@ -220,10 +220,12 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   if($arguments['height'] != '') {
     $height = " height='{$size['height']}'";
   }
-  $inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+  //$inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+  $inline_args = $img_obj->iid;
   $attributes = array(
     'class' => 'wysiwyg_imageupload',
   );
+
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
   return $output;
 }

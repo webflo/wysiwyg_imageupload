@@ -94,3 +94,8 @@ function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
   exit();
 }
+
+function _wysiwyg_imageupload_render_backend($iid,$arguments = "") {
+  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+  return "[[wysiwyg_imageupload:$iid:$arguments]]";
+}
