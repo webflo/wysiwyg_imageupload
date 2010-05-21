@@ -1,0 +1,7 @@
+name = Wysiwyg imageupload - Migrates WYSIWYG imageupload 1-x t 2.x
+dependencies[] = wysiwyg_imageupload
+dependencies[] = wysiwyg_imageupload_migration
+package = Drupal Wiki
+version = "6.x-1.0"
+core = "6.x"
+project = "wysiwyg_imageupload_migrate_1_2"

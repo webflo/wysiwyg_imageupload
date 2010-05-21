@@ -11,7 +11,7 @@ function wysiwyg_imageupload_admin_settings() {
   $form['wysiwyg_imageupload_imgstyles'] = array(
     '#type' => 'textfield',
     '#title' => t('Image style'),
-    '#description' => t('Define which CSS styles the user can chose when adding an image. Please do not define floating or size in that CSS classes, as this is handled seperately. Your calls must have the name "imgupl_style_*". You can give the style a descriptive name to let it handle more easily. The syntax is "Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC.." while imgupl_style_* is a css class'),
+    '#description' => t('Define which CSS styles the user can chose when adding an image. Please do not define floating or size in that CSS classes, as this is handled seperately. You can give the style a descriptive name to make it easier to handle. The syntax is "Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC.." while imgupl_style_* is a css class'),
     '#default_value' => variable_get('wysiwyg_imageupload_imgstyles', '')
   );
 
@@ -19,12 +19,12 @@ function wysiwyg_imageupload_admin_settings() {
   $styles = array();
   foreach ($presets as $preset) {
     // We can use the presetid here (http://drupal.org/node/694188).
-    $styles[$preset['presetname']] = t($preset['presetname']);
+    $styles[$preset['presetname']] = t("!preset", array('!preset' => $preset['presetname']));
   }
 
   $form['wysiwyg_imageupload_allow_presets'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Allowed preset'),
+    '#title' => t('Allowed presets'),
     '#description' => t('Only the selected presets are allowed to be chosen in the dialog')
   );
 

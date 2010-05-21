@@ -1,3 +1,4 @@
+; $Id:$
 name = WYSIWYG Image upload
 description = Image upload dialog for the most WYSIWYG Editors
 dependencies[] = wysiwyg

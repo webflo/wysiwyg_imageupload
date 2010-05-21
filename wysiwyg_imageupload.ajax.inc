@@ -8,7 +8,7 @@
  * Called through ajax(AHAH), uploading an image and replacing
  * the upload form with an image-details form, if successfully uploaded.
  */
-function _wysiwyg_imageupload_upload_js($node_form_build_id) {
+function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
   // Load the cache which includes the currently allready uploaded files.
   $cached_files = cache_get('wysiwyg_imageupload_'.$node_form_build_id);
 
@@ -23,62 +23,88 @@ function _wysiwyg_imageupload_upload_js($node_form_build_id) {
   // The will need to be made persistend on form submit in the hook_comment or hook_nodeapi
   $imgDetails = _wysiwyg_imageupload_upload_file();
 
-  // remove all status messages
-  //drupal_get_messages('status',true);
-  if($imgDetails->filepath != "") {
-    $cached_files[$imgDetails->fid] = $imgDetails;
+  if ($imgDetails->filepath != "") {
+    // save the fid as used inline and generate a iid (inline id)
+    $iid = _wysiwyg_imageupload_craete_inline_entity($imgDetails,true);
+    // we store the iid in the file object, so we can use it on submit of the node form
+    // to update the inline-entry to be static and not temporary
+    $imgDetails->iid = $iid;
+    $cached_files[$iid] = $imgDetails;
     cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_TEMPORARY );
 
-    // We save the filepath in our cache, so we dont need to pass it later as a GET variable.
-    // (when we let the html object generate using ajax).
-    $cacheid = uniqid();
-    cache_set($cacheid , $imgDetails->filepath, 'cache',CACHE_TEMPORARY );
-
-    // Save the main form in the cache, adding the file.
-    // No errors, so lets replace the upload widget with the image details
     $title = $imgDetails->filename;
+    $attributes = array(
+      'class' => 'wysiwyg_imageupload_preview',
+    );
 
-    // This is our thumbnail. It also saves the cacheid in alt. We will inject this into the details form.
-    // TODO: maybe really generate a small thumbnail and not reuse / resize the original using the browser.
-    $img = "<img id='uploadedImage' title='$title' alt='$cacheid' height='200px;border:1px solid black;margin:auto' src='". base_path() . $imgDetails->filepath ."'>";
+    $img = theme('imagecache', 'wysiwyg_imageupload_preview', $imgDetails->filepath, $iid, $title, $attributes, TRUE, FALSE);
 
-    // Create the form image detail form.
-    $form = array();
-    $form_state = array();
-    $form = _wysiwyg_imageupload_details_form($title,$img);
-    $form = form_builder('wysiwyg_imageupload_detailsform', $form, $form_state);
-    $output = theme('status_messages').drupal_render($form);
+    // load the old upload form, so we can extend it with the new fields
+    $cached_form_state = array();
+    $form = form_get_cache($_POST['form_build_id'], $cached_form_state);
+
+    // add our details form.
+    $details = _wysiwyg_imageupload_details_form($img,$iid,array('title' => $title));
+    $form += $details;
+    form_set_cache($_POST['form_build_id'], $form, $cached_form_state );
+
+    // Render the new partial form for output.
+    $form_state = array('submitted' => FALSE);
+    $form = array(
+      '#post' => $_POST,
+      '#programmed' => FALSE,
+      '#tree' => FALSE,
+      '#parents' => array(),
+    );
+
+    $form += $details;
+    $form = form_builder('wysiwyg_imageupload_details_form', $form, $form_state);
+    $output = theme('status_messages') . drupal_render($form);
   }
   else {
-    drupal_set_message(t('Select a file to upload first'),'error');
-    $output = theme('status_messages');
+    drupal_set_message(t('Invalid image (size?). Please select a proper image.'),'error');
+    $output = theme('status_messages','error');
 
     $form_state = array();
     $form = array();
-    $form['image_upload'] = array( '#type' => 'fieldset',
-      '#title'=> t('Upload image'),
-      '#prefix' => '<div id="file_upload_group">',
-      '#suffix' => '</div>');
     _wysiwyg_imageupload_form_add_uploadfields($form,$node_form_build_id);
     $form = form_builder('wysiwyg_imageupload_upload', $form, $form_state);
-    $output .= $output.drupal_render($form);
+    $output = $output . drupal_render($form);
   }
   // As this is an AHAH callback, lets convert to JSON and return.
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
   exit;
 }
 
-/*
- * Ajax callback.
- * Using the cacheID to determine the filepath and returns a html image object.
- * Renders the image using imagecache.
+/**
+ * Ajax callback to render a image for the wysiwyg editor
  */
-function _wysiwyg_imageupload_show_image($cacheID,$preset,$title) {
-  $preset = check_plain($preset);
-  $title = check_plain($title);
-  $filepath = cache_get($cacheID,'cache');
-  $GLOBALS['devel_shutdown'] = FALSE;
-  $output = theme('imagecache',$preset,$filepath->data, $filepath->data,$title);
-  print $output;
-  exit;
+function _wysiwyg_imageupload_render_wysiwyg($iid) {
+  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+
+  $output = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
+  print drupal_to_js(array('status' => TRUE, 'data' => $output));
+  exit();
+}
+
+/**
+ * Ajax callback to render some images for the wysiwyg editor
+ */
+function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id) {
+  $iids = split(',',$iids);
+  $output = array();
+  foreach($iids as $iid) {
+    $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+    $output[$iid] = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
+  }
+  print drupal_to_js(array('status' => TRUE, 'data' => $output));
+  exit();
+}
+
+/**
+ * Helper to convert a inline-image into a backend tag
+ */
+function _wysiwyg_imageupload_render_backend($iid,$arguments = "") {
+  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+  return "[[wysiwyg_imageupload:$iid:$arguments]]";
 }

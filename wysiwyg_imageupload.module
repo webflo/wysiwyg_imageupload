@@ -7,9 +7,10 @@
 require_once('wysiwyg_imageupload.file.inc');
 require_once('wysiwyg_imageupload.form.inc');
 require_once('wysiwyg_imageupload.ajax.inc');
+require_once('wysiwyg_imageupload.filter.inc');
 
 /*
- * Implementes hook_menu
+ * Implementes hook_menu().
  */
 function wysiwyg_imageupload_menu() {
   $items = array();
@@ -20,26 +21,36 @@ function wysiwyg_imageupload_menu() {
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
-
-  $items['ajax/wysiwyg_imgupl/update/%'] = array(
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_update_form',3,4,5,6),
-    'access callback' => 'user_access',
-    'access arguments' => array('use wysiwyg image upload'),
-    'type' => MENU_CALLBACK,
-  );
-
+  // Handle upload
   $items['ajax/wysiwyg_imgupl/upload/%'] = array(
-    'page callback' => '_wysiwyg_imageupload_upload_js',
+    'page callback' => '_wysiwyg_imageupload_entity_upload_js',
     'page arguments' => array(3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
 
-  $items['ajax/wysiwyg_imgupl/showimage/%'] = array(
-    'page callback' => '_wysiwyg_imageupload_show_image',
+  // Render for WYSIWYG
+  $items['ajax/wysiwyg_imgupl/render_wysiwyg/%'] = array(
+    'page callback' => '_wysiwyg_imageupload_render_wysiwyg',
+    'page arguments' => array(3),
+    'access callback' => 'user_access',
+    'access arguments' => array('use wysiwyg image upload'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // return multiple rendered images
+  $items['ajax/wysiwyg_imgupl/render_wysiwyg_images/%'] = array(
+    'page callback' => '_wysiwyg_imageupload_render_wysiwyg_images',
     'page arguments' => array(3,4,5),
+    'access callback' => 'user_access',
+    'access arguments' => array('use wysiwyg image upload'),
+    'type' => MENU_CALLBACK,
+  );
+  // Form for editing an image
+  $items['ajax/wysiwyg_imgupl/edit/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('wysiwyg_imageupload_edit_form',3,4,5),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
@@ -59,7 +70,7 @@ function wysiwyg_imageupload_menu() {
 }
 
 /*
- * Implementing the hook_wysiwyg_include_directory
+ * Implementing the hook_wysiwyg_include_directory().
  * This is needed to register our WYSIWYG Plugin
  */
 function wysiwyg_imageupload_wysiwyg_include_directory($type) {
@@ -70,24 +81,21 @@ function wysiwyg_imageupload_wysiwyg_include_directory($type) {
 }
 
 /*
- * Implementation of hook_perm
+ * Adding general styles like floating and default style
+ */
+function wysiwyg_imageupload_init() {
+  drupal_add_css(drupal_get_path('module','wysiwyg_imageupload').'/plugins/imgupload/imgupload.css');
+}
+
+/*
+ * Implementation of hook_perm().
  */
 function wysiwyg_imageupload_perm() {
   return array('use wysiwyg image upload');
 }
 
 /*
- * implementation of hook_init
- */
-function wysiwyg_imageupload_init() {
-  $m = drupal_get_path('module', 'wysiwyg_imageupload');
-  drupal_add_css($m.'/plugins/imgupload/wysiwyg_imageupload_dialog.css');
-}
-
-/*
  * Implementation of hook_nodeapi().
- *
- * Shared with the upload module
  */
 function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
   switch ($op) {
@@ -101,6 +109,9 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
         _wysiwyg_imageupload_save($node);
       }
       break;
+    case 'delete':
+      _wysiwyg_imageupload_handle_node_delete($node->nid);
+     break;
   }
 }
 
@@ -127,10 +138,10 @@ function _wysiwyg_imageupload_get_image_styles() {
   // Must have the format: Descriptive=css_style,Descriptive2=css_style2..
   $settings = variable_get('wysiwyg_imageupload_imgstyles', '');
   $styles = array();
-  if($settings != '') {
-    foreach(explode(',',$settings) as $style) {
+  if ($settings != '') {
+    foreach (explode(',', $settings) as $style) {
       $style = explode('=',$style);
-      $styles[$style[1]] = t($style[0]);
+      $styles[$style[1]] = t("!style",array('!style' => $style[0]));
     }
   }
   drupal_alter('wysiwyg_imageupload_image_styles', $styles);
@@ -168,25 +179,119 @@ function wysiwyg_imageupload_load_file($fid) {
  * @uid: Only images uploaded by that user are returned
  */
 function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
- if($limit != NULL) {
-  $limit = " LIMIT $limit";
- }
- if($uid != NULL) {
-  $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {wysiwyg_imageupload} as w INNER JOIN {files} AS f on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
- }
- else {
-  $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
- }
+  if ($limit != NULL) {
+    $limit = " LIMIT $limit";
+  }
+  if ($uid != NULL) {
+    $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
+  }
+  else {
+    $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
+  }
 
- if($result != false) {
-   $images = array();
-   while($row = db_fetch_array($result)) {
-    $images[] = $row;
-   };
-   return $images;
- }
+  if ($result != FALSE) {
+    $images = array();
+    while ($row = db_fetch_array($result)) {
+      $images[] = $row;
+    };
+    return $images;
+  }
  // else
  return array();
+}
+
+/*
+ * Implementation of hook_theme
+ * wysiwyg_imageupload_render_image: renders the image for the node view
+ * wysiwyg_imageupload_render_image_wysiwyg: renders the view for the wysiwyg editor. DONT CHANGE THIS
+ */
+function wysiwyg_imageupload_theme() {
+  return array(
+    'wysiwyg_imageupload_render_image' => array(
+      'imgage_obj',
+      'arguments' => array(),
+    ),
+    'wysiwyg_imageupload_render_image_wysiwyg' => array(
+      'imgage_obj',
+      'arguments' => array(),
+    ),
+  );
+}
+/*
+ * wysiwyg_imageupload_render_image: renders the image for the node view
+ */
+function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
+  // If the use set custom sizes
+  if($arguments['width'] != '') {
+    $width = " width='{$size['width']}'";
+  }
+  if($arguments['height'] != '') {
+    $height = " height='{$size['height']}'";
+  }
+  //$inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+  $inline_args = $img_obj->iid;
+  $attributes = array(
+    'class' => 'wysiwyg_imageupload',
+  );
+
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  return $output;
+}
+
+/*
+ * wysiwyg_imageupload_render_image_wysiwyg: renders the view for the wysiwyg editor. DONT CHANGE THIS
+ */
+function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = array()) {
+  // If the use set custom sizes
+  if($arguments['width'] != '') {
+    $width = " width='{$size['width']}'";
+  }
+  if($arguments['height'] != '') {
+    $height = " height='{$size['height']}'";
+  }
+  $inline_args = join('|', array($img_obj->iid));
+  $attributes = array(
+    'class' => 'wysiwyg_imageupload',
+  );
+
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  return $output;
+}
+
+/*
+ *  Those presets are needed for the browser and the details form
+ */
+function wysiwyg_imageupload_imagecache_default_presets() {
+  $presets = array();
+  $presets['wysiwyg_imageupload_preview'] = array (
+  'presetname' => 'wysiwyg_imageupload_preview',
+  'actions' => array (
+    0 => array (
+      'weight' => '0',
+      'module' => 'imagecache',
+      'action' => 'imagecache_scale',
+      'data' => array (
+        'height' => '150',
+        'width' => '250',
+        'upscale' => 1,
+      ),
+    ),
+  ));
+  $presets['wysiwyg_imageupload_browser_preview'] = array (
+  'presetname' => 'wysiwyg_imageupload_browser_preview',
+  'actions' => array (
+    0 => array (
+      'weight' => '0',
+      'module' => 'imagecache',
+      'action' => 'imagecache_scale_and_crop',
+      'data' => array (
+        'width' => '50',
+        'height' => '50',
+        'upscale' => 1,
+      ),
+    ),
+  ));
+  return $presets;
 }
 
 /*
@@ -197,11 +302,11 @@ function _wysiwyg_imagegupload_allowed_presets() {
   $presets = imagecache_presets();
   foreach ($presets as $preset) {
     // We cant use the presetid here (http://drupal.org/node/694188).
-    $defaults[$preset['presetname']] = t($preset['presetname']);
+    $defaults[$preset['presetname']] = t("!preset",array('!preset' =>$preset['presetname']));
   }
   $presets_whitelist = variable_get('wysiwyg_imageupload_presets_whitelist', $defaults);
   // Get all disabled keys (value === 0).
-  $disabled_presets = array_keys($presets_whitelist,0, true);
+  $disabled_presets = array_keys($presets_whitelist,0, TRUE);
 
   // Remove those keys from the result.
   foreach($disabled_presets as $value) {
@@ -209,6 +314,19 @@ function _wysiwyg_imagegupload_allowed_presets() {
   }
 
   return $presets_whitelist;
+}
+
+/*
+ * Checks if the current node has revisioning activated
+ */
+function _wysiwyg_imagegupload_revisions_activated($type) {
+  // Is this content even in moderatation?
+  $var = variable_get( "node_options_$type", array(0));
+  if( array_search('revision',$var) ) {
+    return 1;
+  }
+  //else
+  return 0;
 }
 
 /**

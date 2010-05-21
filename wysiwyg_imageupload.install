@@ -23,8 +23,8 @@ function wysiwyg_imageupload_uninstall() {
 }
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
-  $value = variable_get('wysiwyg_imageupload_imgstyles',false);
-  if($value !== false) {
+  $value = variable_get('wysiwyg_imageupload_imgstyles',FALSE);
+  if ($value !== FALSE) {
     variable_set('wysiwyg_imageupload_imgstyles','s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
   }
 }
@@ -32,9 +32,21 @@ function _wysiwyg_imageupload_install_styles_if_missing() {
  * Implementation of hook_schema().
  */
 function wysiwyg_imageupload_schema() {
-  $schema['wysiwyg_imageupload'] = array(
-    'description' => 'Stores the relation between uploaded images (files) and their parent nodes.',
+  _wysiwyg_imageupload_inline_table($schema);
+  return $schema;
+}
+
+function _wysiwyg_imageupload_inline_table(&$schema) {
+  $schema['wysiwyg_imageupload_entity'] = array(
+    'description' => 'Stores the inline arguments for a specific image used inline',
     'fields' => array(
+      'iid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The inline ID of the field, defined by the database.',
+        'no export' => TRUE,
+      ),
       'fid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -49,13 +61,6 @@ function wysiwyg_imageupload_schema() {
         'default' => 0,
         'description' => 'The {node}.nid associated with the uploaded file.',
       ),
-      'vid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
-      ),
       'cid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -63,38 +68,76 @@ function wysiwyg_imageupload_schema() {
         'default' => 0,
         'description' => 'Primary Key: The {comment}.cid associated with the uploaded file.',
       ),
-      'description' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'Description of the uploaded file.',
-      ),
-      'list' => array(
+      'temporary' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-        'size' => 'tiny',
-        'description' => 'Whether the file should be visibly listed on the node: yes(1) or no(0).',
+        'description' => 'Is this file temporary.',
       ),
-      'weight' => array(
+      'imagecache' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Current selected imagecache preset',
+      ),
+      'style' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Current selected style to show the image with.',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Image title.',
+      ),
+      'alignment' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Defines the alignment of the image',
+      ),
+      'lightbox' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-        'size' => 'tiny',
-        'description' => 'Weight of this upload in relation to other uploads in this node.',
+        'description' => 'Use lightbox integration or not',
       ),
     ),
-    'primary key' => array('vid', 'cid', 'fid'),
-    'indexes' => array(
-      'fid' => array('fid'),
-      'nid' => array('nid'),
-      'cid' => array('cid'),
-    ),
+    'primary key' => array('iid')
   );
 
-  return $schema;
+$schema['wysiwyg_imageupload_entity_revision'] = array(
+    'description' => 'Stores the inline arguments for a specific image used inline',
+    'fields' => array(
+      'iid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The inline ID of the field, defined by the database.',
+        'no export' => TRUE,
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
+      ),
+
+    ),
+    'primary key' => array('vid','iid'),
+    'indexes' => array(
+      'iid' => array('iid'),
+      'vid' => array('vid'),
+    ),
+  );
 }
 
 function wysiwyg_imageupload_update_6108() {
@@ -103,5 +146,14 @@ function wysiwyg_imageupload_update_6108() {
   db_query('ALTER TABLE {wysiwyg_imageupload} DROP PRIMARY KEY, ADD PRIMARY KEY ( `vid` , `fid` , `cid` )');
   _wysiwyg_imageupload_install_styles_if_missing();
   return array();
+}
+
+function wysiwyg_imageupload_update_6200() {
+  $schema = array();
+  _wysiwyg_imageupload_inline_table($schema);
+  $ret = array();
+  db_create_table($ret, 'wysiwyg_imageupload_entity', $schema['wysiwyg_imageupload_entity']);
+  db_create_table($ret, 'wysiwyg_imageupload_entity_revision', $schema['wysiwyg_imageupload_entity_revision']);
+  return $ret;
 }
 
