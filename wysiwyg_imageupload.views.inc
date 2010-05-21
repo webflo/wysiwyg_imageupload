@@ -9,9 +9,9 @@
  * Implements hook_views_data().
  */
 function wysiwyg_imagewysiwyg_imageupload_views_data() {
-  $data['wysiwyg_imageupload']['table']['group']  = t('Wysiwyg ImageUpload');
+  $data['wysiwyg_imageupload_entity']['table']['group']  = t('Wysiwyg ImageUpload');
 
-  $data['wysiwyg_imageupload']['table']['join'] = array(
+  $data['wysiwyg_imageupload_entity']['table']['join'] = array(
     'node' => array(
       'left_field' => 'vid',
       'field' => 'vid',
@@ -26,7 +26,7 @@ function wysiwyg_imagewysiwyg_imageupload_views_data() {
     ),
   );
 
-  $data['wysiwyg_imageupload']['vid'] = array(
+  $data['wysiwyg_imageupload_entity']['vid'] = array(
     'title' => t('Node'),
     'help' => t('The node the wysiwyg_imageuploaded file is attached to'),
     'relationship' => array(
@@ -39,7 +39,7 @@ function wysiwyg_imagewysiwyg_imageupload_views_data() {
     ),
   );
 
-  $data['wysiwyg_imageupload']['description'] = array(
+  $data['wysiwyg_imageupload_entity']['description'] = array(
     'title' => t('Description'),
     'help' => t('The description of the wysiwyg_imageuploaded file.'),
     'field' => array(
@@ -57,7 +57,7 @@ function wysiwyg_imagewysiwyg_imageupload_views_data() {
     ),
   );
 
-  $data['wysiwyg_imageupload']['list'] = array(
+  $data['wysiwyg_imageupload_entity']['list'] = array(
     'title' => t('Listed'),
     'help' => t('Whether or not the file is marked to be listed.'),
     'field' => array(
@@ -74,7 +74,7 @@ function wysiwyg_imagewysiwyg_imageupload_views_data() {
     ),
   );
 
-  $data['wysiwyg_imageupload']['weight'] = array(
+  $data['wysiwyg_imageupload_entity']['weight'] = array(
     'title' => t('Weight'),
     'help' => t('The weight, used for sorting.'),
     'field' => array(
@@ -96,7 +96,7 @@ function wysiwyg_imagewysiwyg_imageupload_views_data() {
  * Implements hook_vies_data_alter().
  */
 function wysiwyg_imageupload_views_data_alter(&$data) {
-  $data['node']['wysiwyg_imageupload_fid'] = array(
+  $data['node']['wysiwyg_imageupload_entity_fid'] = array(
     'group' => t('Wysiwyg imageupload'),
     'title' => t('Attached files'),
     'help' => t('All files attached to a node with wysiwyg_imageupload.module.'),
@@ -113,7 +113,7 @@ function wysiwyg_imageupload_views_data_alter(&$data) {
     ),
     'relationship' => array(
       'title' => t('Attached files'),
-      'relationship table' => 'wysiwyg_imageupload',
+      'relationship table' => 'wysiwyg_imageupload_entity',
       'relationship field' => 'fid',
       'base' => 'files',
       'base field' => 'fid',

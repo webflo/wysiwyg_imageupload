@@ -19,7 +19,7 @@ class wyswiyg_imageupload_handler_field_fid extends views_handler_field_upload_f
       if (!empty($this->options['only_listed'])) {
         $where = " AND u.list <> 0";
       }
-      $result = db_query("SELECT u.vid, u.fid, f.filename, f.filepath, f.filesize, f.filemime, u.description FROM {wyswiyg_imageupload} u LEFT JOIN {files} f ON f.fid = u.fid WHERE u.vid IN (" . implode(', ', $vids) . ")$where ORDER BY u.weight");
+      $result = db_query("SELECT u.vid, u.fid, f.filename, f.filepath, f.filesize, f.filemime, u.description FROM {wysiwyg_imageupload_entity} u LEFT JOIN {files} f ON f.fid = u.fid WHERE u.vid IN (" . implode(', ', $vids) . ")$where ORDER BY u.weight");
       while ($file = db_fetch_array($result)) {
         $file['filename'] = check_plain($file['filename']);
         $file['filemime'] = check_plain($file['filemime']);
