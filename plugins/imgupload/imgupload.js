@@ -34,7 +34,9 @@
         // Default
         var options = {
           id: instanceId,
-          action: 'insert'
+          action: 'insert',
+          // we need that for changing the mode in the edit form to create a new iid if revisioned
+          revisions: Drupal.settings.wysiwyg_imageupload.revisions
         };
         var $node = null;
         if (data.node) {
@@ -74,7 +76,8 @@
         }
         // else
         var iid = 0;
-        $(dialogIframe).contents().find('form#wysiwyg-imageupload-upload-form').ajaxSubmit({
+        form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-upload-form');
+        form.ajaxSubmit({
           dataType : 'json',
           method: 'post',
           async: false,
@@ -118,7 +121,7 @@
         $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').ajaxSubmit({
           dataType : 'json',
           method: 'post',
-          data: { submit: 'submit', op: 'Save' },
+          data: { revisions: options.revisions, node_form_build_id: Drupal.settings.wysiwyg_imageupload.current_form},
           async: false,
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;

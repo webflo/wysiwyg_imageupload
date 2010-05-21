@@ -49,13 +49,6 @@ function wysiwyg_imageupload_schema() {
         'default' => 0,
         'description' => 'The {node}.nid associated with the uploaded file.',
       ),
-      'vid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
-      ),
       'cid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -109,13 +102,6 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
         'default' => 0,
         'description' => 'The {node}.nid associated with the uploaded file.',
       ),
-      'vid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
-      ),
       'cid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -167,6 +153,32 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
     ),
     'primary key' => array('iid')
   );
+
+$schema['wysiwyg_imageupload_entity_revision'] = array(
+    'description' => 'Stores the inline arguments for a specific image used inline',
+    'fields' => array(
+      'iid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The inline ID of the field, defined by the database.',
+        'no export' => TRUE,
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
+      ),
+
+    ),
+    'primary key' => array('vid','iid'),
+    'indexes' => array(
+      'iid' => array('iid'),
+      'vid' => array('vid'),
+    ),
+  );
 }
 
 function wysiwyg_imageupload_update_6108() {
@@ -177,11 +189,12 @@ function wysiwyg_imageupload_update_6108() {
   return array();
 }
 
-function wysiwyg_imageupload_update_6201() {
- $schema = array();
- _wysiwyg_imageupload_inline_table($schema);
- $ret = array();
- db_create_table($ret, 'wysiwyg_imageupload_entity', $schema['wysiwyg_imageupload_entity']);
- return $ret;
+function wysiwyg_imageupload_update_6206() {
+  $schema = array();
+  _wysiwyg_imageupload_inline_table($schema);
+  $ret = array();
+  db_create_table($ret, 'wysiwyg_imageupload_entity', $schema['wysiwyg_imageupload_entity']);
+  db_create_table($ret, 'wysiwyg_imageupload_entity_revision', $schema['wysiwyg_imageupload_entity_revision']);
+  return $ret;
 }
 

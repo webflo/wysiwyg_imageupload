@@ -29,7 +29,7 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
     // we store the iid in the file object, so we can use it on submit of the node form
     // to update the inline-entry to be static and not temporary
     $imgDetails->iid = $iid;
-    $cached_files[$imgDetails->fid] = $imgDetails;
+    $cached_files[$iid] = $imgDetails;
     cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_TEMPORARY );
 
     $title = $imgDetails->filename;
@@ -77,18 +77,18 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
 }
 
 function _wysiwyg_imageupload_render_wysiwyg($iid) {
-  $image_obj = _wysiwyg_imageupload_load_inline($iid);
+  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
 
   $output = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
   exit();
 }
 
-function _wysiwyg_imageupload_render_wysiwyg_images($iids) {
+function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id) {
   $iids = split(',',$iids);
   $output = array();
   foreach($iids as $iid) {
-    $image_obj = _wysiwyg_imageupload_load_inline($iid);
+    $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
     $output[$iid] = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
   }
   print drupal_to_js(array('status' => TRUE, 'data' => $output));

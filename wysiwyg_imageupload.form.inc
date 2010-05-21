@@ -1,6 +1,5 @@
 <?php
 // $Id:$
-
 # Copyright (c) 2010 KontextWork GbR
 # Author: Eugen Mayer
 
@@ -11,6 +10,12 @@
  */
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
+    // SO UGLY: we have to use this, as FAPI has a special case with cached forms
+    // so if you save the form and a validation error occurs, form_alter is not called
+    // in that case all our javascript would be missing
+    $form['#after_build'][] = '_wysiwyg_imageupload_prepare_main_form';
+    // Add this as in some cases like comments drupal is not inlcude it by default
+
     // We need $form_state['post']['form_build_id'] != "" as a additional condition, as there are cases that
     // post is an empty array but it has not been submitted ( no preview, no save).
     if(isset($form_state['post']) && is_array($form_state['post']) && $form_state['post']['form_build_id'] != '') {
@@ -48,11 +53,22 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
       $form['#cache'] = TRUE;
     }
 
-    drupal_add_js(array('wysiwyg_imageupload' => array('current_form' => $form['form_build_id']['#value'])), 'setting');
-    jquery_ui_dialog_parent_js();
-
     $form['#validate'][] = 'wysiwyg_imageupload_form_validate';
   }
+}
+
+function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
+  drupal_add_js('misc/jquery.form.js');
+
+  $settings = array(
+    'current_form' => $form['form_build_id']['#value'],
+    // only set revisions new, when we actually edit a node. It does not make sense for new node
+    'revisions' => (int) (($form['#id'] != 'comment-form') && _wysiwyg_imagegupload_revisions_activated($form['#node']->type) && !empty($form['#node']->nid))
+  );
+
+  drupal_add_js(array('wysiwyg_imageupload' => $settings), 'setting');
+  jquery_ui_dialog_parent_js();
+  return $form;
 }
 
 /*
@@ -122,7 +138,24 @@ function wysiwyg_imageupload_upload_form_submit($form, $state) {
 }
 
 function wysiwyg_imageupload_edit_form_submit($form, $state) {
-  wysiwyg_imageupload_upload_form_submit($form, $state);
+  // create a new inline entity with the same file if we are actually
+  if($_POST['revisions'] == 1) {
+    $old_iid = $state['values']['iid'];
+    $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
+    $state['values']['iid'] = _wysiwyg_imageupload_craete_inline_entity($img_obj,true);
+
+    // Eemove the old inline id and place the new one
+    $cached_form_state = array();
+    $form = form_get_cache($_POST['node_form_build_id'], $cached_form_state);
+    $new_file = $form['#node']->imgupload_images[$old_iid];
+    $new_file->iid = $state['values']['iid'];
+    // Create the new
+    $form['#node']->imgupload_images[$new_file->iid] = $new_file;
+    // Remove the old
+    unset($form['#node']->imgupload_images[$old_iid]);
+  }
+
+  return wysiwyg_imageupload_upload_form_submit($form, $state);
 }
 
 /*
@@ -214,10 +247,9 @@ function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
  * Called when a image was selected and the details form should be shown.
  */
 function wysiwyg_imageupload_edit_form($form_state,$iid) {
-
   jquery_ui_dialog_child_js();
   drupal_set_title(t('Update image'));
-  $img_obj = _wysiwyg_imageupload_load_inline($iid);
+  $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
   $defaults = array (
     'filepath' => $img_obj->filepath,
     'imagecache' => $img_obj->imagecache,

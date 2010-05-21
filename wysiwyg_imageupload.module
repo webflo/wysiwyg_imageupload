@@ -33,7 +33,7 @@ function wysiwyg_imageupload_menu() {
   // Render for WYSIWYG
   $items['ajax/wysiwyg_imgupl/render_wysiwyg/%'] = array(
     'page callback' => '_wysiwyg_imageupload_render_wysiwyg',
-    'page arguments' => array(3,4,5),
+    'page arguments' => array(3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
@@ -50,7 +50,7 @@ function wysiwyg_imageupload_menu() {
   // Form for editing an image
   $items['ajax/wysiwyg_imgupl/edit/%'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_edit_form',3),
+    'page arguments' => array('wysiwyg_imageupload_edit_form',3,4,5),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
@@ -108,6 +108,9 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
         _wysiwyg_imageupload_save($node);
       }
       break;
+    case 'delete':
+      _wysiwyg_imageupload_handle_node_delete($node->nid);
+     break;
   }
 }
 
@@ -195,8 +198,6 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
  // else
  return array();
 }
-
-
 
 function wysiwyg_imageupload_theme() {
   return array(
@@ -298,4 +299,15 @@ function _wysiwyg_imagegupload_allowed_presets() {
   }
 
   return $presets_whitelist;
+}
+
+function _wysiwyg_imagegupload_revisions_activated($type) {
+  // Is this content even in moderatation?
+  $var = variable_get( "node_options_$type", array(0));
+  dsm($var);
+  if( array_search('revision',$var) ) {
+    return 1;
+  }
+  //else
+  return 0;
 }
