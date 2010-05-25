@@ -81,7 +81,6 @@ function _wysiwyg_imageupload_entity_upload_js($node_form_build_id) {
  */
 function _wysiwyg_imageupload_render_wysiwyg($iid) {
   $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
-
   $output = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
   print drupal_to_js(array('status' => TRUE, 'data' => $output));
   exit();

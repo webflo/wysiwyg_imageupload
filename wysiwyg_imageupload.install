@@ -8,6 +8,7 @@
  */
 function wysiwyg_imageupload_install() {
   drupal_install_schema('wysiwyg_imageupload');
+  _wysiwyg_imageupload_install_styles_if_missing();
 }
 
 /**
@@ -15,8 +16,7 @@ function wysiwyg_imageupload_install() {
  */
 function wysiwyg_imageupload_uninstall() {
   // Remove tables.
-  drupal_uninstall_schema('wysiwyg_imageupload');
-  _wysiwyg_imageupload_install_styles_if_missing();
+  drupal_uninstall_schema('wysiwyg_imageupload');  
   // Remove variables.
   db_query("DELETE FROM {variable} WHERE name LIKE 'wysiwyg_imageupload_%%'");
 
@@ -32,6 +32,7 @@ function _wysiwyg_imageupload_install_styles_if_missing() {
  * Implementation of hook_schema().
  */
 function wysiwyg_imageupload_schema() {
+  $schema = array();
   _wysiwyg_imageupload_inline_table($schema);
   return $schema;
 }
