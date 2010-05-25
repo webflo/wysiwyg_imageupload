@@ -4,20 +4,21 @@
  */
 function wysiwyg_imageupload_browser_imagecache_default_presets() {
   $presets = array();
-  $presets['wysiwyg_imageupload_browser'] = array (
-    'presetname' => 'wysiwyg_imageupload_browser',
+  $presets['wysiwyg_imageupload_browser_preview'] = array (
+    'presetname' => 'wysiwyg_imageupload_browser_preview',
     'actions' => array (
       0 => array (
-        'weight' => '0',
-        'module' => 'imagecache',
-        'action' => 'imagecache_scale_and_crop',
-        'data' => array (
-          'width' => '200',
-          'height' => '200',
-          'upscale' => 0,
-        ),
-    ),
-  ));
+	'weight' => '0',
+	'module' => 'imagecache',
+	'action' => 'imagecache_scale_and_crop',
+	'data' => array (
+	  'width' => '50',
+	  'height' => '50',
+	  'upscale' => 1,
+	),
+      ),
+    )
+  );
   return $presets;
 }
 
@@ -73,11 +74,11 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= wysiwyg_imageupload_browser_tabs($tabs,1);
 
-  $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 6),$user->uid);
+  $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 8),$user->uid);
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
   foreach($images as $image){
     $imageHTML = '<div class="browser_image">';
-    $imageHTML .= theme('imagecache', 'wysiwyg_imageupload_browser', $image['filepath'], t('Insert this image'));
+    $imageHTML .= theme('imagecache', 'wysiwyg_imageupload_browser_preview', $image['filepath'], t('Insert this image'), TRUE, FALSE);
     $imageHTML .= '</div>';
     $output .= l($imageHTML, 'ajax/wysiwyg_imgupl/update/Title/', array(
       'title' => t('Insert this image'),

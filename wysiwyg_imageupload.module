@@ -183,7 +183,7 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
     $limit = " LIMIT $limit";
   }
   if ($uid != NULL) {
-    $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
+    $result = db_query('SELECT f.*,w.nid as parent_nid,w.vid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload_entity} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
   }
   else {
     $result = db_query('SELECT w.*,f.* FROM {files} as f INNER JOIN {wysiwyg_imageupload} AS w on w.fid = f.fid GROUP BY w.nid ORDER BY f.timestamp DESC'.$limit);
@@ -254,7 +254,7 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
     'class' => 'wysiwyg_imageupload',
   );
 
-  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes,NULL,false);
   return $output;
 }
 
@@ -264,33 +264,21 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
 function wysiwyg_imageupload_imagecache_default_presets() {
   $presets = array();
   $presets['wysiwyg_imageupload_preview'] = array (
-  'presetname' => 'wysiwyg_imageupload_preview',
-  'actions' => array (
-    0 => array (
-      'weight' => '0',
-      'module' => 'imagecache',
-      'action' => 'imagecache_scale',
-      'data' => array (
-        'height' => '150',
-        'width' => '250',
-        'upscale' => 1,
+    'presetname' => 'wysiwyg_imageupload_preview',
+    'actions' => array (
+      0 => array (
+	'weight' => '0',
+	'module' => 'imagecache',
+	'action' => 'imagecache_scale',
+	'data' => array (
+	  'height' => '150',
+	  'width' => '250',
+	  'upscale' => 1,
+	),
       ),
-    ),
-  ));
-  $presets['wysiwyg_imageupload_browser_preview'] = array (
-  'presetname' => 'wysiwyg_imageupload_browser_preview',
-  'actions' => array (
-    0 => array (
-      'weight' => '0',
-      'module' => 'imagecache',
-      'action' => 'imagecache_scale_and_crop',
-      'data' => array (
-        'width' => '50',
-        'height' => '50',
-        'upscale' => 1,
-      ),
-    ),
-  ));
+    )
+  );
+  
   return $presets;
 }
 
