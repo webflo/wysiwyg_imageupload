@@ -31,7 +31,7 @@ function wysiwyg_imageupload_filter($op, $delta = 0, $format = -1, $text = '') {
  */
 function _wysiwyg_imageupload_filter_process(&$body) {
   // Syntax: [[inlineimage:<iid>:<inlineargs>]]
-  $body = preg_replace(array('/\[\[wysiwyg_imageupload:([^:]*):([^\]]*?)\]\]/e'), array("_wysiwyg_imageupload_render_nodeview($1,'$2');"), $body);
+  $body = preg_replace(array('/\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/e'), array("_wysiwyg_imageupload_render_nodeview($1,'$2');"), $body);
   return $body;
 }
 

@@ -141,6 +141,8 @@ function wysiwyg_imageupload_upload_form_submit($form, $state) {
   );
 
   drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
+  
+  drupal_alter('wysiwyg_imageupload_image_entity_created',$record);
   print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
   exit();
 }
@@ -162,6 +164,8 @@ function wysiwyg_imageupload_edit_form_submit($form, $state) {
     $new_file->iid = $state['values']['iid'];
     // Create the new
     $form['#node']->imgupload_images[$new_file->iid] = $new_file;
+    // call all our hooks
+    drupal_alter('wysiwyg_imageupload_image_entity_created',$new_file);
     // Remove the old
     unset($form['#node']->imgupload_images[$old_iid]);
   }

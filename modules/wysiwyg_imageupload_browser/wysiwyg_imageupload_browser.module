@@ -51,12 +51,33 @@ function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
     );
   }
   if ($form_id == 'wysiwyg_imageupload_admin_settings') {
-    $form['wysiwyg_imageupload_browser_itemcount'] = array(
+    $form['browser'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Browser'),
+      '#description' => t('Only the selected presets are allowed to be chosen in the dialog'),
+      '#collapsed' => true,
+      '#collapsible' => true,
+      '#weight' => 0,
+    );
+    $form['browser']['wysiwyg_imageupload_browser_itemcount'] = array(
       '#type' => 'textfield',
       '#title' => t('Max. Items Displayed'),
       '#description' => t('Define how many Images should be displayed inside the Browser'),
       '#default_value' => variable_get('wysiwyg_imageupload_browser_itemcount', ''),
       '#weight' => 0,
+    );
+    $presets = imagecache_presets();
+    $styles = array();
+    foreach ($presets as $preset) {
+      // We can use the presetid here (http://drupal.org/node/694188).
+      $styles[$preset['presetname']] = t("!preset", array('!preset' => $preset['presetname']));
+    }
+
+    $form['browser']['wysiwyg_imageupload_browser_preset'] = array(
+      '#type' => 'select',
+      '#title' => t('Browser preview preset'),
+      '#default_value' => variable_get('wysiwyg_imageupload_browser_preset', 'wysiwyg_imageupload_browser_preview'),
+      '#options' => $styles
     );
   }
 }
@@ -78,7 +99,8 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
   foreach($images as $image){
     $imageHTML = '<div class="browser_image">';
-    $imageHTML .= theme('imagecache', 'wysiwyg_imageupload_browser_preview', $image['filepath'], t('Insert this image'), TRUE, FALSE);
+    $preset = variable_get('wysiwyg_imageupload_browser_preset', 'wysiwyg_imageupload_browser_preview');
+    $imageHTML .= theme('imagecache', $preset, $image['filepath'], t('Insert this image'), TRUE, FALSE);
     $imageHTML .= '</div>';
     $output .= l($imageHTML, 'ajax/wysiwyg_imgupl/update/Title/', array(
       'title' => t('Insert this image'),

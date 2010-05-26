@@ -168,7 +168,7 @@
     attach: function(content, pluginSettings, id) {
       var plugin = this;
       var iids = [];
-      content = content.replace(/\[\[wysiwyg_imageupload:([^:]*?):([^\]]*?)\]\]/g, function(orig, match) {
+      content = content.replace(/\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g, function(orig, match) {
         iids.push(match);
         return orig;
       });
@@ -181,7 +181,7 @@
       var images = plugin.get_rendered_wysiwyg_images(iids);
 
       content = content.replace(
-        /\[\[wysiwyg_imageupload:([^:]*?):([^\]]*?)\]\]/g,
+        /\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g,
         function(orig, iid) {
           return images[iid];
         }

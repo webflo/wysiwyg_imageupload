@@ -10,8 +10,14 @@
  */
 function _wysiwyg_imageupload_upload_file() {
   global $user;
+  $dest = _wysiwyg_imageupload_get_dest_dir();
+  // create the path if not existent
+  
+  mkdir($dest,0777,true);
+  if(!file_check_directory($dest, FILE_CREATE_DIRECTORY)) {
+    dsm('coult not');
+  }
 
-  $dest = file_directory_path();
   $validators = array(
     'file_validate_is_image' => array()
     // TODO: Implement a administration interface for filesize settings
@@ -34,9 +40,32 @@ function _wysiwyg_imageupload_upload_file() {
     }
   }
 
+  drupal_alter('wysiwyg_imageupload_file_uploaded',$file);
+
   return (object)$file;
 }
 
+/** 
+ * Get the dest dir by parsing the settings and calling other modules
+ *
+ */
+function _wysiwyg_imageupload_get_dest_dir() {
+  global $user;
+  $dest = file_directory_path();
+  // Add the global relativ path
+  $dest = "$dest/".variable_get('wysiwyg_imageupload_dest_root', 'wysiwyg_imageupload');
+  // If its not a guest and we have set a userpath, add it relativly
+  if($user->uid > 0) {      
+    $userpath  = variable_get('wysiwyg_imageupload_relative_user', '$uid');
+    if($userpath != '') {
+      $userpath  = str_replace("\$uid",$user->uid,variable_get('wysiwyg_imageupload_relative_user', '$uid'));
+      $dest = "$dest/$userpath";
+    }
+  }
+  // Finally let other modules alter the path
+  drupal_alter('wysiwyg_imageupload_dest_path',$dest);
+  return $dest;
+}
 
 /*
  * Loading all files uploaded to a node
@@ -119,7 +148,8 @@ function _wysiwyg_imageupload_save(&$node) {
         'temporary' => 0,
       );
       drupal_write_record('wysiwyg_imageupload_entity', $data, array('iid'));
-
+      // Call the alter hooks to react on the current attached image entity
+      drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
       // Skip the other steps, as its a comment - not a node
       continue;
     }
@@ -134,8 +164,11 @@ function _wysiwyg_imageupload_save(&$node) {
     );
 
     drupal_write_record('wysiwyg_imageupload_entity',$data, array('iid'));
-    _wysiwyg_imageupload_create_revision($iid, $node->vid);
+    _wysiwyg_imageupload_create_revision($iid, $node->vid);    
     _wysiwyg_imageupload_cleanup_temps($node->nid);
+    // Call the alter hooks to react on the current attached image entity
+    $data = (object) $data;
+    drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
   }
 }
 
@@ -193,8 +226,8 @@ function _wysiwyg_imageupload_create_revision($iid,$vid) {
 /*
  * Loads the inline-image object with all its details
  */
-function _wysiwyg_imageupload_load_inline_entity($iid) {
-  $result = db_query('SELECT * FROM wysiwyg_imageupload_entity AS inl LEFT JOIN files AS f ON inl.fid=f.fid WHERE iid=%d LIMIT 1', $iid);
+function _wysiwyg_imageupload_load_inline_entity($iid) {  
+  $result = db_query('SELECT inl.*,f.*,er.vid FROM {wysiwyg_imageupload_entity} AS inl LEFT JOIN {wysiwyg_imageupload_entity_revision} as er ON inl.iid=er.iid LEFT JOIN {files} AS f ON inl.fid=f.fid WHERE inl.iid=%d LIMIT 1', $iid);
   if($result !== false) {
     return db_fetch_object($result);
   }

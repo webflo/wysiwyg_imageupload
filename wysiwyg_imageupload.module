@@ -249,11 +249,11 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
   if($arguments['height'] != '') {
     $height = " height='{$size['height']}'";
   }
-  $inline_args = join('|', array($img_obj->iid));
+  $inline_args = $img_obj->iid;
   $attributes = array(
     'class' => 'wysiwyg_imageupload',
   );
-
+  
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes,NULL,false);
   return $output;
 }
