@@ -1,7 +1,7 @@
 <?php
 // $Id:$
 
-# Copyright (c) 2010 Impressive.media
+# Copyright (c) 2010 KontextWork
 # Author: Eugen Mayer
 
 /*
@@ -15,7 +15,8 @@ function _wysiwyg_imageupload_upload_file() {
   
   mkdir($dest,0777,true);
   if(!file_check_directory($dest, FILE_CREATE_DIRECTORY)) {
-    dsm('coult not');
+    drupal_set_message('Destination path is not writeable, cant upload','error');
+    return NULL;
   }
 
   $validators = array(
