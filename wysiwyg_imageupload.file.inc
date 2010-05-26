@@ -12,8 +12,10 @@ function _wysiwyg_imageupload_upload_file() {
   global $user;
   $dest = _wysiwyg_imageupload_get_dest_dir();
   // create the path if not existent
-  
-  mkdir($dest,0777,true);
+  if(!file_check_directory($dest)) {
+    mkdir($dest,0777,true);
+  }
+
   if(!file_check_directory($dest, FILE_CREATE_DIRECTORY)) {
     drupal_set_message('Destination path is not writeable, cant upload','error');
     return NULL;
