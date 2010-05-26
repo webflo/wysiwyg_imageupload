@@ -24,8 +24,7 @@ function _wysiwyg_imageupload_migrate_1_2_iterate() {
   $m = drupal_get_path('module','wysiwyg_imageupload_migrate_1_2');
   require_once("$m/smartdomdocument.class.php");
   foreach($nodes as $node) {
-    _wysiwyg_imageupload_migrate_1_2_migratenode($node);
-    //dsm("migrated node: {$node->nid}");
+    _wysiwyg_imageupload_migrate_1_2_migratenode($node);    
   }
   $c = count($nodes);
   return t("Migration completed, overall $c nodes migrated");
@@ -49,8 +48,7 @@ function _wysiwyg_imageupload_migrate_1_2_migratenode($node) {
 }
 
 function _wysiwyg_imageupload_migrate_1_2_migrate($node,$part = 'body') {
-  if($node->$part == '') {
-    dsm('emtpy');
+  if($node->$part == '') {    
     return '';
   }
 
