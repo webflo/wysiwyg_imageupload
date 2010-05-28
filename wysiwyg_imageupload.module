@@ -198,27 +198,38 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
  */
 function wysiwyg_imageupload_theme() {
   return array(    
-    'wysiwyg_imageupload_render_image_entity' => array(
-      'imgage_obj',
-      'arguments' => array(),
+    'wysiwyg_imageupload_render_image_entity' => array(      
+      'arguments' => array(
+	'imgage_obj',
+	'arguments' => array(),
+      ),
     ),
     'wysiwyg_imageupload_render_image' => array(
-      'imgage_obj',
-      'arguments' => array(),
+      
+      'arguments' => array(
+	'imgage_obj',
+	'arguments' => array(),
+	),
     ),
-    'wysiwyg_imageupload_render_meta' => array(
-      'imgage_obj',
-      'arguments' => array(),
+    'wysiwyg_imageupload_render_meta' => array(      
+      'arguments' => array(
+	'imgage_obj',
+	'arguments' => array(),
+	),
     ),
-    'wysiwyg_imageupload_render_container' => array(
-      'image',
-      'meta',
-      'imgage_obj',
-      'arguments' => array(),
+    'wysiwyg_imageupload_render_container' => array(      
+      'arguments' => array(
+	'image',
+	'meta',
+	'imgage_obj',
+	'arguments' => array(),
+      ),
     ),
-    'wysiwyg_imageupload_render_image_wysiwyg' => array(
-      'imgage_obj',
-      'arguments' => array(),
+    'wysiwyg_imageupload_render_image_wysiwyg' => array(      
+      'arguments' => array(
+	'imgage_obj',
+	'arguments' => array(),
+      ),
     ),
   );
 }
@@ -227,10 +238,9 @@ function wysiwyg_imageupload_theme() {
  * wysiwyg_imageupload_render_image: renders the image for the node view
  */
 function theme_wysiwyg_imageupload_render_image_entity($img_obj, $arguments) {
-  $image = theme('wysiwyg_imageupload_render_image', $img_obj, $arguments);
+  $image = theme('wysiwyg_imageupload_render_image', $img_obj, $arguments);  
   $meta = theme('wysiwyg_imageupload_render_meta', $img_obj, $arguments);
-  $output = theme('wysiwyg_imageupload_render_container', $image, $meta, $img_obj, $arguments);
-  return $output;
+  return theme('wysiwyg_imageupload_render_container', $image, $meta, $img_obj, $arguments);  
 }
 
 /**
@@ -253,6 +263,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
   return $output;
 }
+
 
 /**
  * Renders the meta data of an image. By default only the title

@@ -21,6 +21,15 @@ function wysiwyg_imageupload_lightbox_add_field() {
   return $ret;
 }
 
+function wysiwyg_imageupload_lightbox_schema_alter(&$schema) {
+  // Add field to existing schema.
+  $schema['wysiwyg_imageupload_entity']['fields']['lightbox'] = array(
+    'type' => int,    
+    'not null' => TRUE,
+    'default' => -1,
+    'description' => 'Use lightbox integration or not',    
+  );
+}
 /**
  * Implementation of hook_uninstall().
  */
