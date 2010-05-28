@@ -29,6 +29,10 @@ function wysiwyg_imageupload_lightbox_form_alter(&$form, &$state,$form_id) {
   }
 }
 
+function wysiwyg_imageupload_lightbox_theme() {
+  return wysiwyg_imageupload_theme();
+}
+
 /**
  * Implementation of hook_wysiwyg_imageupload_entity_save
  */
