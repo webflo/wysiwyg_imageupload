@@ -76,7 +76,7 @@
         }
         // else
         var iid = 0;
-        form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-upload-form');
+        form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form');
         form.ajaxSubmit({
           dataType : 'json',
           method: 'post',
@@ -96,9 +96,9 @@
       btns[Drupal.t('Cancel')] = function () {
         $(this).dialog("close");
       };
-      var form_id = Drupal.settings.wysiwyg_imageupload.current_form;
+      var parent_build_id = Drupal.settings.wysiwyg_imageupload.current_form;
       // Location, where to fetch the dialog.
-      var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/add/' + form_id;
+      var aurl = Drupal.settings.basePath + 'index.php?q=wysiwy_imageupload/upload/' + parent_build_id;
       // Open the dialog, load the form.
       Drupal.jqui_dialog.open({
         url: aurl,
@@ -121,7 +121,7 @@
         $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').ajaxSubmit({
           dataType : 'json',
           method: 'post',
-          data: { revisions: options.revisions, node_form_build_id: Drupal.settings.wysiwyg_imageupload.current_form},
+          data: { revisions: options.revisions, parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form},
           async: false,
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;
@@ -140,7 +140,7 @@
       };
 
       // Location, where to fetch the dialog.
-      var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/edit/' + options.iid;
+      var aurl = Drupal.settings.basePath + 'index.php?q=wysiwyg_imageupload/edit/' + options.iid;
       // Finally open the dialog.
       Drupal.jqui_dialog.open({
         url: aurl,

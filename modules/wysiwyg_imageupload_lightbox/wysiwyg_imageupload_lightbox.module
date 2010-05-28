@@ -1,0 +1,159 @@
+<?php
+
+/**
+ * Thats where we actually alter the form and add out extra meta data
+ * The loaded $img_obj hold your data dui to the hook_wysiwyg_imageupload_entity_load_alter
+ * We use the value to set our default value
+ */
+function wysiwyg_imageupload_lightbox_form_alter(&$form, &$state,$form_id) {
+  if ( $form_id == 'wysiwyg_imageupload_edit_form') {
+    // You always find the IID here
+    $iid = $form['image_upload_details']['iid']['#value'];
+    $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+    
+    $default = variable_get('wysiwyg_imageupload_lightbox_default', 1);
+    // only use the defaul if nothing set yet
+    if($img_obj->lightbox > -1) {
+      $default = $img_obj->lightbox;
+    }
+
+    $form['image_upload_details']['extras']['lightbox'] = array(
+      '#title' => t('Popup'),
+      '#description' => t('Preview original-size picture on click'),
+      '#type' => 'checkbox',
+      '#default_value' => $default,
+    );
+  }
+  else if ($form_id == 'wysiwyg_imageupload_admin_settings') {
+    wysiwyg_imageupload_lightbox_admin_settings($form);
+  }
+}
+
+/**
+ * Implementation of hook_wysiwyg_imageupload_entity_save
+ */
+function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_entity_save($post, $iid) {
+  // $post has the $form_state['values'], so we find our form element there (the value)
+  $update = array (
+    'iid',
+  );
+  
+  $record = array (
+    'lightbox' => $post['lightbox'],
+    'iid' => $post['iid'],
+  );
+  drupal_write_record('wysiwyg_imageupload_entity',$record,$update);
+}
+
+/************* Everything below is optional ********************************************** */
+
+/**
+ * Implementation of hook_wysiwyg_imageupload_entity_load_alter
+ * This is an example for how to load values if you stored the meta data in a different table
+ * them wysiwyg_imageupload_entity
+ * YOU DONT need to implement this if you actually store your meta data IN the wysiwyg_imageupload_entity
+ * table
+ */
+/*
+function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_entity_load_alter($entity, $iid) {
+  $result = db_fetch_object(db_query('SELECT lightbox FROM {some_relation_table} WHERE iid=%d',$iid);
+  $entity->lightbox = $result->lightbox;  
+}*/
+
+/** 
+ * This is optional. We alter the wysiwyg_imageupload admin settings
+ * to provide some settings for our module. If you dont need those
+ * you dont need to implement thise
+ */
+function wysiwyg_imageupload_lightbox_admin_settings(&$form) {
+  $presets = imagecache_presets();
+  $styles = array();
+  foreach ($presets as $preset) {
+    // We can use the presetid here (http://drupal.org/node/694188).
+    $styles[$preset['presetname']] = t("!preset", array('!preset' => $preset['presetname']));
+  }
+
+  $form['wysiwyg_imageupload_lightbox_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Lightbox settings'),
+    '#description' => t('Only the selected presets are allowed to be chosen in the dialog'),
+    '#collapsed' => true,
+    '#collapsible' => true,
+    '#weight' => 0,
+  );
+
+  $form['wysiwyg_imageupload_lightbox_settings']['wysiwyg_imageupload_lightbox_preset'] = array(
+    '#type' => 'select',
+    '#title' => t('What preset to use for the popup?'),
+    '#description' => t('This preset will be used to show the image in the lightbox'),
+    '#default_value' => variable_get('wysiwyg_imageupload_lightbox_preset', 'wysiwyg_imageupload_lightbox_preset'),
+    '#options' => $styles
+  );
+   $form['wysiwyg_imageupload_lightbox_settings']['wysiwyg_imageupload_lightbox_default'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Default value'),
+    '#description' => t('If checked, lightbox integration will be checked in the image detail form by default'),
+    '#default_value' => variable_get('wysiwyg_imageupload_lightbox_default', 1),    
+  );
+}
+
+/**
+  * For proper lightbox integration we need to change the theming of the image
+ */
+function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_render_image($img_obj,$arguments) {  
+  //$inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+  $inline_args = $img_obj->iid;
+  $attributes = array(
+    'class' => 'wysiwyg_imageupload',
+    'rel' => 'lightbox'
+  );
+
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  return $output;
+}
+
+/**
+ *  Those presets are needed for the lightbox
+ */
+function wysiwyg_imageupload_lightbox_imagecache_default_presets() {
+  $presets = array();
+  $presets['wysiwyg_imageupload_lightbox_preset'] = array (
+    'presetname' => 'wysiwyg_imageupload_lightbox_preset',
+    'actions' => array (
+      0 => array (
+	'weight' => '0',
+	'module' => 'imagecache',
+	'action' => 'imagecache_scale',
+	'data' => array (
+	  'height' => '768',
+	  'width' => '1280',	  
+	),
+      ),
+    )
+  );
+  
+  return $presets;
+}
+
+
+function wysiwyg_imageupload_lightbox_theme_registry_alter(&$theme_registry) {
+  $modulepath = drupal_get_path('module', 'wysiwyg_imageupload_lightbox');
+  // make pattern template from our module take effect
+  // if no theme provide such.
+  $tmp = $theme_registry;
+  // Pretend we are a theme and tell it to work on it
+  // this will discover pattern hooks in our module directory
+  _theme_process_registry($tmp, 'phptemplate', 'theme_engine', 'wysiwyg_imageupload_lightbox', $modulepath);
+  // add only the newly discover hooks
+  $theme_registry += array_diff_key($tmp, $theme_registry);
+ 
+  // the following make our moudule available for alternate suggestion template search
+  // insert our module path at second spot behind hook definer so
+  // theme suggestion tamplate take priority
+  //_drupalwiki_dokument_insert_after_first_element($theme_registry['node']['theme paths'], $modulepath);
+}
+/*
+function _drupalwiki_dokument_insert_after_first_element(&$a, $element) {
+  $first_element = array_shift($a);
+  array_unshift($a, $first_element, $element);
+}*/

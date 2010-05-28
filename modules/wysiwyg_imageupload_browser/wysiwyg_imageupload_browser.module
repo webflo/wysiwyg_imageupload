@@ -41,13 +41,15 @@ function wysiwyg_imageupload_browser_menu() {
  * Implementation of hook_form_alter
  */
 function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
-  if ($form_id == 'wysiwyg_imageupload_upload_form') {
+  if ($form_id == 'wysiwyg_imageupload_upload_form' ||  $form_id == 'wysiwyg_imageupload_edit_form') {
     $tabs = array();
     $tabs[] = '<a href="#">New Image</a>';
     $tabs[] = l(t('Browser'), 'ajax/wysiwyg_imageupload_browser/'.$form["#parameters"][2], array('title' => t('Choose a new image out of all your already uploaded ones')));
     $form['browse'] = array(
-      '#value' => wysiwyg_imageupload_browser_tabs($tabs,0),
+      '#value' => _wysiwyg_imageupload_browser_tabs($tabs,0),
       '#weight' => 0,
+      '#prefix' => '<div id="wysiwyg_imagepload_tabnav" class="clearfix">',
+      '#suffix' => '</div>',
     );
   }
   if ($form_id == 'wysiwyg_imageupload_admin_settings') {
@@ -93,7 +95,7 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $tabs = array();
   $tabs[] = l(t('New Image'), 'ajax/wysiwyg_imgupl/add/'.arg(2), array('title' => t('Go back to the upload form and upload a new image')));
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
-  $output .= wysiwyg_imageupload_browser_tabs($tabs,1);
+  $output .= _wysiwyg_imageupload_browser_tabs($tabs,1);
 
   $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 8),$user->uid);
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
@@ -115,11 +117,11 @@ function wysiwyg_imageupload_browser_browser($form_id){
 
   return $output;
 }
-function wysiwyg_imageupload_browser_tabs($tabs,$active){
+function _wysiwyg_imageupload_browser_tabs($tabs,$active){
   $m = drupal_get_path('module', 'wysiwyg_imageupload_browser');
   drupal_add_css($m.'/wysiwyg_imageupload_browser.css');
 
-  $output .= '<ul class="wysiwyg_imageupload_tabs">';
+  $output .= '<ul class="wysiwyg_imageupload_tabs clearfix">';
   foreach($tabs as $index => $tab){
     if($index == $active){$class = 'active';}else{$class = 'inactive';}
     $output .= '<li class="wysiwyg_imageupload_tab wysiwyg_imageupload_tab_'.$class.'">'.$tab.'</li>';

@@ -232,8 +232,11 @@ function _wysiwyg_imageupload_create_revision($iid,$vid) {
 function _wysiwyg_imageupload_load_inline_entity($iid) {  
   $result = db_query('SELECT inl.*,f.*,er.vid FROM {wysiwyg_imageupload_entity} AS inl LEFT JOIN {wysiwyg_imageupload_entity_revision} as er ON inl.iid=er.iid LEFT JOIN {files} AS f ON inl.fid=f.fid WHERE inl.iid=%d LIMIT 1', $iid);
   if($result !== false) {
-    return db_fetch_object($result);
+    $img_obj = db_fetch_object($result);
+    drupal_alter('wysiwyg_imageupload_entity_load',$img_obj,$iid);
+    return $img_obj;
   }
+  
   // else
   return false;
 }
@@ -241,11 +244,13 @@ function _wysiwyg_imageupload_load_inline_entity($iid) {
 /*
  * Create a basic / dummy inline-image entity which will be filled later
  */
-function _wysiwyg_imageupload_craete_inline_entity($file,$temporary = true) {
+function _wysiwyg_imageupload_craete_inline_entity($file,$temporary = true, $options = array()) {
   $record = array(
     'fid' => $file->fid,
     'temporary' => $temporary,
   );
+  $record = array_merge($record, $options);
+
   drupal_write_record('wysiwyg_imageupload_entity',$record);
 
   return $record['iid'];

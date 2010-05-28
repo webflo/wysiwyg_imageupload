@@ -106,10 +106,14 @@ function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
  * This form is shown before an image has been uploaded,
  * afterwards it is replaced by the image details form
  */
-function wysiwyg_imageupload_upload_form(&$form_state,$form_id) {
-  $form_id = check_plain($form_id);
+function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
+  $m = drupal_get_path('module','wysiwyg_imageupload');
+  
+  $parent_build_id = check_plain($parent_build_id);
   jquery_ui_dialog_child_js();
   drupal_set_title(t('Upload image'));
+  drupal_add_js("$m/js/wysiwyg_imageupload_uploadform.js");
+
   $form = array();
   $form['#attributes'] = array('enctype' => "multipart/form-data");
   $form['image_upload'] = array(
@@ -118,59 +122,120 @@ function wysiwyg_imageupload_upload_form(&$form_state,$form_id) {
     '#prefix' => '<div id="file_upload_group">',
     '#suffix' => '</div>'
   );
-  _wysiwyg_imageupload_form_add_uploadfields($form,$form_id);
 
+   $form[''] = array(
+    '#type' => 'value',
+    '#value' => $parent_build_id
+  );
+
+  $form['image_upload']['wysiwyg_imageupload_file'] = array(
+    '#type' => 'file',
+    '#title' => t('Select an image to upload'),
+    '#size' => 22,
+  );
+
+  /*'$form['image_upload']['start_upload'] = array(
+    '#type' => 'submit',    
+    '#value' => t('Upload image'),
+    '#name' => 'attach',
+  );*/  
+ 
   return $form;
 }
 
-/*
- * Handles the submit of the details form, which has been injected
- * into the upload form before.
- * Adds the details into the database for the inline-id
- */
-function wysiwyg_imageupload_upload_form_submit($form, $state) {
-  $update = array(
-    'iid'
-  );
-  $record = array(
-    'style' => $state['values']['style'],
-    'imagecache' => $state['values']['preset'],
-    'alignment' => $state['values']['alignment'],
-    'title' => $state['values']['title'],
-    'iid' => $state['values']['iid']
-  );
 
-  drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
+function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {  
+  $iid = _wysiwyg_imageupload_entity_upload($state['values']['parent_build_id']);
+  if($iid == false) {    
+    form_set_error('wysiwyg_imageupload_file',t('This file could not be uploaded'));
+    return;
+  }
   
-  drupal_alter('wysiwyg_imageupload_image_entity_created',$record);
-  print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
-  exit();
+  drupal_goto("wysiwyg_imageupload/edit/$iid");   
 }
 
+
 /*
- * Handles edits on inline-images
+ * Called when a image was selected / uploaded and the details form should be shown.
  */
-function wysiwyg_imageupload_edit_form_submit($form, $state) {
-  // create a new inline entity with the same file if we are actually
+function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
+  jquery_ui_dialog_child_js(array('width' => 740));
+  drupal_set_title(t('Image details'));
+  $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+  if($img_obj == false) {
+    drupal_set_message(t('Could not find image in the media-database'),'warning');
+    return array();
+  }
+  
+  $defaults = array (
+    'filepath' => $img_obj->filepath,
+    'imagecache' => $img_obj->imagecache,
+    'alignment' => $img_obj->alignment,
+    'style' => $img_obj->style,
+    'title' => $img_obj->title,
+  );
+  $attributes = array(
+    'class' => 'wysiwyg_imageupload_preview',
+  );
+  
+  // Create the form image detail form.
+  $form['#cache'] = TRUE;
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+
+  $img = theme('imagecache', 'wysiwyg_imageupload_preview', $defaults['filepath'], $iid, $defaults['title'], $attributes, TRUE, FALSE);
+  $form = _wysiwyg_imageupload_details_form($img,$iid,$defaults);
+
+  if(is_array($form_state['post']) && count($form_state['post']) > 0) {
+    $form['#post'] = $_POST;
+  }
+  return $form;
+}
+
+
+function wysiwyg_imageupload_edit_form_validate($form, &$state) {
   if($_POST['revisions'] == 1) {
+    // As this node is going to have a new revision AND we just EDITED an image
+    // (NOT updated)
+    // we create a new inline entity with the new settings and dont touch the old one.
+    // This way the old inline image stays the same in older revisions
     $old_iid = $state['values']['iid'];
     $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
+    // Create new inline entity and save it to our form_state
+    // so the the code below handles the right entity
     $state['values']['iid'] = _wysiwyg_imageupload_craete_inline_entity($img_obj,true);
-
-    // Eemove the old inline id and place the new one
+    // Remove the old inline id and place the new one
     $cached_form_state = array();
-    $form = form_get_cache($_POST['node_form_build_id'], $cached_form_state);
+    $form = form_get_cache($_POST['parent_build_id'], $cached_form_state);
     $new_file = $form['#node']->imgupload_images[$old_iid];
     $new_file->iid = $state['values']['iid'];
     // Create the new
     $form['#node']->imgupload_images[$new_file->iid] = $new_file;
-    // call all our hooks
-    drupal_alter('wysiwyg_imageupload_image_entity_created',$new_file);
     // Remove the old
     unset($form['#node']->imgupload_images[$old_iid]);
   }
+}
 
-  return wysiwyg_imageupload_upload_form_submit($form, $state);
+/*
+ * Handles the submit of the edit form
+ * Adds the details into the database for the inline-id
+ */
+function wysiwyg_imageupload_edit_form_submit($form, &$state) {
+  $update = array(
+    'iid',
+  );
+  $record = array(
+    'style' => $state['values']['style'],
+    'imagecache' => $state['values']['imagecache'],
+    'alignment' => $state['values']['alignment'],
+    'title' => $state['values']['title'],
+    'iid' => $state['values']['iid'],
+  );
+
+  drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
+  // call all our hooks    
+  module_invoke_all('wysiwyg_imageupload_entity_save',$state['values'],$state['values']['iid']);
+  print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
+  exit();
 }
 
 /*
@@ -178,18 +243,13 @@ function wysiwyg_imageupload_edit_form_submit($form, $state) {
  * Title, floating description and so forth
  */
 function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
-  // TODO: would love to add some drupal_alter stuff here, but we will need to
-  // have something similar on the javascript side.
   $form = array();
-  $form['image_upload_details'] = array( '#type' => 'fieldset',
-    '#title'=> t('Upload image'),
-    '#prefix' => '<div id="file_upload_group">',
+
+  $form['image_upload_details'] = array( 
+    '#type' => 'fieldset',
+    '#title'=> t('Image details'),
+    '#prefix' => '<div id="image_details">',
     '#suffix' => '</div>'
-  );
-  $form['image_upload_details']['uploadedImage'] = array (
-    '#prefix' => '<div>',
-    '#suffix' => '</div>',
-    '#value' => $img
   );
   $form['image_upload_details']['title'] = array(
     '#type' => 'textfield',
@@ -209,18 +269,24 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#default_value' => $defaults['alignment']
   );
 
-  $form['image_upload_details']['preset'] = array(
+  $form['image_upload_details']['imagecache'] = array(
     '#type' => 'select',
     '#title' => t('Size'),
     '#default_value' => $defaults['imagecache'],
     '#options' => _wysiwyg_imagegupload_allowed_presets(),
+  );
+  $form['image_upload_details']['extras'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Extras'),
+    '#collapsed' => true,
+    '#collapsible' => true,    
   );
 
   // styles.
   $styles = _wysiwyg_imageupload_get_image_styles();
   if (count($styles) > 0) { // If any.
     array_unshift($styles, t('None'));
-    $form['image_upload_details']['style'] = array(
+    $form['image_upload_details']['extras']['style'] = array(
       '#type' => 'select',
       '#title' => t('Style'),
       '#options' => $styles,
@@ -233,55 +299,17 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#value' => $iid,
     '#default_value' => $iid
   );
+  $form['image_details_form']['preview'] = array (
+    '#type' => 'fieldset',
+    '#title' => t('Preview'),
+    '#attributes' => array('id' => 'image_preview'),
+    '#collapsible' => false
+  );
+  $form['image_details_form']['preview'] ['uploadedImage'] = array (
+    '#prefix' => '<div >',
+    '#suffix' => '</div>',
+    '#value' => $img
+  );
 
-  return $form;
-}
-
-/*
- * Returning the form elements for the image upload
- */
-function _wysiwyg_imageupload_form_add_uploadfields(&$form, $form_id) {
-  $form['image_upload']['wysiwyg_imageupload_file'] = array(
-    '#type' => 'file',
-    '#title' => t('Select an image to upload'),
-    '#size' => 40,
-  );
-  $form['image_upload']['start_upload'] = array(
-    '#type' => 'submit',
-    '#value' => t('Upload image'),
-    '#name' => 'attach',
-    '#ahah' => array(
-      'path' => "ajax/wysiwyg_imgupl/upload/$form_id",
-      'wrapper' => 'file_upload_group',
-      'progress' => array('type' => 'bar', 'message' => t('Please wait...'))
-    )
-  );
-}
-
-/*
- * Called when a image was selected and the details form should be shown.
- */
-function wysiwyg_imageupload_edit_form($form_state,$iid) {
-  jquery_ui_dialog_child_js();
-  drupal_set_title(t('Update image'));
-  $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
-  $defaults = array (
-    'filepath' => $img_obj->filepath,
-    'imagecache' => $img_obj->imagecache,
-    'alignment' => $img_obj->alignment,
-    'style' => $img_obj->style,
-    'title' => $img_obj->title,
-  );
-  $attributes = array(
-    'class' => 'wysiwyg_imageupload_preview',
-  );
-  $img = theme('imagecache', 'wysiwyg_imageupload_preview', $defaults['filepath'], $iid, $defaults['title'], $attributes, TRUE, FALSE);
-  // Create the form image detail form.
-  $form['#cache'] = TRUE;
-  $form['#attributes'] = array('enctype' => "multipart/form-data");
-  $form = _wysiwyg_imageupload_details_form($img,$iid,$defaults);
-  if(is_array($form_state['post']) && count($form_state['post']) > 0) {
-    $form['#post'] = $_POST;
-  }
   return $form;
 }

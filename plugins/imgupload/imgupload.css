@@ -30,3 +30,48 @@ img.imgupl_styles_black_border
 {
   border:1px solid #000;
 }
+
+#image_preview {
+  float:right;
+}
+
+#image_details {
+  float:left;
+}
+
+#image_details_form {
+  width:300px;
+}
+
+#edit-start-upload {
+  display:inline;
+  margin-top:25px;
+  margin-left:5px;
+}
+
+#edit-wysiwyg-imageupload-file-wrapper {
+  display:inline;
+}
+
+.uploading  {
+  background-image: url('images/throbber.gif');
+  background-position: center center;
+  background-repeat: no-repeat;
+  height:130px;
+  width:500px;
+}
+
+#wysiwyg-imageupload-edit-form {
+  width:700px;
+}
+
+.clearfix:after {
+  clear:both;
+  content:".";
+  display:block;
+  font-size:0;
+  height:0;
+  visibility:hidden;
+}
+
+.clearfix { display:block; }

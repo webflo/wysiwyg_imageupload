@@ -103,13 +103,7 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
         'not null' => TRUE,
         'default' => '',
         'description' => 'Defines the alignment of the image',
-      ),
-      'lightbox' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Use lightbox integration or not',
-      ),
+      ),     
     ),
     'primary key' => array('iid')
   );
