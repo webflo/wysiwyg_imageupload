@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Thats where we actually alter the form and add out extra meta data
+ * Thats where we actually alter the form and add our extra meta data
  * The loaded $img_obj hold your data dui to the hook_wysiwyg_imageupload_entity_load_alter
  * We use the value to set our default value
  */
@@ -27,6 +27,10 @@ function wysiwyg_imageupload_lightbox_form_alter(&$form, &$state,$form_id) {
   else if ($form_id == 'wysiwyg_imageupload_admin_settings') {
     wysiwyg_imageupload_lightbox_admin_settings($form);
   }
+}
+
+function wysiwyg_imageupload_lightbox_theme() {
+  return wysiwyg_imageupload_theme();
 }
 
 /**
@@ -100,8 +104,9 @@ function wysiwyg_imageupload_lightbox_admin_settings(&$form) {
 /**
   * For proper lightbox integration we need to change the theming of the image
  */
-function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_render_image($img_obj,$arguments) {  
+function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_render_image($img_obj, $arguments) {  
   //$inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+  dsm('boom');
   $inline_args = $img_obj->iid;
   $attributes = array(
     'class' => 'wysiwyg_imageupload',
@@ -134,26 +139,3 @@ function wysiwyg_imageupload_lightbox_imagecache_default_presets() {
   
   return $presets;
 }
-
-
-function wysiwyg_imageupload_lightbox_theme_registry_alter(&$theme_registry) {
-  $modulepath = drupal_get_path('module', 'wysiwyg_imageupload_lightbox');
-  // make pattern template from our module take effect
-  // if no theme provide such.
-  $tmp = $theme_registry;
-  // Pretend we are a theme and tell it to work on it
-  // this will discover pattern hooks in our module directory
-  _theme_process_registry($tmp, 'phptemplate', 'theme_engine', 'wysiwyg_imageupload_lightbox', $modulepath);
-  // add only the newly discover hooks
-  $theme_registry += array_diff_key($tmp, $theme_registry);
- 
-  // the following make our moudule available for alternate suggestion template search
-  // insert our module path at second spot behind hook definer so
-  // theme suggestion tamplate take priority
-  //_drupalwiki_dokument_insert_after_first_element($theme_registry['node']['theme paths'], $modulepath);
-}
-/*
-function _drupalwiki_dokument_insert_after_first_element(&$a, $element) {
-  $first_element = array_shift($a);
-  array_unshift($a, $first_element, $element);
-}*/

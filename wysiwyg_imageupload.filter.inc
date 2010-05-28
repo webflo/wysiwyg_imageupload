@@ -40,6 +40,6 @@ function _wysiwyg_imageupload_filter_process(&$body) {
  */
 function _wysiwyg_imageupload_render_nodeview($iid, $arguments) {
   $arguments = unserialize(urldecode($arguments));
-  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);  
   return theme('wysiwyg_imageupload_render_image_entity', $image_obj, $arguments);
 }
