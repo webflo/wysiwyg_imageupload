@@ -96,7 +96,7 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
     break;
     case 'insert':
     case 'update':
-      if (user_access('use wysiwyg image upload')) {
+      if (user_access('use wysiwyg image upload')) {	
         _wysiwyg_imageupload_save($node);
       }
       break;
@@ -259,8 +259,10 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   $attributes = array(
     'class' => 'wysiwyg_imageupload',
   );
+  drupal_alter('wysiwyg_imageupload_image_attribute',$attributes,$img_obj);
 
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, TRUE, FALSE);
+  drupal_alter('wysiwyg_imageupload_rendered_image',$output,$img_obj);
   return $output;
 }
 
@@ -275,8 +277,7 @@ function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
 /**
  * Renders the meta container of an image.
  */
-function theme_wysiwyg_imageupload_render_container($image,$meta,$img_obj,$arguments) {  
-  dsm($image);
+function theme_wysiwyg_imageupload_render_container($image,$meta,$img_obj,$arguments) {    
   return "$image <div class'image_meta'>$meta</div>";
 }
 

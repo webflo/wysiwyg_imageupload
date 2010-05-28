@@ -75,14 +75,14 @@ function _wysiwyg_imageupload_get_dest_dir() {
  */
 function _wysiwyg_imageupload_load($node) {
   $files = array();
-
+  
   if ($node->vid) {
     $result = db_query('SELECT * FROM {wysiwyg_imageupload_entity_revision} as r LEFT JOIN {wysiwyg_imageupload_entity} AS e ON r.iid=e.iid LEFT JOIN {files} as f ON f.fid = e.fid  WHERE r.vid = %d ', $node->vid);
     while ($file = db_fetch_object($result)) {
       $files[$file->iid] = $file;
     }
   }
-
+  
   return $files;
 }
 
@@ -106,16 +106,17 @@ function _wysiwyg_imageupload_commment_load($cid) {
  * This is actually the place where a file object get attached to a node, the
  * relation is saved in the wysiwyg_imageupload table
  */
-function _wysiwyg_imageupload_save(&$node) {
-  if (!is_object($node)) {
+function _wysiwyg_imageupload_save(&$entity) {
+  if (!is_object($entity)) {
     // comments might be submitted as array
-    $node = (object)$node;
+    $entity = (object)$entity;
   }
 
-  if (empty($node->imgupload_images) || !is_array($node->imgupload_images)) {
+
+  if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
     return;
   }
-  foreach ($node->imgupload_images as $iid => $file) {
+  foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
     // Convert file to object for compatibility
     $file = (object)$file;
@@ -135,7 +136,7 @@ function _wysiwyg_imageupload_save(&$node) {
 
       // Remove it from the session in the case of new uploads,
       // that you want to disassociate before node submission.
-      unset($node->imgupload_images[$fid]);
+      unset($entity->imgupload_images[$fid]);
       // Move on, so the removed file won't be added to new revisions.
       continue;
     }
@@ -143,16 +144,19 @@ function _wysiwyg_imageupload_save(&$node) {
       file_set_status($file, FILE_STATUS_PERMANENT);
     }
     // It's a comment
-    if (!empty($node->cid) && $node->cid > 0) {
+    if (!empty($entity->cid) && $entity->cid > 0) {
       $data = array(
-        'nid' =>$node->nid,
-        'cid' =>$node->cid,
+        'nid' =>$entity->nid,
+        'cid' =>$entity->cid,
         'iid' =>$file->iid,
         'temporary' => 0,
       );
       drupal_write_record('wysiwyg_imageupload_entity', $data, array('iid'));
+      _wysiwyg_imageupload_cleanup_temps($entity->nid);
       // Call the alter hooks to react on the current attached image entity
+      $data = (object) $data;
       drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
+      
       // Skip the other steps, as its a comment - not a node
       continue;
     }
@@ -160,15 +164,15 @@ function _wysiwyg_imageupload_save(&$node) {
     // Its a node
     // Create a new revision, or associate a new file needed.
     $data = array(
-      'nid' => $node->nid,
+      'nid' => $entity->nid,
       'cid' => 0,
       'iid' => $file->iid,
       'temporary' => 0,
     );
 
     drupal_write_record('wysiwyg_imageupload_entity',$data, array('iid'));
-    _wysiwyg_imageupload_create_revision($iid, $node->vid);    
-    _wysiwyg_imageupload_cleanup_temps($node->nid);
+    _wysiwyg_imageupload_create_revision($iid, $entity->vid);    
+    _wysiwyg_imageupload_cleanup_temps($entity->nid);
     // Call the alter hooks to react on the current attached image entity
     $data = (object) $data;
     drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
@@ -211,8 +215,7 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
  * Updates or revision table for inline images and adds a new revision
  */
 function _wysiwyg_imageupload_create_revision($iid,$vid) {
-    $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));
-
+    $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));    
     if($idd) {
       // version already exists, dont create a new one
       return false;

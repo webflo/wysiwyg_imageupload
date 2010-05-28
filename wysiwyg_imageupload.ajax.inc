@@ -18,7 +18,7 @@ function _wysiwyg_imageupload_entity_upload($node_form_build_id) {
     $cached_files->data = array();
   }
   $cached_files = $cached_files->data;
-
+  
   // Handle new uploads. Create the files in the files table and make them temperory.
   // The will need to be made persistend on form submit in the hook_comment or hook_nodeapi
   $imgDetails = _wysiwyg_imageupload_upload_file();

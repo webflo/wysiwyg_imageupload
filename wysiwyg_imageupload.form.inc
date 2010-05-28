@@ -123,7 +123,7 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
     '#suffix' => '</div>'
   );
 
-   $form[''] = array(
+   $form['parent_build_id'] = array(
     '#type' => 'value',
     '#value' => $parent_build_id
   );
@@ -145,6 +145,7 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
 
 
 function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {  
+  
   $iid = _wysiwyg_imageupload_entity_upload($state['values']['parent_build_id']);
   if($iid == false) {    
     form_set_error('wysiwyg_imageupload_file',t('This file could not be uploaded'));
