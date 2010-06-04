@@ -96,7 +96,7 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
     break;
     case 'insert':
     case 'update':
-      if (user_access('use wysiwyg image upload')) {	
+      if (user_access('use wysiwyg image upload')) {
         _wysiwyg_imageupload_save($node);
       }
       break;
@@ -197,27 +197,27 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL) {
  * wysiwyg_imageupload_render_image_wysiwyg: renders the view for the wysiwyg editor. DONT CHANGE THIS
  */
 function wysiwyg_imageupload_theme() {
-  return array(    
-    'wysiwyg_imageupload_render_image_entity' => array(      
+  return array(
+    'wysiwyg_imageupload_render_image_entity' => array(
       'arguments' => array(
 	'imgage_obj',
 	'arguments' => array(),
       ),
     ),
     'wysiwyg_imageupload_render_image' => array(
-      
+
       'arguments' => array(
 	'imgage_obj',
 	'arguments' => array(),
 	),
     ),
-    'wysiwyg_imageupload_render_meta' => array(      
+    'wysiwyg_imageupload_render_meta' => array(
       'arguments' => array(
 	'imgage_obj',
 	'arguments' => array(),
 	),
     ),
-    'wysiwyg_imageupload_render_container' => array(      
+    'wysiwyg_imageupload_render_container' => array(
       'arguments' => array(
 	'image',
 	'meta',
@@ -225,7 +225,7 @@ function wysiwyg_imageupload_theme() {
 	'arguments' => array(),
       ),
     ),
-    'wysiwyg_imageupload_render_image_wysiwyg' => array(      
+    'wysiwyg_imageupload_render_image_wysiwyg' => array(
       'arguments' => array(
 	'imgage_obj',
 	'arguments' => array(),
@@ -238,9 +238,9 @@ function wysiwyg_imageupload_theme() {
  * wysiwyg_imageupload_render_image: renders the image for the node view
  */
 function theme_wysiwyg_imageupload_render_image_entity($img_obj, $arguments) {
-  $image = theme('wysiwyg_imageupload_render_image', $img_obj, $arguments);  
+  $image = theme('wysiwyg_imageupload_render_image', $img_obj, $arguments);
   $meta = theme('wysiwyg_imageupload_render_meta', $img_obj, $arguments);
-  return theme('wysiwyg_imageupload_render_container', $image, $meta, $img_obj, $arguments);  
+  return theme('wysiwyg_imageupload_render_container', $image, $meta, $img_obj, $arguments);
 }
 
 /**
@@ -258,6 +258,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   $inline_args = $img_obj->iid;
   $attributes = array(
     'class' => 'wysiwyg_imageupload',
+    'style' => '',
   );
   drupal_alter('wysiwyg_imageupload_image_attribute',$attributes,$img_obj);
 
@@ -277,7 +278,7 @@ function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
 /**
  * Renders the meta container of an image.
  */
-function theme_wysiwyg_imageupload_render_container($image,$meta,$img_obj,$arguments) {    
+function theme_wysiwyg_imageupload_render_container($image,$meta,$img_obj,$arguments) {
   return "$image <div class'image_meta'>$meta</div>";
 }
 
@@ -296,7 +297,7 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
   $attributes = array(
     'class' => 'wysiwyg_imageupload',
   );
-  
+
   $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes,NULL,false);
   return $output;
 }
@@ -315,13 +316,13 @@ function wysiwyg_imageupload_imagecache_default_presets() {
 	'action' => 'imagecache_scale',
 	'data' => array (
 	  'height' => '150',
-	  'width' => '250',
+	  'width' => '220',
 	  'upscale' => 1,
 	),
       ),
     )
   );
-  
+
   return $presets;
 }
 
