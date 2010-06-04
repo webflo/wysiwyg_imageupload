@@ -16,7 +16,7 @@
 
     /* We need this due all the special cases in the editors */
     getRepresentitiveNode: function(node) {
-      if(node.$) {
+      if (node != null && typeof(node) != 'undefined' && '$' in node) {
         // This case is for the CKeditor, where
         // $(node) != $(node.$)
         return $(node.$);
@@ -30,6 +30,10 @@
     * Execute the button.
     */
     invoke: function (data, settings, instanceId) {
+      if(data == null && typeof(data) == 'undefined') {
+        return;
+      }
+
       if (data.format == 'html') {
         // Default
         var options = {
@@ -39,7 +43,7 @@
           revisions: Drupal.settings.wysiwyg_imageupload.revisions
         };
         var $node = null;
-        if (data.node) {
+        if ('node' in data) {
           $node = this.getRepresentitiveNode(data.node);
         }
 
@@ -231,6 +235,7 @@
       );
       return result;
     },
+
     uniqueArray: function (a) {
       var r = new Array();
       o: for (var i = 0, n = a.length; i < n; i++) {
