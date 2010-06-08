@@ -1,4 +1,7 @@
 <?php
+// $Id:$
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
 
 /**
  * Thats where we actually alter the form and add our extra meta data

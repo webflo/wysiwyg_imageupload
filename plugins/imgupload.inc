@@ -1,8 +1,7 @@
 <?php
-// $Id: imgupload.inc,v 1.1.2.18 2010/03/19 11:20:43 eugenmayer Exp $
-
-# Copyright (c) 2010 Impressive.media
-# Author: Eugen Mayer
+// $Id:$
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
 
 function wysiwyg_imageupload_imgupload_plugin() {
   $plugins = array();

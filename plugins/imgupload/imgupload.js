@@ -1,5 +1,7 @@
 // $Id:$
-// Helper method.
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
+
 (function($) {
   $.fn.imguploadOuterHTML = function (s) {
     return (s) ? this.before(s).remove() : jQuery("<p>").append(this.eq(0).clone()).html();

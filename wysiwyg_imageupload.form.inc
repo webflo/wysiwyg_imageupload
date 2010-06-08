@@ -1,13 +1,12 @@
 <?php
 // $Id:$
-# Copyright (c) 2010 KontextWork GbR
-# Author: Eugen Mayer
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
 
-
-/*
- * Implementation of hook_form_alter
- * Adding jquery_ui_dialog javascript / css definitions to the form.
- */
+/**
+* Implementation of hook_form_alter
+* Adding jquery_ui_dialog javascript / css definitions to the form.
+*/
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
     // SO UGLY: we have to use this, as FAPI has a special case with cached forms
@@ -57,9 +56,9 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
   }
 }
 
-/*
- * Inlcude all js libs and css we need for the form
- */
+/**
+* Inlcude all js libs and css we need for the form
+*/
 function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
   drupal_add_js('misc/jquery.form.js');
 
@@ -74,12 +73,12 @@ function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
   return $form;
 }
 
-/*
- * This method transfers the cache of the old from_build_id to a new cache setting
- * using the new form_build_id. This is need due every preview and save of a non cached form
- * is causing the form_build_id to change and therefor we could later not load our uploaded files
- * for making them persisten.
- */
+/**
+* This method transfers the cache of the old from_build_id to a new cache setting
+* using the new form_build_id. This is need due every preview and save of a non cached form
+* is causing the form_build_id to change and therefor we could later not load our uploaded files
+* for making them persisten.
+*/
 function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
   $old_form_build_id = $form_state['post']['form_build_id'];
   $new_form_build_id = $form['#build_id'];
@@ -89,11 +88,11 @@ function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
   cache_set('wysiwyg_imageupload_'.$new_form_build_id,$old->data,'cache',CACHE_TEMPORARY);
 }
 
-/*
- * Called on every node or comment save
- * This method will load the cache and put the loaded files into the comment-object for use in insert/update
- * where those files will be made persistent and added to the relation table.
- */
+/**
+* Called on every node or comment save
+* This method will load the cache and put the loaded files into the comment-object for use in insert/update
+* where those files will be made persistent and added to the relation table.
+*/
 function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
   if ($form_state['submitted'] == true) {
     $value = cache_get('wysiwyg_imageupload_' . $form_state['values']['form_build_id'], 'cache');
@@ -101,11 +100,11 @@ function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
   }
 }
 
-/*
- * Returns the general image upload form.
- * This form is shown before an image has been uploaded,
- * afterwards it is replaced by the image details form
- */
+/**
+* Returns the general image upload form.
+* This form is shown before an image has been uploaded,
+* afterwards it is replaced by the image details form
+*/
 function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
   $m = drupal_get_path('module','wysiwyg_imageupload');
   
@@ -123,7 +122,7 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
     '#suffix' => '</div>'
   );
 
-   $form['parent_build_id'] = array(
+  $form['parent_build_id'] = array(
     '#type' => 'value',
     '#value' => $parent_build_id
   );
@@ -139,7 +138,7 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
     '#value' => t('Upload image'),
     '#name' => 'attach',
   );*/  
- 
+
   return $form;
 }
 
@@ -156,9 +155,9 @@ function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
 }
 
 
-/*
- * Called when a image was selected / uploaded and the details form should be shown.
- */
+/**
+* Called when a image was selected / uploaded and the details form should be shown.
+*/
 function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
   jquery_ui_dialog_child_js(array('width' => 740));
   drupal_set_title(t('Image details'));
@@ -198,28 +197,28 @@ function wysiwyg_imageupload_edit_form_validate($form, &$state) {
     // As this node is going to have a new revision AND we just EDITED an image
     // (NOT updated)
     // we create a new inline entity with the new settings and dont touch the old one.
-    // This way the old inline image stays the same in older revisions
+    // This way the old inline image stays the same in older revisions.
     $old_iid = $state['values']['iid'];
     $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
     // Create new inline entity and save it to our form_state
-    // so the the code below handles the right entity
+    // so the the code below handles the right entity.
     $state['values']['iid'] = _wysiwyg_imageupload_craete_inline_entity($img_obj,true);
-    // Remove the old inline id and place the new one
+    // Remove the old inline id and place the new one.
     $cached_form_state = array();
     $form = form_get_cache($_POST['parent_build_id'], $cached_form_state);
     $new_file = $form['#node']->imgupload_images[$old_iid];
     $new_file->iid = $state['values']['iid'];
-    // Create the new
+    // Create the new.
     $form['#node']->imgupload_images[$new_file->iid] = $new_file;
-    // Remove the old
+    // Remove the old.
     unset($form['#node']->imgupload_images[$old_iid]);
   }
 }
 
-/*
- * Handles the submit of the edit form
- * Adds the details into the database for the inline-id
- */
+/**
+* Handles the submit of the edit form
+* Adds the details into the database for the inline-id
+*/
 function wysiwyg_imageupload_edit_form_submit($form, &$state) {
   $update = array(
     'iid',
@@ -233,16 +232,16 @@ function wysiwyg_imageupload_edit_form_submit($form, &$state) {
   );
 
   drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
-  // call all our hooks    
+  // Call all our hooks.
   module_invoke_all('wysiwyg_imageupload_entity_save',$state['values'],$state['values']['iid']);
   print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
   exit();
 }
 
-/*
- * Return the form to be presented as image details form.
- * Title, floating description and so forth
- */
+/**
+* Return the form to be presented as image details form.
+* Title, floating description and so forth
+*/
 function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
   $form = array();
 

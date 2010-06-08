@@ -4,7 +4,7 @@
 # Copyright (c) 2010 KontextWork
 # Author: Eugen Mayer
 
-/*
+/**
  * Uploading a image and calling the file_insert hooks.
  * @return: Returns the uploaded file as an object
  */
@@ -55,9 +55,9 @@ function _wysiwyg_imageupload_upload_file() {
 function _wysiwyg_imageupload_get_dest_dir() {
   global $user;
   $dest = file_directory_path();
-  // Add the global relativ path
+  // Add the global relativ path.
   $dest = "$dest/".variable_get('wysiwyg_imageupload_dest_root', 'wysiwyg_imageupload');
-  // If its not a guest and we have set a userpath, add it relativly
+  // If its not a guest and we have set a userpath, add it relativly.
   if($user->uid > 0) {      
     $userpath  = variable_get('wysiwyg_imageupload_relative_user', '$uid');
     if($userpath != '') {
@@ -70,7 +70,7 @@ function _wysiwyg_imageupload_get_dest_dir() {
   return $dest;
 }
 
-/*
+/**
  * Loading all files uploaded to a node
  */
 function _wysiwyg_imageupload_load($node) {
@@ -86,7 +86,7 @@ function _wysiwyg_imageupload_load($node) {
   return $files;
 }
 
-/*
+/**
  * Loading all files uploaded to a comment
  */
 function _wysiwyg_imageupload_commment_load($cid) {
@@ -100,7 +100,7 @@ function _wysiwyg_imageupload_commment_load($cid) {
   return $files;
 }
 
-/*
+/**
  * Share from the upload.module
  * Adds, removes or updates files in the image property.
  * This is actually the place where a file object get attached to a node, the
@@ -108,7 +108,7 @@ function _wysiwyg_imageupload_commment_load($cid) {
  */
 function _wysiwyg_imageupload_save(&$entity) {
   if (!is_object($entity)) {
-    // comments might be submitted as array
+    // comments might be submitted as array.
     $entity = (object)$entity;
   }
 
@@ -118,16 +118,16 @@ function _wysiwyg_imageupload_save(&$entity) {
   }
   foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
-    // Convert file to object for compatibility
+    // Convert file to object for compatibility.
     $file = (object)$file;
 
     // Remove file. Process removals first since no further processing
     // will be required.
     if (!empty($file->remove)) {
-      // Delete from our relation table - removing the inline entity
+      // Delete from our relation table - removing the inline entity.
       db_query('DELETE FROM {wysiwyg_imageupload_entity} WHERE iid = %d', $file->iid);
 
-      // If the file isn't used by any other revisions delete it completely
+      // If the file isn't used by any other revisions delete it completely.
       $count = db_result(db_query('SELECT COUNT(fid) FROM {wysiwyg_imageupload_entity} WHERE fid = %d', $fid));
       if ($count < 1) {
         file_delete($file->filepath);
@@ -143,7 +143,7 @@ function _wysiwyg_imageupload_save(&$entity) {
     if($file->new) {
       file_set_status($file, FILE_STATUS_PERMANENT);
     }
-    // It's a comment
+    // It's a comment.
     if (!empty($entity->cid) && $entity->cid > 0) {
       $data = array(
         'nid' =>$entity->nid,
@@ -153,15 +153,15 @@ function _wysiwyg_imageupload_save(&$entity) {
       );
       drupal_write_record('wysiwyg_imageupload_entity', $data, array('iid'));
       _wysiwyg_imageupload_cleanup_temps($entity->nid);
-      // Call the alter hooks to react on the current attached image entity
+      // Call the alter hooks to react on the current attached image entity.
       $data = (object) $data;
       drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
       
-      // Skip the other steps, as its a comment - not a node
+      // Skip the other steps, as its a comment - not a node.
       continue;
     }
 
-    // Its a node
+    // Its a node.
     // Create a new revision, or associate a new file needed.
     $data = array(
       'nid' => $entity->nid,
@@ -173,34 +173,34 @@ function _wysiwyg_imageupload_save(&$entity) {
     drupal_write_record('wysiwyg_imageupload_entity',$data, array('iid'));
     _wysiwyg_imageupload_create_revision($iid, $entity->vid);    
     _wysiwyg_imageupload_cleanup_temps($entity->nid);
-    // Call the alter hooks to react on the current attached image entity
+    // Call the alter hooks to react on the current attached image entity.
     $data = (object) $data;
     drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
   }
 }
 
-/*
+/**
  * Cleanup all files marked as temporary for this node
  */
 function _wysiwyg_imageupload_cleanup_temps($nid) {
   db_query('DELETE FROM {wysiwyg_imageupload_entity} WHERE temporary=1 AND nid=%d',$nid);
 }
 
-/*
+/**
  * Deletes all inline entities for a specific node
  * If the correspinding files are not using in any other node, they will be deleted
  */
 function _wysiwyg_imageupload_handle_node_delete($nid) {
   $entities = array();
-  // Get all current entities to later be able to look if their files are still in use
+  // Get all current entities to later be able to look if their files are still in use.
   $result = db_query('SELECT * FROM {wysiwyg_imageupload_entity} WHERE nid=%d',$nid);
   while($entity = db_fetch_object($result)) {
     $entities[] = $entity;
   }
-  // Delete all inline entities for all version
+  // Delete all inline entities for all version.
   db_query('DELETE r.*,e.* FROM {wysiwyg_imageupload_entity} as e LEFT JOIN {wysiwyg_imageupload_entity_revision} AS r ON e.iid=r.iid WHERE nid=%d',$nid);
 
-  // Cleanup files which are no longer used
+  // Cleanup files which are no longer used.
   foreach($entities as $entity){
     $count = db_result(db_query('SELECT COUNT(fid) FROM {wysiwyg_imageupload_entity} WHERE fid = %d', $entity->fid));
     if ($count < 1) {
@@ -211,7 +211,7 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
 
 }
 
-/*
+/**
  * Updates or revision table for inline images and adds a new revision
  */
 function _wysiwyg_imageupload_create_revision($iid,$vid) {
@@ -229,7 +229,7 @@ function _wysiwyg_imageupload_create_revision($iid,$vid) {
     return true;
 }
 
-/*
+/**
  * Loads the inline-image object with all its details
  */
 function _wysiwyg_imageupload_load_inline_entity($iid) {  
@@ -244,7 +244,7 @@ function _wysiwyg_imageupload_load_inline_entity($iid) {
   return false;
 }
 
-/*
+/**
  * Create a basic / dummy inline-image entity which will be filled later
  */
 function _wysiwyg_imageupload_craete_inline_entity($file,$temporary = true, $options = array()) {

@@ -1,10 +1,10 @@
 <?php
 // $Id:$
 
-# Copyright (c) 2010 Impressive.media
-# Author: Eugen Mayer
+// Copyright (c) 2010 KontextWork
+// Author: Eugen Mayer
 
-/*
+/**
  * Providing a administration interface for tagging.
  */
 function wysiwyg_imageupload_admin_settings() {
