@@ -77,16 +77,20 @@ function _wysiwyg_imageupload_migrate_1_2_migrate($node,$part = 'body') {
       $m = drupal_get_path('module','wysiwyg_imageupload');
       require_once("$m/wysiwyg_imageupload.module");
       $iid = _wysiwyg_imageupload_craete_inline_entity($file,false);
-
-
+      
+      
       $update = array(
         'iid'
       );
+      
+      $old = db_fetch_object(db_query('SELECT * FROM {wysiwyg_imageupload} WHERE fid=%d',$file->fid));
       $record = array(
         'style' => $style,
         'imagecache' => $preset,
-        'alignment' => v,
+        'alignment' => $alignment,
         'title' => $title,
+        'nid' => $old->nid,
+        'cid' => $old->cid,
         'iid' => $iid
       );
       drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
