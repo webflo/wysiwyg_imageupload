@@ -7,7 +7,10 @@
 * Implementation of hook_form_alter
 * Adding jquery_ui_dialog javascript / css definitions to the form.
 */
-function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id){
+function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
+  if(variable_get('wysiwyg_imageupload_skip_dependencies_check', true)) {
+    _wysiwyg_imageupload_check_dependencies();
+  }
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
     // SO UGLY: we have to use this, as FAPI has a special case with cached forms
     // so if you save the form and a validation error occurs, form_alter is not called
