@@ -12,14 +12,14 @@ function wysiwyg_imageupload_browser_imagecache_default_presets() {
     'presetname' => 'wysiwyg_imageupload_browser_preview',
     'actions' => array (
       0 => array (
-	'weight' => '0',
-	'module' => 'imagecache',
-	'action' => 'imagecache_scale_and_crop',
-	'data' => array (
-	  'width' => '50',
-	  'height' => '50',
-	  'upscale' => 1,
-	),
+      'weight' => '0',
+      'module' => 'imagecache',
+      'action' => 'imagecache_scale_and_crop',
+      'data' => array (
+        'width' => '120',
+        'height' => '120',
+        'upscale' => 1,
+      ),
       ),
     )
   );
@@ -69,7 +69,7 @@ function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
       '#type' => 'textfield',
       '#title' => t('Max. Items Displayed'),
       '#description' => t('Define how many Images should be displayed inside the Browser'),
-      '#default_value' => variable_get('wysiwyg_imageupload_browser_itemcount', ''),
+      '#default_value' => variable_get('wysiwyg_imageupload_browser_itemcount', 8),
       '#weight' => 0,
     );
     $presets = imagecache_presets();
@@ -98,25 +98,24 @@ function wysiwyg_imageupload_browser_browser($form_id){
 
   // Adding tabs.
   $tabs = array();
-  $tabs[] = l(t('New Image'), 'ajax/wysiwyg_imgupl/add/'.arg(2), array('title' => t('Go back to the upload form and upload a new image')));
+  $tabs[] = l(t('New Image'), 'wysiwy_imageupload/upload/'.arg(2), array('title' => t('Go back to the upload form and upload a new image')));
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= _wysiwyg_imageupload_browser_tabs($tabs,1);
 
-  $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 8),$user->uid);
+  $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 8), $user->uid, 'f.fid');
+  //$images = wysiwyg_imageupload_get_images(8,$user->uid,'f.fid');
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
+  $preset = variable_get('wysiwyg_imageupload_browser_preset', 'wysiwyg_imageupload_browser_preview');
   foreach($images as $image){
     $imageHTML = '<div class="browser_image">';
-    $preset = variable_get('wysiwyg_imageupload_browser_preset', 'wysiwyg_imageupload_browser_preview');
-    $imageHTML .= theme('imagecache', $preset, $image['filepath'], t('Insert this image'), TRUE, FALSE);
+    
+    $imageHTML .= theme('imagecache', $preset, $image['filepath'], t('Insert this image'),t('Insert this image'), TRUE, FALSE);
     $imageHTML .= '</div>';
-    $output .= l($imageHTML, 'ajax/wysiwyg_imgupl/update/Title/', array(
+    $output .= l($imageHTML, 'wysiwyg_imageupload/edit/'.$image['iid'], array(
       'title' => t('Insert this image'),
       'html' => 'true',
-      'absolute' => TRUE,
-      'query' => array(
-        'imagepath' => $image['filepath'])
-      )
-    );
+      'absolute' => TRUE
+    ));
   }
   $output .= '</div>';
 
