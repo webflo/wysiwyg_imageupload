@@ -176,9 +176,9 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL, $group = nul
     $group = " GROUP BY $group";
   }
   if ($uid != NULL) {
-    $result = db_query('SELECT f.*,w.* as parent_nid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload_entity} AS w on w.fid = f.fid WHERE f.uid = %d  ORDER BY f.timestamp DESC'.$limit,$uid);
+    $result = db_query('SELECT f.*,w.* as parent_nid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload_entity} AS w on w.fid = f.fid WHERE f.uid = %d'.$group.' ORDER BY f.timestamp DESC'.$group.$limit,$uid);
   } else {
-    $result = db_query('SELECT f.*,w.* as parent_nid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload_entity} AS w on w.fid = f.fid ORDER BY f.timestamp DESC'.$limit);
+    $result = db_query('SELECT f.*,w.* as parent_nid FROM {files} as f RIGHT JOIN {wysiwyg_imageupload_entity} AS w on w.fid = f.fid'.$group.' ORDER BY f.timestamp DESC'.$limit);
   }
   
   if ($result != FALSE) {
