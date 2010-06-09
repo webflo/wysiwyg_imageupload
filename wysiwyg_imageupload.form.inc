@@ -202,7 +202,7 @@ function wysiwyg_imageupload_edit_form_validate($form, &$state) {
     $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
     // Create new inline entity and save it to our form_state
     // so the the code below handles the right entity.
-    $state['values']['iid'] = _wysiwyg_imageupload_craete_inline_entity($img_obj,true);
+    $state['values']['iid'] = _wysiwyg_imageupload_create_inline_entity($img_obj,true);
     // Remove the old inline id and place the new one.
     $cached_form_state = array();
     $form = form_get_cache($_POST['parent_build_id'], $cached_form_state);

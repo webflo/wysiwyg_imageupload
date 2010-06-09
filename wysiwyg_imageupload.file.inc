@@ -247,7 +247,7 @@ function _wysiwyg_imageupload_load_inline_entity($iid) {
 /**
  * Create a basic / dummy inline-image entity which will be filled later
  */
-function _wysiwyg_imageupload_craete_inline_entity($file,$temporary = true, $options = array()) {
+function _wysiwyg_imageupload_create_inline_entity($file,$temporary = true, $options = array()) {
   $record = array(
     'fid' => $file->fid,
     'temporary' => $temporary,

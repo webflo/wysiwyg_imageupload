@@ -76,7 +76,7 @@ function _wysiwyg_imageupload_migrate_1_2_migrate($node,$part = 'body') {
       $file = db_fetch_object(db_query('SELECT * from {files} where filepath="%s"',$path));
       $m = drupal_get_path('module','wysiwyg_imageupload');
       require_once("$m/wysiwyg_imageupload.module");
-      $iid = _wysiwyg_imageupload_craete_inline_entity($file,false);
+      $iid = _wysiwyg_imageupload_create_inline_entity($file,false);
       
       
       $update = array(
