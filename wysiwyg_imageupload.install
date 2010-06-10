@@ -152,3 +152,9 @@ function wysiwyg_imageupload_update_6200() {
   return $ret;
 }
 
+function wysiwyg_imageupload_requirements($phase) {
+  $requirements = array();
+  _wysiwyg_imageupload_check_dependencies($requirements);
+  return $requirements;
+}
+

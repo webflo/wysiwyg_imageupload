@@ -361,31 +361,85 @@ function _wysiwyg_imagegupload_revisions_activated($type) {
   return 0;
 }
 
-function _wysiwyg_imageupload_check_dependencies() {  
+function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {  
   $error = false;
-  $jquiv = jquery_ui_get_version();
-  if (!preg_match('@1\.7\.\d+@',$jquiv)) {
-    drupal_set_message('You jquery ui library version is to old to use wysiwyg_imageupload. You need at least 1.7.x and you are currently running '.$jquiv. ' Please read <a href="http://drupal.org/node/809812">this howto</a> on how to fix this.','error');
+  if(module_exists('jquery_ui')) {
+    $jquiv = jquery_ui_get_version();
+    if (!preg_match('@1\.7\.\d+@',$jquiv)) {
+      $msg = 'Your jquery ui library version is to old to use wysiwyg_imageupload. You need at least 1.7.x and you are currently running '.$jquiv. ' Please read <a href="http://drupal.org/node/809812">this howto</a> on how to fix this.';
+      if (is_array($requirements)) {
+        $requirements['wyiwyg_imageupload_jquery_ui']['description'] = $msg;
+        $requirements['wyiwyg_imageupload_jquery_ui']['title'] = 'WYSIWYG imageupload: Jquery UI';
+        $requirements['wyiwyg_imageupload_jquery_ui']['severity'] = REQUIREMENT_ERROR;
+        $requirements['wyiwyg_imageupload_jquery_ui']['value'] = $jquiv;
+      }
+      else {
+        drupal_set_message($msg,'error');
+      }
+      $error = true;
+    }    
+  }
+  else {
+    drupal_set_message('You dont have <a href="http://drupal.org/project/jquery_ui">jquery_ui</a> installed, so wysiwyg_imageupload wont work at all. You will also need at least 1.7.x of the jquery ui library . Check <a href="http://drupal.org/node/809812">this howto</a> on how to fix this.','error');
+    $error = true;   
+  }
+  
+  if(module_exists('jquery_update')) {
+    $jqv = jquery_update_get_version();
+    if (!preg_match('@1\.3\.\d+@',$jqv)) {
+      $msg = 'Your jquery version is to old to use wysiwyg_imageupload. Therefore you need to install <a href="http://drupal.org/project/jquery_update">jquery_update</a> 6.2.x, not jquery_update 6.1.x. Please read point 3 at <a href="http://drupal.org/node/809608">this howto</a> to fix this.';
+      if(is_array($requirements)) {
+        $requirements['wyiwyg_imageupload_jquery_update']['description'] = $msg;
+        $requirements['wyiwyg_imageupload_jquery_update']['title'] = 'WYSIWYG imageupload: JQuery Update';
+        $requirements['wyiwyg_imageupload_jquery_update']['severity'] = REQUIREMENT_ERROR;
+        $requirements['wyiwyg_imageupload_jquery_update']['value'] = $jqv;
+      }
+      else {
+        drupal_set_message($msg,'error');
+      }
+      $error = true;
+    }
+  }
+  else {
+    drupal_set_message('You dont have <a href="http://drupal.org/project/jquery_update">jquery_update</a> installed, so wysiwyg_imageupload wont work at all. You need to install <a href="http://drupal.org/project/jquery_update">jquery_update</a> 6.2.x, not jquery_update 6.1.x. Please read point 3 at <a href="http://drupal.org/node/809608">this howto</a> to fix this.','error');
     $error = true;
   }
   
-  $jqv = jquery_update_get_version();
-  if (!preg_match('@1\.3\.\d+@',$jqv)) {
-    drupal_set_message('Your jquery version is to old to use wysiwyg_imageupload. Therefore you need to install <a href="http://drupal.org/project/jquery_update">jquery_update</a> 6.2.x, not jquery_update 6.1.x Please read point 3 at <a href="http://drupal.org/node/809608">this howto</a> to fix this.','error');
-    $error = true;
+  if(module_exists('imageapi')) {
+    $toolkits = imageapi_get_available_toolkits();
+    if(!array($toolkits) || count($toolkits) == 0) {
+      $msg = 'You need to have at least one ImageAPI library activated 6.2.x to use wysiwyg_imageupload. Please read point 4 at <a href="http://drupal.org/node/809608">this howto</a> on ho to fix this. Go to your '.l('modules page','admin/build/modules/list').' under section "imagecache"';
+      if(is_array($requirements)) {
+        $requirements['wyiwyg_imageupload_imageapi']['description'] = $msg;
+        $requirements['wyiwyg_imageupload_imageapi']['title'] = 'WYSIWYG imageupload: ImageAPI library';
+        $requirements['wyiwyg_imageupload_imageapi']['severity'] = REQUIREMENT_ERROR;
+        $requirements['wyiwyg_imageupload_imageapi']['value'] = 'None activated';
+      }
+      else {
+        drupal_set_message($msg,'error');
+      }
+      $error = true;
+    }
   }
-  
-  $toolkits = imageapi_get_available_toolkits();
-  
-  if(!array($toolkits) || count($toolkits) == 0) {
-    drupal_set_message('You need to have at least one ImageAPI library activated 6.2.x to use wysiwyg_imageupload. Please read point 4 at <a href="http://drupal.org/node/809608">this howto</a> on ho to fix this. Go to your '.l('modules page','admin/build/modules/list').' under section "imagecache"','error');
+  else {
+    drupal_set_message('You need to have installed <a href="http://drupal.org/project/imageapi">imageapi</a> to use to use wysiwyg_imageupload.','error');
     $error = true;
   }
   
   $roles = user_roles(false,'use wysiwyg image upload'); 
   if(!array($roles) || count($roles) == 0) {
-    drupal_set_message('You did not give any role the "use wysiwyg image upload" permission, so nobody can use wysiwyg_imageupload. Please read point 8 at <a href="http://drupal.org/node/809608">this howto</a> on ho to fix this.','error');
+    $msg = 'You did not give any role the "use wysiwyg image upload" permission, so nobody can use wysiwyg_imageupload. Please read point 8 at <a href="http://drupal.org/node/809608">this howto</a> on ho to fix this.';
+    if(is_array($requirements)) {
+      $requirements['wyiwyg_imageupload_user_permissions']['description'] = $msg;
+      $requirements['wyiwyg_imageupload_user_permissions']['title'] = 'WYSIWYG imageupload: User Permissions';
+      $requirements['wyiwyg_imageupload_user_permissions']['severity'] = REQUIREMENT_ERROR;
+      $requirements['wyiwyg_imageupload_user_permissions']['value'] = 'Not set';
+    }
+    else {
+      drupal_set_message($msg,'error');
+    }
     $error = true;
   }
   return $error;
 }
+
