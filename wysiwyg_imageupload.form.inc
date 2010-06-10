@@ -282,7 +282,7 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#type' => 'fieldset',
     '#title' => t('Extras'),
     '#collapsed' => true,
-    '#collapsible' => true,    
+    '#collapsible' => true,
   );
 
   // styles.

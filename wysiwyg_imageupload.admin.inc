@@ -10,8 +10,8 @@
 function wysiwyg_imageupload_admin_settings() {
   $form['wysiwyg_imageupload_do_dependencies_check'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Do the dependencies checks'),
-    '#description' => t('If this is set, dependencies checks will be done and you see errors when editing a node. If something is not correct, you get a anoying error message!'),
+    '#title' => t('Do the requirements checks'),
+    '#description' => t('If this is set, requirements checks will be done. If something is not correct, you get a anoying error message!'),
     '#default_value' => variable_get('wysiwyg_imageupload_skip_dependencies_check', true),
   );
   $form['styles'] = array(
@@ -23,9 +23,9 @@ function wysiwyg_imageupload_admin_settings() {
     '#weight' => -2,
   );
   $form['styles']['wysiwyg_imageupload_imgstyles'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Image style'),
-    '#description' => t('Define which CSS styles the user can chose when adding an image. Please do not define floating or size in that CSS classes, as this is handled seperately. You can give the style a descriptive name to make it easier to handle. The syntax is "Descriptive Name=imgupl_style_XYC,Other Descriptive name=imgupl_style_ZXC.." while imgupl_style_* is a css class'),
+    '#description' => t('Define which CSS styles the user can chose when adding an image. Please do not define floating or size in that CSS classes, as this is handled seperately. You can give the style a descriptive name to make it easier to handle. The syntax is "Descriptive Name=imgupl_style_XYC". You _must_ prefix the style with imgupl_style_*! For each style use on separate line.'),
     '#default_value' => variable_get('wysiwyg_imageupload_imgstyles', '')
   );
 

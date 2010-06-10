@@ -68,7 +68,7 @@ msgstr "Text unter/vor Bild (kein Textfluss)"
 
 #: wysiwyg_imageupload.form.inc:137
 msgid "Image on left, text on right"
-msgstr "Bild rechts, Text rechts"
+msgstr "Bild links, Text rechts"
 
 #: wysiwyg_imageupload.form.inc:138
 msgid "Image on right, text on left"
