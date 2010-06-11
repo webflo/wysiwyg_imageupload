@@ -27,7 +27,7 @@ function _wysiwyg_imageupload_upload_file() {
     // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
   );
   $file = NULL;
-  if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest,FILE_EXISTS_RENAME)) {
+  if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest, FILE_EXISTS_RENAME)) {
     foreach (module_implements('wysiwyg_imageupload_image_uploaded') as $module) {
       $function =  $module .'_wysiwyg_imageupload_image_uploaded';
       $function($file);
@@ -42,10 +42,13 @@ function _wysiwyg_imageupload_upload_file() {
       watchdog('wysiwyg_imageupload', 'Could not set permissons on destination file: %file', array('%file' => $file->filepath));
     }
   }
+  else {
+    // Upload failed.
+    return NULL;
+  }
 
   drupal_alter('wysiwyg_imageupload_file_uploaded',$file);
-
-  return (object)$file;
+  return (object) $file;
 }
 
 /** 

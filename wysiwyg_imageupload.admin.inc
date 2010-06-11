@@ -8,7 +8,7 @@
  * Providing a administration interface for tagging.
  */
 function wysiwyg_imageupload_admin_settings() {
-  $form['wysiwyg_imageupload_do_dependencies_check'] = array(
+  $form['wysiwyg_imageupload_skip_dependencies_check'] = array(
     '#type' => 'checkbox',
     '#title' => t('Do the requirements checks'),
     '#description' => t('If this is set, requirements checks will be done. If something is not correct, you get a anoying error message!'),

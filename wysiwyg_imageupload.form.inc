@@ -8,10 +8,10 @@
 * Adding jquery_ui_dialog javascript / css definitions to the form.
 */
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
-  if(variable_get('wysiwyg_imageupload_skip_dependencies_check', true)) {
-    _wysiwyg_imageupload_check_dependencies();
-  }
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
+    if(variable_get('wysiwyg_imageupload_skip_dependencies_check', true)) {
+      _wysiwyg_imageupload_check_dependencies();
+    }
     // SO UGLY: we have to use this, as FAPI has a special case with cached forms
     // so if you save the form and a validation error occurs, form_alter is not called
     // in that case all our javascript would be missing
@@ -88,7 +88,7 @@ function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
   // Lets get the old cache and set it to the new cache
   $old = cache_get('wysiwyg_imageupload_'.$old_form_build_id);
   // Now apply it using the new from_build_id
-  cache_set('wysiwyg_imageupload_'.$new_form_build_id,$old->data,'cache',CACHE_TEMPORARY);
+  cache_set('wysiwyg_imageupload_'.$new_form_build_id, $old->data,'cache', CACHE_TEMPORARY);
 }
 
 /**
@@ -146,15 +146,14 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
 }
 
 
-function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {  
-  
+function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
   $iid = _wysiwyg_imageupload_entity_upload($state['values']['parent_build_id']);
-  if($iid == false) {    
+  if ($iid == false) {
     form_set_error('wysiwyg_imageupload_file',t('This file could not be uploaded'));
     return;
   }
-  
-  drupal_goto("wysiwyg_imageupload/edit/$iid");   
+  // If the upload was fine, redirect to the details form
+  drupal_goto("wysiwyg_imageupload/edit/$iid");
 }
 
 
@@ -169,7 +168,7 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
     drupal_set_message(t('Could not find image in the media-database'),'warning');
     return array();
   }
-  
+
   $defaults = array (
     'filepath' => $img_obj->filepath,
     'imagecache' => $img_obj->imagecache,
@@ -180,15 +179,16 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
   $attributes = array(
     'class' => 'wysiwyg_imageupload_preview',
   );
-  
+
   // Create the form image detail form.
   $form['#cache'] = TRUE;
   $form['#attributes'] = array('enctype' => "multipart/form-data");
-
+  // Render the image for the preview in the form.
   $img = theme('imagecache', 'wysiwyg_imageupload_preview', $defaults['filepath'], $iid, $defaults['title'], $attributes, TRUE, FALSE);
-  $form = _wysiwyg_imageupload_details_form($img,$iid,$defaults);
+  // Load the details form.
+  $form += _wysiwyg_imageupload_details_form($img,$iid,$defaults);
 
-  if(is_array($form_state['post']) && count($form_state['post']) > 0) {
+  if (is_array($form_state['post']) && count($form_state['post']) > 0) {
     $form['#post'] = $_POST;
   }
   return $form;
@@ -196,7 +196,7 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
 
 
 function wysiwyg_imageupload_edit_form_validate($form, &$state) {
-  if($_POST['revisions'] == 1) {
+  if ($_POST['revisions'] == 1) {
     // As this node is going to have a new revision AND we just EDITED an image
     // (NOT updated)
     // we create a new inline entity with the new settings and dont touch the old one.
@@ -233,7 +233,7 @@ function wysiwyg_imageupload_edit_form_submit($form, &$state) {
     'title' => $state['values']['title'],
     'iid' => $state['values']['iid'],
   );
-
+  // Update the details of the inline entity.
   drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
   // Call all our hooks.
   module_invoke_all('wysiwyg_imageupload_entity_save',$state['values'],$state['values']['iid']);
@@ -287,7 +287,7 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
 
   // styles.
   $styles = _wysiwyg_imageupload_get_image_styles();
-  if (count($styles) > 0) { // If any.
+  if (count($styles) > 0) {
     array_unshift($styles, t('None'));
     $form['image_upload_details']['extras']['style'] = array(
       '#type' => 'select',

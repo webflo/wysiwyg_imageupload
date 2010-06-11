@@ -25,7 +25,7 @@ function _wysiwyg_imageupload_entity_upload($node_form_build_id) {
   if ($imgDetails->filepath != "") {  
     $options = array( 'title' => check_plain($imgDetails->filename));
     // save the fid as used inline and generate a iid (inline id)
-    $iid = _wysiwyg_imageupload_create_inline_entity($imgDetails,true, $options);
+    $iid = _wysiwyg_imageupload_create_inline_entity($imgDetails, true, $options);
     // we store the iid in the file object, so we can use it on submit of the node form
     // to update the inline-entry to be static and not temporary
     $imgDetails->iid = $iid;
