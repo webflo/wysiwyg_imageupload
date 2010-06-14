@@ -70,7 +70,7 @@ function wysiwyg_imageupload_admin_settings() {
   $form['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_relative_user'] = array(
     '#type' => 'textfield',
     '#title' => t('Subdirectory for private uploads'),
-    '#description' => t('This is the user-files destination relative to the current wysiwyg_imagepload root destination(see above) directory (e.g. "'.file_directory_path().'/rootdest/$uid"). $uid will be replaced by the current user-id. Keep blanc to save it in the root.'),
+    '#description' => t('This is the user-files destination relative to the current wysiwyg_imageupload root destination(see above) directory (e.g. "'.file_directory_path().'/rootdest/$uid"). $uid will be replaced by the current user-id. Keep blanc to save it in the root.'),
     '#default_value' => variable_get('wysiwyg_imageupload_relative_user', '$uid')
   );
 
