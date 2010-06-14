@@ -87,6 +87,7 @@
           dataType : 'json',
           method: 'post',
           async: false,
+          data: { 'submitimagedetails' : 'JSinsert' },
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;
               if(!iid) {
@@ -127,7 +128,7 @@
         $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').ajaxSubmit({
           dataType : 'json',
           method: 'post',
-          data: { revisions: options.revisions, parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form},
+          data: { revisions: options.revisions, parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form, 'submitimagedetails' : 'JSinsert' },
           async: false,
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;

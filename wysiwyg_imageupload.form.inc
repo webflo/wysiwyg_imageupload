@@ -188,15 +188,12 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
   // Load the details form.
   $form += _wysiwyg_imageupload_details_form($img,$iid,$defaults);
 
-  if (is_array($form_state['post']) && count($form_state['post']) > 0) {
-    $form['#post'] = $_POST;
-  }
   return $form;
 }
 
 
 function wysiwyg_imageupload_edit_form_validate($form, &$state) {
-  if ($_POST['revisions'] == 1) {
+  if (isset($_POST['revisions'])&& $_POST['revisions'] == 1) {
     // As this node is going to have a new revision AND we just EDITED an image
     // (NOT updated)
     // we create a new inline entity with the new settings and dont touch the old one.
@@ -312,6 +309,11 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#prefix' => '<div >',
     '#suffix' => '</div>',
     '#value' => $img
+  );
+  $form['image_details_form']['buttons']['submitimagedetails'] = array(
+    '#type' => 'submit',
+    '#value' => 'JSinsert', // t() not needed here, see comment below.
+    '#access' => FALSE,
   );
 
   return $form;
