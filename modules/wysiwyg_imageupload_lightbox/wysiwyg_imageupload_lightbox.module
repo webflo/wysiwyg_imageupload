@@ -104,7 +104,6 @@ function wysiwyg_imageupload_lightbox_admin_settings(&$form) {
   );
 }
 
-
 function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_rendered_image_alter(&$img,$img_obj) {
   $default = variable_get('wysiwyg_imageupload_lightbox_default', 1);
   // only use the defaul if nothing set yet
@@ -112,12 +111,12 @@ function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_rendered_image_alter(&
     $default = $img_obj->lightbox;
   }
 
-  $transformed_path = imagecache_create_url(variable_get('wysiwyg_imageupload_lightbox_preset', 'wysiwyg_imageupload_lightbox_preset'), $img_obj->filepath);
-  $link_attributes = array(
-    'rel' => 'lightbox[wysiwyg_imageupload_inline]',
-    'title' => $img_obj->title
-  );
   if($default != 0) {
+    $transformed_path = imagecache_create_url(variable_get('wysiwyg_imageupload_lightbox_preset', 'wysiwyg_imageupload_lightbox_preset'), $img_obj->filepath);
+    $link_attributes = array(
+      'rel' => 'lightbox[wysiwyg_imageupload_inline]',
+      'title' => $img_obj->title
+    );
     $img = l($img,$transformed_path,array('html' => true,'attributes' => $link_attributes));
   }
 }
@@ -131,13 +130,13 @@ function wysiwyg_imageupload_lightbox_imagecache_default_presets() {
     'presetname' => 'wysiwyg_imageupload_lightbox_preset',
     'actions' => array (
       0 => array (
-	'weight' => '0',
-	'module' => 'imagecache',
-	'action' => 'imagecache_scale',
-	'data' => array (
-	  'height' => '768',
-	  'width' => '1280',	  
-	),
+        'weight' => '0',
+        'module' => 'imagecache',
+        'action' => 'imagecache_scale',
+        'data' => array (
+          'height' => '768',
+          'width' => '1280',	  
+        ),
       ),
     )
   );
