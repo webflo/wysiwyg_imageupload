@@ -16,7 +16,7 @@ function wysiwyg_imageupload_migrate_1_2_menu() {
 }
 
 function _wysiwyg_imageupload_migrate_1_2_iterate() {
-  $result = db_query("SELECT * FROM {node_revisions} as nr LEFT JOIN {node} as n on nr.nid=n.nid WHERE nr.body LIKE '%<img%'");
+  $result = db_query("SELECT * FROM {node_revisions} as nr WHERE nr.body LIKE '%<img%'");
   $nodes = array();
   while($row = db_fetch_object($result)) {
     //$nodes[] = node_load($row->nid, $row->vid);
@@ -32,9 +32,6 @@ function _wysiwyg_imageupload_migrate_1_2_iterate() {
 }
 
 function _wysiwyg_imageupload_migrate_1_2_migratenode($node) {
-  $text = $node->body;
-  $results = array();
-
   $body = _wysiwyg_imageupload_migrate_1_2_migrate($node,'body');
   $teaser  = _wysiwyg_imageupload_migrate_1_2_migrate($node,'teaser');
 
@@ -77,7 +74,6 @@ function _wysiwyg_imageupload_migrate_1_2_migrate($node,$part = 'body') {
       $m = drupal_get_path('module','wysiwyg_imageupload');
       require_once("$m/wysiwyg_imageupload.module");
       $iid = _wysiwyg_imageupload_create_inline_entity($file,false);
-      
       
       $update = array(
         'iid'

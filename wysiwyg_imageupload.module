@@ -273,7 +273,11 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
 * Renders the meta data of an image. By default only the title
 */
 function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
-  return "<div class='image_title'>&raquo; {$img_obj->title}</div>";
+  $output = '';
+  if($img_obj->title != '') {
+    $output .= "<div class='image_title'>{$img_obj->title}</div>";    
+  }
+  return $output;
 }
 
 /**
