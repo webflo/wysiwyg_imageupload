@@ -14,14 +14,14 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
       _wysiwyg_imageupload_check_dependencies();
     }
     // SO UGLY: we have to use this, as FAPI has a special case with cached forms
-    // so if you save the form and a validation error occurs, form_alter is not called
+    // If you save or preview the form and a validation error occurs, form_alter is not called
     // in that case all our javascript would be missing
     $form['#after_build'][] = '_wysiwyg_imageupload_prepare_main_form';
     // Add this as in some cases like comments drupal is not inlcude it by default
 
     // In the case of an preview, where we dont have a validation error
-    // the form gets rebuild and gets a new form_build_id. In this case we have to transfer our case
-    // to the new id so we can later restore the case properly in our _wysiwyg_imageupload_transfer_cache method
+    // the form gets rebuild and gets a new form_build_id. In this case we have to transfer our cache
+    // to the new form_buil_id so we can later restore the cache properly in our _wysiwyg_imageupload_transfer_cache method
     if($form_state['submitted'] == true && $form_state['rebuild'] == true) {
       // The form has been saved or is preview, transfer the cache to the new form_build_id
       _wysiwyg_imageupload_transfer_cache($form, $form_state);
@@ -56,7 +56,7 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
     }
     // Comment form is incompatible with form caching see http://drupal.org/node/644222
     if($form['#id'] != 'comment-form') {
-      // Thats is not mandatory anymore, as we handle or cache ourselfs
+      // Thats is mandatory now, as we handle or cache ourselfs
       $form['#cache'] = TRUE;
     }
 
@@ -72,7 +72,7 @@ function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
 
   $settings = array(
     'current_form' => $form['form_build_id']['#value'],
-    // only set revisions new, when we actually edit a node. It does not make sense for new node
+    // only set revisions new, when we actually edit a node. It does not make sense for new node nor for comments
     'revisions' => (int) (($form['#id'] != 'comment-form') && _wysiwyg_imagegupload_revisions_activated($form['#node']->type) && !empty($form['#node']->nid))
   );
 
@@ -139,14 +139,7 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
     '#type' => 'file',
     '#title' => t('Select an image to upload'),
     '#size' => 22,
-  );
-
-  /*'$form['image_upload']['start_upload'] = array(
-    '#type' => 'submit',    
-    '#value' => t('Upload image'),
-    '#name' => 'attach',
-  );*/  
-
+  );  
   return $form;
 }
 
@@ -197,13 +190,12 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
 
 function wysiwyg_imageupload_edit_form_validate($form, &$state) {
   if (isset($_POST['revisions']) && $_POST['revisions'] == 1) {
-    // As this node is going to have a new revision AND we just EDITED an image
-    // (NOT updated)
+    // As this node is going to have a new revision AND we just EDITED an image (NOT updated)
     // we create a new inline entity with the new settings and dont touch the old one.
     // This way the old inline image stays the same in older revisions.
     $old_iid = $state['values']['iid'];
     $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
-    // Create new inline entity and save it to our form_state
+    // Create a new inline entity and save it to our form_state
     // so the the code below handles the right entity.
     $state['values']['iid'] = _wysiwyg_imageupload_create_inline_entity($img_obj,true);
     // Remove the old inline id and place the new one.
@@ -235,7 +227,7 @@ function wysiwyg_imageupload_edit_form_submit($form, &$state) {
   );
   // Update the details of the inline entity.
   drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
-  // Call all our hooks.
+  // Call all our api hooks.
   module_invoke_all('wysiwyg_imageupload_entity_save',$state['values'],$state['values']['iid']);
   print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
   exit();
@@ -254,13 +246,14 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#prefix' => '<div id="image_details">',
     '#suffix' => '</div>'
   );
+  // Title
   $form['image_upload_details']['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
     '#default_value' => $defaults['title'],
     '#size' => 50
   );
-
+  // Alignment / Floating
   $form['image_upload_details']['alignment'] = array(
     '#type' => 'select',
     '#title' => t('Image alignment'),
@@ -271,13 +264,15 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     ),
     '#default_value' => $defaults['alignment']
   );
-
+  // Imagecache preset
   $form['image_upload_details']['imagecache'] = array(
     '#type' => 'select',
     '#title' => t('Size'),
     '#default_value' => $defaults['imagecache'],
     '#options' => _wysiwyg_imagegupload_allowed_presets(),
   );
+  
+  // We group all those extras into this fieldset to hide them from the general UI.
   $form['image_upload_details']['extras'] = array(
     '#type' => 'fieldset',
     '#title' => t('Extras'),
@@ -285,7 +280,7 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#collapsible' => true,
   );
 
-  // styles.
+  // image styles.
   $styles = _wysiwyg_imageupload_get_image_styles();
   if (count($styles) > 0) {
     array_unshift($styles, t('None'));
@@ -297,11 +292,7 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     );
   }
 
-  $form['image_upload_details']['iid'] = array(
-    '#type' => 'value',
-    '#value' => $iid,
-    '#default_value' => $iid
-  );
+  // this is the container for our preview-image
   $form['image_details_form']['preview'] = array (
     '#type' => 'fieldset',
     '#title' => t('Preview'),
@@ -313,11 +304,19 @@ function _wysiwyg_imageupload_details_form($img, $iid, $defaults = array()){
     '#suffix' => '</div>',
     '#value' => $img
   );
+  
+  // This is a fake submit button, thats why "access false" is used.
+  // This is due we use ajax form submit.
   $form['image_details_form']['buttons']['submitimagedetails'] = array(
     '#type' => 'submit',
     '#value' => 'JSinsert', // t() not needed here, see comment below.
     '#access' => FALSE,
   );
 
+  $form['image_upload_details']['iid'] = array(
+    '#type' => 'value',
+    '#value' => $iid,
+    '#default_value' => $iid
+  );
   return $form;
 }
