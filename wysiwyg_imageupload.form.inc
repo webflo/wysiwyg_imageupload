@@ -8,6 +8,7 @@
 * Adding jquery_ui_dialog javascript / css definitions to the form.
 */
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
+  
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
     if(variable_get('wysiwyg_imageupload_skip_dependencies_check', true)) {
       _wysiwyg_imageupload_check_dependencies();
@@ -18,11 +19,15 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
     $form['#after_build'][] = '_wysiwyg_imageupload_prepare_main_form';
     // Add this as in some cases like comments drupal is not inlcude it by default
 
-    // We need $form_state['post']['form_build_id'] != "" as a additional condition, as there are cases that
-    // post is an empty array but it has not been submitted ( no preview, no save).
-    if(isset($form_state['post']) && is_array($form_state['post']) && $form_state['post']['form_build_id'] != '') {
+    // In the case of an preview, where we dont have a validation error
+    // the form gets rebuild and gets a new form_build_id. In this case we have to transfer our case
+    // to the new id so we can later restore the case properly in our _wysiwyg_imageupload_transfer_cache method
+    if($form_state['submitted'] == true && $form_state['rebuild'] == true) {
       // The form has been saved or is preview, transfer the cache to the new form_build_id
       _wysiwyg_imageupload_transfer_cache($form, $form_state);
+    }
+    else if ($form_state['submitted'] == true) {
+      // From submitted, but not rebuild. We dont need to do anything here
     }
     else {
       // Load already existing files and put them in the array before the form is shown.
@@ -83,7 +88,7 @@ function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
 * for making them persisten.
 */
 function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
-  $old_form_build_id = $form_state['post']['form_build_id'];
+  $old_form_build_id = $form_state['values']['form_build_id'];
   $new_form_build_id = $form['#build_id'];
   // Lets get the old cache and set it to the new cache
   $old = cache_get('wysiwyg_imageupload_'.$old_form_build_id);
