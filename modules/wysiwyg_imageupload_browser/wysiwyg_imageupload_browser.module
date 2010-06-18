@@ -98,7 +98,8 @@ function wysiwyg_imageupload_browser_browser($form_id){
 
   // Adding tabs.
   $tabs = array();
-  $tabs[] = l(t('New Image'), 'wysiwy_imageupload/upload/'.arg(2), array('title' => t('Go back to the upload form and upload a new image')));
+  $parent_build_id = arg(2);
+  $tabs[] = l(t('New Image'), 'wysiwy_imageupload/upload/'.$parent_build_id, array('title' => t('Go back to the upload form and upload a new image')));
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= _wysiwyg_imageupload_browser_tabs($tabs,1);
 
@@ -110,7 +111,7 @@ function wysiwyg_imageupload_browser_browser($form_id){
     $imageHTML = '<div class="browser_image">';
     $imageHTML .= theme('imagecache', $preset, $image['filepath'], t('Insert this image'),t('Insert this image'), TRUE, FALSE);
     $imageHTML .= '</div>';
-    $output .= l($imageHTML, 'wysiwyg_imageupload/reuse/'.$image['iid'], array(
+    $output .= l($imageHTML, 'wysiwyg_imageupload/reuse/'.$image['iid']."/$parent_build_id", array(
       'title' => t('Insert this image'),
       'html' => 'true',
       'absolute' => TRUE

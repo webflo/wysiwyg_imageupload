@@ -139,7 +139,7 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
     '#type' => 'file',
     '#title' => t('Select an image to upload'),
     '#size' => 22,
-  );  
+  );
   return $form;
 }
 
@@ -150,16 +150,31 @@ function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
     return;
   }
   // If the upload was fine, redirect to the details form
-  drupal_goto("wysiwyg_imageupload/edit/$iid");
+  drupal_goto("wysiwyg_imageupload/edit/$iid/".$state['values']['parent_build_id']);
 }
 
 
 /**
 * Called when a image was selected / uploaded and the details form should be shown.
 */
-function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
+function wysiwyg_imageupload_edit_form(&$form_state,$iid, $parent_build_id, $rebuild_entity = false) {
   jquery_ui_dialog_child_js(array('width' => 740));
   drupal_set_title(t('Image details'));
+  if($rebuild_entity) {
+    $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+    $iid = _wysiwyg_imageupload_create_inline_entity($img_obj,true, array('title' => $img_obj->title, 'imagecache' => $img_obj->imagecache,'style' => $img_obj->style));
+    $img_obj->iid= $iid;
+    $img_obj->nid = null;
+    $img_obj->vid = null;
+    $img_obj->vid = null;
+    
+    $old = cache_get('wysiwyg_imageupload_'.$parent_build_id, 'cache');
+    $old = $old->data;
+    // Add the new entity
+    $old[$img_obj->iid] = $img_obj;
+    cache_set('wysiwyg_imageupload_'.$parent_build_id, $old,'cache', CACHE_TEMPORARY);
+  }
+  
   $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
   if($img_obj == false) {
     drupal_set_message(t('Could not find image in the media-database'),'warning');
@@ -199,14 +214,16 @@ function wysiwyg_imageupload_edit_form_validate($form, &$state) {
     // so the the code below handles the right entity.
     $state['values']['iid'] = _wysiwyg_imageupload_create_inline_entity($img_obj,true);
     // Remove the old inline id and place the new one.
-    $cached_form_state = array();
-    $form = form_get_cache($_POST['parent_build_id'], $cached_form_state);
-    $new_file = $form['#node']->imgupload_images[$old_iid];
+    $old = cache_get('wysiwyg_imageupload_' . $_POST['parent_build_id'], 'cache');;
+    $old = $old->data;
+    $new_file = $old[$old_iid];
+    // remove the old
+    unset($old[$old_iid]);
     $new_file->iid = $state['values']['iid'];
     // Create the new.
-    $form['#node']->imgupload_images[$new_file->iid] = $new_file;
-    // Remove the old.
-    unset($form['#node']->imgupload_images[$old_iid]);
+    $old[$new_file->iid] = $new_file;
+    // update the cache
+    cache_set('wysiwyg_imageupload_'.$_POST['parent_build_id'], $old,'cache', CACHE_TEMPORARY);
   }
 }
 

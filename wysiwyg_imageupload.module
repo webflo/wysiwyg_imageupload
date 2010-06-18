@@ -39,16 +39,16 @@ function wysiwyg_imageupload_menu() {
   // Form for editing an image
   $items['wysiwyg_imageupload/edit/%'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_edit_form',2),
+    'page arguments' => array('wysiwyg_imageupload_edit_form',2,3),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
   
   // Form for editing an image
-  $items['wysiwyg_imageupload/reuse/%wysiwyg_imageupload_new_entity'] = array(
+  $items['wysiwyg_imageupload/reuse/%'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_edit_form',2),
+    'page arguments' => array('wysiwyg_imageupload_edit_form',2, 3,true),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
@@ -459,11 +459,3 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
   }
   return $error;
 }
-
-function wysiwyg_imageupload_new_entity_load($old_iid) {
-  $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
-    // Create new inline entity and save it to our form_state
-    // so the the code below handles the right entity.
-  return _wysiwyg_imageupload_create_inline_entity($img_obj,true);
-}
-
