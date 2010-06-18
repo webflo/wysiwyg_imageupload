@@ -115,10 +115,10 @@ function _wysiwyg_imageupload_save(&$entity) {
     $entity = (object)$entity;
   }
 
-
   if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
     return;
   }
+
   foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
     // Convert file to object for compatibility.
@@ -143,9 +143,11 @@ function _wysiwyg_imageupload_save(&$entity) {
       // Move on, so the removed file won't be added to new revisions.
       continue;
     }
+
     if($file->new) {
       file_set_status($file, FILE_STATUS_PERMANENT);
     }
+
     // It's a comment.
     if (!empty($entity->cid) && $entity->cid > 0) {
       $data = array(
@@ -159,7 +161,6 @@ function _wysiwyg_imageupload_save(&$entity) {
       // Call the alter hooks to react on the current attached image entity.
       $data = (object) $data;
       drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
-      
       // Skip the other steps, as its a comment - not a node.
       continue;
     }
@@ -174,7 +175,7 @@ function _wysiwyg_imageupload_save(&$entity) {
     );
 
     drupal_write_record('wysiwyg_imageupload_entity',$data, array('iid'));
-    _wysiwyg_imageupload_create_revision($iid, $entity->vid);    
+    _wysiwyg_imageupload_create_revision($iid, $entity->vid);
     _wysiwyg_imageupload_cleanup_temps($entity->nid);
     // Call the alter hooks to react on the current attached image entity.
     $data = (object) $data;

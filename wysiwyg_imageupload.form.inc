@@ -145,7 +145,6 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
   return $form;
 }
 
-
 function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
   $iid = _wysiwyg_imageupload_entity_upload($state['values']['parent_build_id']);
   if ($iid == false) {
@@ -191,9 +190,8 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid) {
   return $form;
 }
 
-
 function wysiwyg_imageupload_edit_form_validate($form, &$state) {
-  if (isset($_POST['revisions'])&& $_POST['revisions'] == 1) {
+  if (isset($_POST['revisions']) && $_POST['revisions'] == 1) {
     // As this node is going to have a new revision AND we just EDITED an image
     // (NOT updated)
     // we create a new inline entity with the new settings and dont touch the old one.

@@ -28,7 +28,6 @@ function wysiwyg_imageupload_menu() {
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
   );
-
   // return multiple rendered images
   $items['ajax/wysiwyg_imgupl/render_wysiwyg_images/%'] = array(
     'page callback' => '_wysiwyg_imageupload_render_wysiwyg_images',
@@ -39,6 +38,15 @@ function wysiwyg_imageupload_menu() {
   );
   // Form for editing an image
   $items['wysiwyg_imageupload/edit/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('wysiwyg_imageupload_edit_form',2),
+    'access callback' => 'user_access',
+    'access arguments' => array('use wysiwyg image upload'),
+    'type' => MENU_CALLBACK,
+  );
+  
+  // Form for editing an image
+  $items['wysiwyg_imageupload/reuse/%wysiwyg_imageupload_new_entity'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_edit_form',2),
     'access callback' => 'user_access',
@@ -368,6 +376,10 @@ function _wysiwyg_imagegupload_revisions_activated($type) {
 
 function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {  
   $error = false;
+   if (!is_array($requirements) && module_exists('devel_themer') && (user_access('access devel theme information') || user_access('access devel information'))) {
+    drupal_set_message(t('You cannot use wysiwyg_imageupload while the Theme Developer tool is enabled. It is highly recommended to <a href="!url">disable this module</a> unless it is actively being used.', array('!url' => url('admin/build/modules'))), 'error');
+  }
+  
   if(module_exists('jquery_ui')) {
     $jquiv = jquery_ui_get_version();
     if (!preg_match('@1\.7\.\d+@',$jquiv)) {
@@ -446,5 +458,12 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
     $error = true;
   }
   return $error;
+}
+
+function wysiwyg_imageupload_new_entity_load($old_iid) {
+  $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
+    // Create new inline entity and save it to our form_state
+    // so the the code below handles the right entity.
+  return _wysiwyg_imageupload_create_inline_entity($img_obj,true);
 }
 

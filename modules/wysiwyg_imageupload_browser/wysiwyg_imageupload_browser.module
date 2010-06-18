@@ -103,15 +103,14 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $output .= _wysiwyg_imageupload_browser_tabs($tabs,1);
 
   $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 8), $user->uid, 'f.fid');
-  //$images = wysiwyg_imageupload_get_images(8,$user->uid,'f.fid');
+  
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
   $preset = variable_get('wysiwyg_imageupload_browser_preset', 'wysiwyg_imageupload_browser_preview');
   foreach($images as $image){
     $imageHTML = '<div class="browser_image">';
-    
     $imageHTML .= theme('imagecache', $preset, $image['filepath'], t('Insert this image'),t('Insert this image'), TRUE, FALSE);
     $imageHTML .= '</div>';
-    $output .= l($imageHTML, 'wysiwyg_imageupload/edit/'.$image['iid'], array(
+    $output .= l($imageHTML, 'wysiwyg_imageupload/reuse/'.$image['iid'], array(
       'title' => t('Insert this image'),
       'html' => 'true',
       'absolute' => TRUE
