@@ -292,7 +292,7 @@ function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
 * Renders the meta container of an image.
 */
 function theme_wysiwyg_imageupload_render_container($image,$meta,$img_obj,$arguments) {
-  return "<div class='wysiwyg_imageupload image {$img_obj->alignment} {$img_obj->style}'>$image <div class'image_meta'>$meta</div></div>";
+  return "<div class='wysiwyg_imageupload image {$img_obj->alignment} {$img_obj->style}'>$image <div class='image_meta'>$meta</div></div>";
 }
 
 /**
@@ -324,14 +324,14 @@ function wysiwyg_imageupload_imagecache_default_presets() {
     'presetname' => 'wysiwyg_imageupload_preview',
     'actions' => array (
       0 => array (
-  'weight' => '0',
-  'module' => 'imagecache',
-  'action' => 'imagecache_scale',
-  'data' => array (
-    'height' => '150',
-    'width' => '220',
-    'upscale' => 1,
-  ),
+        'weight' => '0',
+        'module' => 'imagecache',
+        'action' => 'imagecache_scale',
+        'data' => array (
+          'height' => '150',
+          'width' => '220',
+          'upscale' => 1,
+        ),
       ),
     )
   );
