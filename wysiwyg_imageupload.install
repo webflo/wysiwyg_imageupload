@@ -157,6 +157,7 @@ function wysiwyg_imageupload_update_6201() {
   if ($value !== FALSE) {
     variable_set('wysiwyg_imageupload_imgstyles',str_replace(';',"\r",$value));
   }
+  return array();
 }
 
 function wysiwyg_imageupload_requirements($phase) {
