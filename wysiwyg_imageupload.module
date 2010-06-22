@@ -104,6 +104,7 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
     case 'insert':
     case 'update':
       if (user_access('use wysiwyg image upload')) {
+        _wysiwyg_imageupload_reset_filter_cache($node->format, $node->body);
         _wysiwyg_imageupload_save($node);
       }
       break;
@@ -123,6 +124,7 @@ function wysiwyg_imageupload_comment(&$a1, $op) {
       $comment = $a1;
       if (user_access('use wysiwyg image upload')) {
         _wysiwyg_imageupload_save($comment);
+        _wysiwyg_imageupload_reset_filter_cache($comment->format, $comment->body);
       }
       break;
   }
@@ -283,7 +285,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
 function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
   $output = '';
   if ($img_obj->title != '') {
-    $output .= "<div class='image_title'>{$img_obj->title}</div>";    
+    $output .= "<div class='image_title'>{$img_obj->title}</div>";
   }
   return $output;
 }
@@ -466,7 +468,7 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
 function wysiwyg_imageupload_help($path, $arg) {
   switch ($path) {
     case 'admin/help#wysiwyg_imageupload':
-      $output = t('<p>An image upload dialog for the most WYSIWYG Editors.<h2>Full Installation</h2> 
+      $output = t('<p>An image upload dialog for most WYSIWYG Editors.<h2>Full Installation</h2>
 <ul>
 <li>You need to have a <a href="http://drupal.org/project/wysiwyg" target="_blank">WYSIWYG</a>-compatible editor enabled
 <li>Check the <a href="http://drupal.org/node/808626" target="_blank">Installation How-to</a>
@@ -474,4 +476,9 @@ function wysiwyg_imageupload_help($path, $arg) {
 </ul></p>');
       return $output;
   }
+}
+
+function _wysiwyg_imageupload_reset_filter_cache($format, $text) {
+  $cid = $format .':'. md5($text);
+  cache_clear_all($cid,'cache_filter');
 }
