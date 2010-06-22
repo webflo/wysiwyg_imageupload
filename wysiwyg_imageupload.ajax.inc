@@ -45,7 +45,7 @@ function _wysiwyg_imageupload_render_wysiwyg($iid) {
   $output = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
   
   $GLOBALS['devel_shutdown'] = FALSE;
-  print drupal_to_js(array('status' => TRUE, 'data' => $output));
+  print _wysiwyg_imageupload_to_js(array('status' => TRUE, 'data' => $output));
   exit();
 }
 
@@ -61,7 +61,7 @@ function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id
   }
   
   $GLOBALS['devel_shutdown'] = FALSE;
-  print drupal_to_js(array('status' => TRUE, 'data' => $output));
+  print _wysiwyg_imageupload_to_js(array('status' => TRUE, 'data' => $output));
   exit();
 }
 

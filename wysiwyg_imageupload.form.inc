@@ -247,7 +247,7 @@ function wysiwyg_imageupload_edit_form_submit($form, &$state) {
   // Call all our api hooks.
   module_invoke_all('wysiwyg_imageupload_entity_save',$state['values'],$state['values']['iid']);
   $GLOBALS['devel_shutdown'] = FALSE;
-  print drupal_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
+  print _wysiwyg_imageupload_to_js(array('status' => TRUE, 'data' => array('iid' => $state['values']['iid'])));
   exit();
 }
 

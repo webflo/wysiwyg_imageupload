@@ -482,3 +482,16 @@ function _wysiwyg_imageupload_reset_filter_cache($format, $text) {
   $cid = $format .':'. md5($text);
   cache_clear_all($cid,'cache_filter');
 }
+
+/**
+ * Converts a PHP variable into its Javascript equivalent.
+ * This function is used instead of drupal_to_js to avoid malformed unicode encoded data when using <, > or &.
+ */
+function _wysiwyg_imageupload_to_js($var) {
+  if (function_exists('json_encode')) {
+    return str_replace(array('<', '>', '&'), array('\u003c', '\u003e', '\u0026'), json_encode($var));
+  }
+  else {
+    return str_replace(array('\x3c', '\x3e', '\x26'), array('\u003c', '\u003e', '\u0026'), drupal_to_js($var));
+  }
+}
