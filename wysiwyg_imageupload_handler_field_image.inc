@@ -66,9 +66,6 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
     $object->filemime = $values->{$this->aliases['filemime']};
     $object->status = $values->{$this->aliases['status']};
     $object->timestamp = $values->{$this->aliases['timestamp']};
-    dsm($object);
-    // @TODO make the relationship working.
-//     $object = _wysiwyg_imageupload_load_inline_entity($value);
     
     return theme('wysiwyg_imageupload_render_image_entity', $object, array());
   }
