@@ -36,6 +36,89 @@ function wysiwyg_imageupload_views_data() {
       'field' => 'cid',
     ),
   );
+  
+  $data['wysiwyg_imageupload_entity']['title'] = array(
+    'title' => t('Title'),
+    'help' => t('The title of the image.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    // Information for accepting a title as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  $data['wysiwyg_imageupload_entity']['imagecache'] = array(
+    'title' => t('imagecache'),
+    'help' => t('The imagecache of the image.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    // Information for accepting a title as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  $data['wysiwyg_imageupload_entity']['alignment'] = array(
+    'title' => t('imagecache'),
+    'help' => t('The imagecache of the image.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    // Information for accepting a title as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  $data['wysiwyg_imageupload_entity']['style'] = array(
+    'title' => t('imagecache'),
+    'help' => t('The imagecache of the image.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    // Information for accepting a title as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+        'temporary' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Is this file temporary.',
+      ),
 
   return $data;
 }
