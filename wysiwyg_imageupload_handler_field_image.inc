@@ -22,10 +22,27 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
     $this->additional_fields['timestamp'] = array('table' => 'files', 'field' => 'timestamp');
     // @TODO add stuff from revision.
   }
-  
+
   function query() {
-//     dsm($this->query->ensure_table('files'));//, $this->query->get_join_data('files', $this->base_table)));
-    parent::query();
+    $this->ensure_my_table();
+    // Add the field.
+    $this->field_alias = $this->query->add_field($this->table_alias, $this->real_field);
+
+    $def = array();
+    $def['left_table'] = $this->table_alias;
+    $def['left_field'] = 'fid';
+    $def['field'] = 'fid';
+    $def['table'] = 'files';
+    $def['type'] = 'INNER';
+
+    $join = new views_join();
+
+    $join->definition = $def;
+    $join->construct();
+    $join->adjusted = TRUE;
+    $this->query->add_relationship('files', $join, 'wysiwyg_imageupload_entity', 'wysiwyg_imageupload_entity');
+
+    $this->add_additional_fields();
   }
 
   function option_definition() {
@@ -49,8 +66,9 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
     $object->filemime = $values->{$this->aliases['filemime']};
     $object->status = $values->{$this->aliases['status']};
     $object->timestamp = $values->{$this->aliases['timestamp']};
+    dsm($object);
     // @TODO make the relationship working.
-    $object = _wysiwyg_imageupload_load_inline_entity($value);
+//     $object = _wysiwyg_imageupload_load_inline_entity($value);
     
     return theme('wysiwyg_imageupload_render_image_entity', $object, array());
   }
