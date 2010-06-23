@@ -136,7 +136,7 @@ function wysiwyg_imageupload_views_data() {
     'title' => t('Files'),
     'help' => t('The uploaded file'),
     'relationship' => array(
-      'label' => t('Image'),
+      'label' => t('File'),
       'base' => 'files',
       'base field' => 'fid',
     ),
@@ -145,7 +145,7 @@ function wysiwyg_imageupload_views_data() {
     'title' => t('Node'),
     'help' => t('The node the uploaded file is attached to'),
     'relationship' => array(
-      'label' => t('Image'),
+      'label' => t('Node'),
       'base' => 'node',
       'base field' => 'nid',
     ),
@@ -154,7 +154,7 @@ function wysiwyg_imageupload_views_data() {
     'title' => t('Comment'),
     'help' => t('The comment the uploaded file is attached to'),
     'relationship' => array(
-      'label' => t('Image'),
+      'label' => t('Comment'),
       'base' => 'comments',
       'base field' => 'cid',
     ),
