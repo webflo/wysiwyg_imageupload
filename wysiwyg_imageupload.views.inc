@@ -76,8 +76,8 @@ function wysiwyg_imageupload_views_data() {
   );
 
   $data['wysiwyg_imageupload_entity']['alignment'] = array(
-    'title' => t('imagecache'),
-    'help' => t('The imagecache of the image.'),
+    'title' => t('alignment'),
+    'help' => t('The alignment of the image.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -95,8 +95,8 @@ function wysiwyg_imageupload_views_data() {
   );
 
   $data['wysiwyg_imageupload_entity']['style'] = array(
-    'title' => t('imagecache'),
-    'help' => t('The imagecache of the image.'),
+    'title' => t('Style'),
+    'help' => t('The Style of the image.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
