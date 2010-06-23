@@ -112,6 +112,25 @@ function wysiwyg_imageupload_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
+  
+  $data['wysiwyg_imageupload_entity']['temporary'] = array(
+    'title' => t('temporary'),
+    'help' => t('The temporary of the image.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    // Information for accepting a title as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_boolean',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+  );
         'temporary' => array(
         'type' => 'int',
         'unsigned' => TRUE,
