@@ -35,6 +35,20 @@ function wysiwyg_imageupload_views_data() {
       'field' => 'cid',
     ),
   );
+  
+  // This displays a image, will all goodies, therefore it needs a extra handler.
+  $data['wysiwyg_imageupload_entity']['iid'] = array(
+    'title' => t('Image'),
+    'help' => t('The image.'),
+    'field' => array(
+      'handler' => 'wysiwyg_imageupload_handler_field_image',
+      'click sortable' => FALSE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+    // @TODO Perhaps someone needs a filter/sort here, but i cannot imagine this.
+  );
 
   $data['wysiwyg_imageupload_entity']['title'] = array(
     'title' => t('Title'),
