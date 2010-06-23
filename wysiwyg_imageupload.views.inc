@@ -30,13 +30,12 @@ function wysiwyg_imageupload_views_data() {
       'left_field' => 'fid',
       'field' => 'fid',
     ),
-    
     'comments' => array(
       'left_field' => 'cid',
       'field' => 'cid',
     ),
   );
-  
+
   $data['wysiwyg_imageupload_entity']['title'] = array(
     'title' => t('Title'),
     'help' => t('The title of the image.'),
@@ -129,6 +128,44 @@ function wysiwyg_imageupload_views_data() {
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
+    ),
+  );
+
+  // Here comes the cool stuff, relationships!!
+  $data['wysiwyg_imageupload_entity']['fid'] = array(
+    'title' => t('Node'),
+    'help' => t('The node the uploaded file is attached to'),
+    'relationship' => array(
+      'label' => t('upload'),
+      'base' => 'node',
+      'base field' => 'vid',
+      // This allows us to not show this relationship if the base is already
+      // node so users won't create circular relationships.
+      'skip base' => array('node', 'node_revisions'),
+    ),
+  );
+  $data['wysiwyg_imageupload_entity']['nid'] = array(
+    'title' => t('Node'),
+    'help' => t('The node the uploaded file is attached to'),
+    'relationship' => array(
+      'label' => t('upload'),
+      'base' => 'node',
+      'base field' => 'vid',
+      // This allows us to not show this relationship if the base is already
+      // node so users won't create circular relationships.
+      'skip base' => array('node', 'node_revisions'),
+    ),
+  );
+    $data['wysiwyg_imageupload_entity']['cid'] = array(
+    'title' => t('Node'),
+    'help' => t('The node the uploaded file is attached to'),
+    'relationship' => array(
+      'label' => t('upload'),
+      'base' => 'node',
+      'base field' => 'vid',
+      // This allows us to not show this relationship if the base is already
+      // node so users won't create circular relationships.
+      'skip base' => array('node', 'node_revisions'),
     ),
   );
 
