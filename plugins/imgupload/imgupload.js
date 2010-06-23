@@ -1,5 +1,7 @@
 // $Id:$
-// Helper method.
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
+
 (function($) {
   $.fn.imguploadOuterHTML = function (s) {
     return (s) ? this.before(s).remove() : jQuery("<p>").append(this.eq(0).clone()).html();
@@ -16,7 +18,7 @@
 
     /* We need this due all the special cases in the editors */
     getRepresentitiveNode: function(node) {
-      if(node.$) {
+      if (node != null && typeof(node) != 'undefined' && '$' in node) {
         // This case is for the CKeditor, where
         // $(node) != $(node.$)
         return $(node.$);
@@ -30,6 +32,10 @@
     * Execute the button.
     */
     invoke: function (data, settings, instanceId) {
+      if(data == null && typeof(data) == 'undefined') {
+        return;
+      }
+
       if (data.format == 'html') {
         // Default
         var options = {
@@ -39,7 +45,7 @@
           revisions: Drupal.settings.wysiwyg_imageupload.revisions
         };
         var $node = null;
-        if (data.node) {
+        if ('node' in data) {
           $node = this.getRepresentitiveNode(data.node);
         }
 
@@ -76,11 +82,12 @@
         }
         // else
         var iid = 0;
-        form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-upload-form');
+        form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form');
         form.ajaxSubmit({
           dataType : 'json',
           method: 'post',
           async: false,
+          data: { 'submitimagedetails' : 'JSinsert' },
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;
               if(!iid) {
@@ -96,9 +103,9 @@
       btns[Drupal.t('Cancel')] = function () {
         $(this).dialog("close");
       };
-      var form_id = Drupal.settings.wysiwyg_imageupload.current_form;
+      var parent_build_id = Drupal.settings.wysiwyg_imageupload.current_form;
       // Location, where to fetch the dialog.
-      var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/add/' + form_id;
+      var aurl = Drupal.settings.basePath + 'index.php?q=wysiwy_imageupload/upload/' + parent_build_id;
       // Open the dialog, load the form.
       Drupal.jqui_dialog.open({
         url: aurl,
@@ -121,7 +128,7 @@
         $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').ajaxSubmit({
           dataType : 'json',
           method: 'post',
-          data: { revisions: options.revisions, node_form_build_id: Drupal.settings.wysiwyg_imageupload.current_form},
+          data: { revisions: options.revisions, parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form, 'submitimagedetails' : 'JSinsert' },
           async: false,
           success : function(data,status,xhr,jq) {
               iid = data.data.iid;
@@ -140,7 +147,7 @@
       };
 
       // Location, where to fetch the dialog.
-      var aurl = Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/edit/' + options.iid;
+      var aurl = Drupal.settings.basePath + 'index.php?q=wysiwyg_imageupload/edit/' + options.iid;
       // Finally open the dialog.
       Drupal.jqui_dialog.open({
         url: aurl,
@@ -168,7 +175,7 @@
     attach: function(content, pluginSettings, id) {
       var plugin = this;
       var iids = [];
-      content = content.replace(/\[\[wysiwyg_imageupload:([^:]*?):([^\]]*?)\]\]/g, function(orig, match) {
+      content = content.replace(/\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g, function(orig, match) {
         iids.push(match);
         return orig;
       });
@@ -181,7 +188,7 @@
       var images = plugin.get_rendered_wysiwyg_images(iids);
 
       content = content.replace(
-        /\[\[wysiwyg_imageupload:([^:]*?):([^\]]*?)\]\]/g,
+        /\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g,
         function(orig, iid) {
           return images[iid];
         }
@@ -231,6 +238,7 @@
       );
       return result;
     },
+
     uniqueArray: function (a) {
       var r = new Array();
       o: for (var i = 0, n = a.length; i < n; i++) {

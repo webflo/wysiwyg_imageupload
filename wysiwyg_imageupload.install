@@ -1,13 +1,14 @@
 <?php
 // $Id:$
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
 
-# Copyright (c) 2010 Impressive.media
-# Author: Eugen Mayer
 /**
  * Implementation of hook_install().
  */
 function wysiwyg_imageupload_install() {
   drupal_install_schema('wysiwyg_imageupload');
+  _wysiwyg_imageupload_install_styles_if_missing();
 }
 
 /**
@@ -16,7 +17,6 @@ function wysiwyg_imageupload_install() {
 function wysiwyg_imageupload_uninstall() {
   // Remove tables.
   drupal_uninstall_schema('wysiwyg_imageupload');
-  _wysiwyg_imageupload_install_styles_if_missing();
   // Remove variables.
   db_query("DELETE FROM {variable} WHERE name LIKE 'wysiwyg_imageupload_%%'");
 
@@ -24,14 +24,15 @@ function wysiwyg_imageupload_uninstall() {
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
   $value = variable_get('wysiwyg_imageupload_imgstyles',FALSE);
-  if ($value !== FALSE) {
-    variable_set('wysiwyg_imageupload_imgstyles','s:113:"Black Border=imgupl_styles_black_border,Spacing 5px=imgupl_styles_spacing_5,Spacing 10px=imgupl_styles_spacing_10');
+  if ($value == FALSE) {
+    variable_set('wysiwyg_imageupload_imgstyles','Spacing 20px Border=imgupl_styles_spacing_20_black_border\n\rBlack Border=imgupl_styles_black_border\n\rSpacing 5px=imgupl_styles_spacing_5\n\rSpacing 10px=imgupl_styles_spacing_10');
   }
 }
 /**
  * Implementation of hook_schema().
  */
 function wysiwyg_imageupload_schema() {
+  $schema = array();
   _wysiwyg_imageupload_inline_table($schema);
   return $schema;
 }
@@ -103,12 +104,6 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
         'default' => '',
         'description' => 'Defines the alignment of the image',
       ),
-      'lightbox' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Use lightbox integration or not',
-      ),
     ),
     'primary key' => array('iid')
   );
@@ -157,3 +152,19 @@ function wysiwyg_imageupload_update_6200() {
   return $ret;
 }
 
+function wysiwyg_imageupload_update_6201() {
+   $value = variable_get('wysiwyg_imageupload_imgstyles',FALSE);
+  if ($value !== FALSE) {
+    variable_set('wysiwyg_imageupload_imgstyles',str_replace(';',"\r",$value));
+  }
+  return array();
+}
+
+function wysiwyg_imageupload_requirements($phase) {
+  $requirements = array();
+  if($phase == 'runtime') {
+    require_once('wysiwyg_imageupload.module');
+    _wysiwyg_imageupload_check_dependencies($requirements);
+  }
+  return $requirements;
+}

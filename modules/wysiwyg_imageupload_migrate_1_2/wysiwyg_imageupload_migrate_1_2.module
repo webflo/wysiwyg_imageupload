@@ -1,6 +1,7 @@
 <?php
-# Copyright (c) 2010 Impressive.media
-# Author: Eugen Mayer
+// $Id:$
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
 
 function wysiwyg_imageupload_migrate_1_2_menu() {
   $items = array();
@@ -15,7 +16,7 @@ function wysiwyg_imageupload_migrate_1_2_menu() {
 }
 
 function _wysiwyg_imageupload_migrate_1_2_iterate() {
-  $result = db_query("SELECT * FROM {node_revisions} as nr LEFT JOIN {node} as n on nr.nid=n.nid WHERE nr.body LIKE '%<img%'");
+  $result = db_query("SELECT * FROM {node_revisions} as nr WHERE nr.body LIKE '%<img%'");
   $nodes = array();
   while($row = db_fetch_object($result)) {
     //$nodes[] = node_load($row->nid, $row->vid);
@@ -24,17 +25,13 @@ function _wysiwyg_imageupload_migrate_1_2_iterate() {
   $m = drupal_get_path('module','wysiwyg_imageupload_migrate_1_2');
   require_once("$m/smartdomdocument.class.php");
   foreach($nodes as $node) {
-    _wysiwyg_imageupload_migrate_1_2_migratenode($node);
-    //dsm("migrated node: {$node->nid}");
+    _wysiwyg_imageupload_migrate_1_2_migratenode($node);    
   }
   $c = count($nodes);
   return t("Migration completed, overall $c nodes migrated");
 }
 
 function _wysiwyg_imageupload_migrate_1_2_migratenode($node) {
-  $text = $node->body;
-  $results = array();
-
   $body = _wysiwyg_imageupload_migrate_1_2_migrate($node,'body');
   $teaser  = _wysiwyg_imageupload_migrate_1_2_migrate($node,'teaser');
 
@@ -49,8 +46,7 @@ function _wysiwyg_imageupload_migrate_1_2_migratenode($node) {
 }
 
 function _wysiwyg_imageupload_migrate_1_2_migrate($node,$part = 'body') {
-  if($node->$part == '') {
-    dsm('emtpy');
+  if($node->$part == '') {    
     return '';
   }
 
@@ -77,17 +73,20 @@ function _wysiwyg_imageupload_migrate_1_2_migrate($node,$part = 'body') {
       $file = db_fetch_object(db_query('SELECT * from {files} where filepath="%s"',$path));
       $m = drupal_get_path('module','wysiwyg_imageupload');
       require_once("$m/wysiwyg_imageupload.module");
-      $iid = _wysiwyg_imageupload_craete_inline_entity($file,false);
-
-
+      $iid = _wysiwyg_imageupload_create_inline_entity($file,false);
+      
       $update = array(
         'iid'
       );
+      
+      $old = db_fetch_object(db_query('SELECT * FROM {wysiwyg_imageupload} WHERE fid=%d',$file->fid));
       $record = array(
         'style' => $style,
         'imagecache' => $preset,
-        'alignment' => v,
+        'alignment' => $alignment,
         'title' => $title,
+        'nid' => $old->nid,
+        'cid' => $old->cid,
         'iid' => $iid
       );
       drupal_write_record('wysiwyg_imageupload_entity',$record, $update);

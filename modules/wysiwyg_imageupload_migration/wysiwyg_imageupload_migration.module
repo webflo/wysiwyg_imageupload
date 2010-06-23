@@ -1,6 +1,7 @@
 <?php
-# Copyright (c) 2010 Impressive.media
-# Author: Eugen Mayer
+// $Id:$
+// Copyright (c) 2010 KontextWork GbR
+// Author: Eugen Mayer
 
 function wysiwyg_imageupload_migration_menu() {
   $items = array();

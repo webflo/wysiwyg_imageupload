@@ -6,6 +6,6 @@ dependencies[] = jquery_ui
 dependencies[] = jquery_update
 dependencies[] = jquery_ui_dialog
 dependencies[] = imagecache
-package = WYSIWYG
+package = Drupal Wiki
 core = "6.x"
 project = "wysiwyg_imageupload"

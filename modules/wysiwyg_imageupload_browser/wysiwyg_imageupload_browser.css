@@ -9,12 +9,14 @@ ul.wysiwyg_imageupload_tabs {
 }
 
 .browser_image {
-	float: left;
-	width: 200px;
-	height: 200px;
-	border:1px solid black;
+	float: left;	
 	margin:3px;
 }
+
+.browser_image img {  
+  border:1px solid black;
+}
+
 
 .wysiwyg_imageupload_tab {	
   border-top: 1px solid #ccc;
