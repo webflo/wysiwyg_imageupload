@@ -131,13 +131,6 @@ function wysiwyg_imageupload_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-        'temporary' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Is this file temporary.',
-      ),
 
   return $data;
 }
