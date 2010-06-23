@@ -181,6 +181,10 @@ function wysiwyg_imageupload_views_data() {
  * Implements hook_vies_data_alter().
  */
 function wysiwyg_imageupload_views_data_alter(&$data) {
+  $data['files']['join']['table']['wysiwyg_imageupload_entity'] = array(
+    'left_field' => 'fid',
+    'field' => 'fid',
+  );
 }
 
 /**

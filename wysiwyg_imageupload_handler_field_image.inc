@@ -30,6 +30,7 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
   }
   
   function render($values) {
+    dsm($values);
     return theme('wysiwyg_imageupload_render_image_entity', $object, array());
   }
 }
