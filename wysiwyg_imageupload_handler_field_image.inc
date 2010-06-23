@@ -22,6 +22,11 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
     $this->additional_fields['timestamp'] = array('table' => 'files', 'field' => 'timestamp');
     // @TODO add stuff from revision.
   }
+  
+  function query() {
+//     dsm($this->query->ensure_table('files'));//, $this->query->get_join_data('files', $this->base_table)));
+    parent::query();
+  }
 
   function option_definition() {
     $options = parent::option_definition();
@@ -30,7 +35,23 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
   }
   
   function render($values) {
-    dsm($values);
+    $value = $values->{$this->field_alias};
+    $object = new stdClass();
+    $object->iid = $value;
+    $object->imagecache = $values->{$this->aliases['imagecache']};
+    $object->style = $values->{$this->aliases['style']};
+    $object->title = $values->{$this->aliases['title']};
+    $object->alignment = $values->{$this->aliases['alignment']};
+    $object->fid = $values->{$this->aliases['fid']};
+    $object->filename = $values->{$this->aliases['filename']};
+    $object->filepath = $values->{$this->aliases['filepath']};
+    $object->filesize = $values->{$this->aliases['filesize']};
+    $object->filemime = $values->{$this->aliases['filemime']};
+    $object->status = $values->{$this->aliases['status']};
+    $object->timestamp = $values->{$this->aliases['timestamp']};
+    // @TODO make the relationship working.
+    $object = _wysiwyg_imageupload_load_inline_entity($value);
+    
     return theme('wysiwyg_imageupload_render_image_entity', $object, array());
   }
 }

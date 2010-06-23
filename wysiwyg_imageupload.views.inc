@@ -47,6 +47,11 @@ function wysiwyg_imageupload_views_data() {
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
+    'relationship' => array(
+      'base' => 'files',
+      'field' => 'fid',
+//       'label' => t('Related term'),
+    ),
     // @TODO Perhaps someone needs a filter/sort here, but i cannot imagine this.
   );
 
