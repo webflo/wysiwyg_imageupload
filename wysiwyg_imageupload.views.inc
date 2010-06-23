@@ -190,6 +190,9 @@ function wysiwyg_imageupload_views_handlers() {
   return array(
     'handlers' => array(
       // Fields
+      'wysiwyg_imageupload_handler_field_image' => array(
+        'parent' => 'views_handler_field',
+      ),
       // Filters
     ),
   );
