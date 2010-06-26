@@ -5,12 +5,12 @@
 
 function wysiwyg_imageupload_migration_menu() {
   $items = array();
-  $items['admin/build/wysiwyg_imageupload/img_assist'] = array (
+/*  $items['admin/build/wysiwyg_imageupload/img_assist'] = array (
     'title' => 'Migrate from img_assist',
     'page callback' => '_wysiwyg_imageupload_migration_imageassist',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
-  );
+  );*/
 
   $items['admin/build/wysiwyg_imageupload'] = array (
     'title' => 'Wysiwyg imageupload migration',
