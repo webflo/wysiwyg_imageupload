@@ -188,8 +188,13 @@
 
       content = content.replace(
         /\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g,
-        function(orig, iid) {
-          return images[iid];
+        function(orig, iid, attributes) {
+          attributes=attributes.split(',');
+          for (var i=0; i<attributes.length; i++) {
+              var attribute = attributes[i].split('=');
+              attributes[i] = attribute[0] + '="' + attribute[1] + '"';
+          }
+          return images[iid].replace('wysiwyg_placeholder="1"', attributes.join(' '));
         }
       );
       return content;
@@ -201,8 +206,15 @@
       $content = $(content);
       $content.find('img.wysiwyg_imageupload').map(
         function(i, img) {
-          var inlineTag = $(img).attr('alt');
-          $(img, $content).replaceWith('[[wysiwyg_imageupload:'+inlineTag+':]]');
+          var $img = $(img);
+          var inlineTag = $img.attr('alt');
+          var height = parseInt($img.css('height'), 10);
+          height = height ? 'height=' + height : '';
+          var width = parseInt($img.css('width'), 10);
+          width = width ? 'width=' + width : '';
+          var inlineAttribs = height;
+          inlineAttribs += inlineAttribs ? ',' + width : width;
+          $(img, $content).replaceWith('[[wysiwyg_imageupload:'+inlineTag+':' + inlineAttribs + ']]');
         }
       );
       content = $content.html();

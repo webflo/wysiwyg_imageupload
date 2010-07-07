@@ -58,7 +58,7 @@ function _wysiwyg_imageupload_render_wysiwyg_images($iids, $revisioned, $form_id
   $output = array();
   foreach($iids as $iid) {
     $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
-    $output[$iid] = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array());
+    $output[$iid] = theme('wysiwyg_imageupload_render_image_wysiwyg', $image_obj, array('wysiwyg_placeholder'=>'1'));
   }
   
   $GLOBALS['devel_shutdown'] = FALSE;
