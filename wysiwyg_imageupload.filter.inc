@@ -41,8 +41,23 @@ function _wysiwyg_imageupload_filter_process(&$body) {
 * returns a rendered(html) image for the tag
 */
 function _wysiwyg_imageupload_render_nodeview($iid, $arguments) {
-  $arguments = unserialize(urldecode($arguments));
-  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);  
-  
+  $arguments = _wysiwyg_imageupload_unserialize_arguments(urldecode($arguments));
+  $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
+
   return theme('wysiwyg_imageupload_render_image_entity', $image_obj, $arguments);
+}
+
+/**
+ * Loads the comma seperated argument list into an array
+ */
+function _wysiwyg_imageupload_unserialize_arguments($arguments) {
+    // Argument syntax: key=value,key=value,key=value
+    $result = array();
+    // TODO: What about values with commas?
+    $arguments = explode(',', $arguments);
+    foreach($arguments as $value) {
+      $pair = explode('=', $value);
+      $result[ $pair[0] ] = $pair[1];
+    }
+    return $result;
 }

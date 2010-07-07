@@ -267,13 +267,15 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   if ($arguments['width'] != '') {
     $attributes['width'] = $arguments['width'];
   }
+  
   if ($arguments['height'] != '') {
     $attributes['height'] = $arguments['height'];
   }
+  
   if (isset($attributes['height']) || isset($attributes['width'])) {
     $do_getsize = FALSE;
   }
-  //$inline_args = join('|', array($img_obj->iid, $arguments['height'], $arguments['width']));
+
   $inline_args = $img_obj->iid;
   drupal_alter('wysiwyg_imageupload_image_attribute',$attributes,$img_obj);
 

@@ -189,6 +189,7 @@
       content = content.replace(
         /\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g,
         function(orig, iid, attributes) {
+          // Render arguments.
           attributes=attributes.split(',');
           for (var i=0; i<attributes.length; i++) {
               var attribute = attributes[i].split('=');
