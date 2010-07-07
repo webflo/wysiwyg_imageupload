@@ -190,7 +190,7 @@
         /\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/g,
         function(orig, iid, attributes) {
           // Render arguments.
-          attributes=attributes.split(',');
+          attributes = attributes.split(',');
           for (var i=0; i<attributes.length; i++) {
               var attribute = attributes[i].split('=');
               attributes[i] = attribute[0] + '="' + attribute[1] + '"';
@@ -208,14 +208,12 @@
       $content.find('img.wysiwyg_imageupload').map(
         function(i, img) {
           var $img = $(img);
-          var inlineTag = $img.attr('alt');
-          var height = parseInt($img.css('height'), 10);
-          height = height ? 'height=' + height : '';
-          var width = parseInt($img.css('width'), 10);
-          width = width ? 'width=' + width : '';
-          var inlineAttribs = height;
-          inlineAttribs += inlineAttribs ? ',' + width : width;
-          $(img, $content).replaceWith('[[wysiwyg_imageupload:'+inlineTag+':' + inlineAttribs + ']]');
+          // Thats the inlineID we use for extracting the meta data from the database
+          var inlineID = $img.attr('alt');
+          
+          var attributes = plugin.get_inline_attributes($img);
+          var inlineAttribs = attributes.join(',');
+          $(img, $content).replaceWith('[[wysiwyg_imageupload:'+inlineID+':' + inlineAttribs + ']]');
         }
       );
       content = $content.html();
@@ -250,7 +248,22 @@
       );
       return result;
     },
-
+    
+    get_inline_attributes: function($img) {
+      var attributes = Array();
+      
+      var height = parseInt($img.css('height'), 10);
+      if(height) {
+        attributes.push('height=' + height);
+      }
+      
+      var width = parseInt($img.css('width'), 10);
+      if(width) {
+        attributes.push('width=' + width);
+      }
+      return attributes;
+    },
+    
     uniqueArray: function (a) {
       var r = new Array();
       o: for (var i = 0, n = a.length; i < n; i++) {
