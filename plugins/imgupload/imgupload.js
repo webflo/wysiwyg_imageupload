@@ -109,7 +109,8 @@
       Drupal.jqui_dialog.open({
         url: aurl,
         buttons: btns,
-        width: 540
+        width: 540,
+        namespace: 'wysiwyg_imageupload'
       });
     },
 
@@ -151,7 +152,8 @@
       Drupal.jqui_dialog.open({
         url: aurl,
         buttons: btns,
-        width: 540
+        width: 540,
+        namespace: 'wysiwyg_imageupload'
       });
     },
 
