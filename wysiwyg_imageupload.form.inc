@@ -8,7 +8,6 @@
 * Adding jquery_ui_dialog javascript / css definitions to the form.
 */
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
-  
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
     if(variable_get('wysiwyg_imageupload_skip_dependencies_check', true)) {
       _wysiwyg_imageupload_check_dependencies();
