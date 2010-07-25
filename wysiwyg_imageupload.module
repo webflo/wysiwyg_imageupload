@@ -9,6 +9,22 @@ require_once('wysiwyg_imageupload.ajax.inc');
 require_once('wysiwyg_imageupload.filter.inc');
 
 /**
+* Implementation of hook_help().
+*/
+function wysiwyg_imageupload_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#wysiwyg_imageupload':
+      $output = t('<p>An image upload dialog for most WYSIWYG Editors.<h2>Full Installation</h2>
+<ul>
+<li>You need to have a <a href="http://drupal.org/project/wysiwyg" target="_blank">WYSIWYG</a>-compatible editor enabled
+<li>Check the <a href="http://drupal.org/node/808626" target="_blank">Installation How-to</a>
+<li>Also refer to the <a href="http://drupal.org/project/wysiwyg_imageupload" target="_blank">WYSIWYG image upload</a> home page
+</ul></p>');
+      return $output;
+  }
+}
+
+/**
 * Implementes hook_menu().
 */
 function wysiwyg_imageupload_menu() {
@@ -131,25 +147,6 @@ function wysiwyg_imageupload_comment(&$a1, $op) {
 }
 
 /**
-* Returns all the image styles to show in the selection
-*/
-function _wysiwyg_imageupload_get_image_styles() {
-  // Must have the format: Descriptive=css_style,Descriptive2=css_style2..
-  $settings = variable_get('wysiwyg_imageupload_imgstyles', '');
-  $styles = array();
-  if ($settings != '') {
-    $styles_lines = array();
-    $styles_lines = preg_split("/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $settings);
-    foreach ($styles_lines as $style) {
-      $style = explode('=',$style);
-      $styles[$style[1]] = t("!style",array('!style' => $style[0]));
-    }
-  }
-  drupal_alter('wysiwyg_imageupload_image_styles', $styles);
-  return $styles;
-}
-
-/**
 * API: returns the filepath of a file
 * @fid: the file id
 */
@@ -201,6 +198,31 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL, $group = nul
   }
   // else
   return array();
+}
+
+
+/**
+*  Those presets are needed for the browser and the details form
+*/
+function wysiwyg_imageupload_imagecache_default_presets() {
+  $presets = array();
+  $presets['wysiwyg_imageupload_preview'] = array (
+    'presetname' => 'wysiwyg_imageupload_preview',
+    'actions' => array (
+      0 => array (
+        'weight' => '0',
+        'module' => 'imagecache',
+        'action' => 'imagecache_scale',
+        'data' => array (
+          'height' => '150',
+          'width' => '220',
+          'upscale' => 1,
+        ),
+      ),
+    )
+  );
+
+  return $presets;
 }
 
 /**
@@ -319,27 +341,22 @@ function theme_wysiwyg_imageupload_render_image_wysiwyg($img_obj, $arguments = a
 }
 
 /**
-*  Those presets are needed for the browser and the details form
+* Returns all the image styles to show in the selection
 */
-function wysiwyg_imageupload_imagecache_default_presets() {
-  $presets = array();
-  $presets['wysiwyg_imageupload_preview'] = array (
-    'presetname' => 'wysiwyg_imageupload_preview',
-    'actions' => array (
-      0 => array (
-        'weight' => '0',
-        'module' => 'imagecache',
-        'action' => 'imagecache_scale',
-        'data' => array (
-          'height' => '150',
-          'width' => '220',
-          'upscale' => 1,
-        ),
-      ),
-    )
-  );
-
-  return $presets;
+function _wysiwyg_imageupload_get_image_styles() {
+  // Must have the format: Descriptive=css_style,Descriptive2=css_style2..
+  $settings = variable_get('wysiwyg_imageupload_imgstyles', '');
+  $styles = array();
+  if ($settings != '') {
+    $styles_lines = array();
+    $styles_lines = preg_split("/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $settings);
+    foreach ($styles_lines as $style) {
+      $style = explode('=',$style);
+      $styles[$style[1]] = t("!style",array('!style' => $style[0]));
+    }
+  }
+  drupal_alter('wysiwyg_imageupload_image_styles', $styles);
+  return $styles;
 }
 
 /**
@@ -463,21 +480,6 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
   return $error;
 }
 
-/**
-* Implementation of hook_help().
-*/
-function wysiwyg_imageupload_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#wysiwyg_imageupload':
-      $output = t('<p>An image upload dialog for most WYSIWYG Editors.<h2>Full Installation</h2>
-<ul>
-<li>You need to have a <a href="http://drupal.org/project/wysiwyg" target="_blank">WYSIWYG</a>-compatible editor enabled
-<li>Check the <a href="http://drupal.org/node/808626" target="_blank">Installation How-to</a>
-<li>Also refer to the <a href="http://drupal.org/project/wysiwyg_imageupload" target="_blank">WYSIWYG image upload</a> home page
-</ul></p>');
-      return $output;
-  }
-}
 
 function _wysiwyg_imageupload_reset_filter_cache($format, $text) {
   $cid = $format .':'. md5($text);
