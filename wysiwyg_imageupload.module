@@ -259,9 +259,10 @@ function theme_wysiwyg_imageupload_render_image_entity($img_obj, $arguments) {
 */
 function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   $attributes = array(
-    'class' => 'wysiwyg_imageupload '.$img_obj->style,
+    'class' => 'imagecache wysiwyg_imageupload '.$img_obj->style.' imagecache imagecache-'.$img_obj->imagecache,
     'style' => '',
   );
+  
   $do_getsize = TRUE;
   // If the use set custom sizes
   if ($arguments['width'] != '') {
