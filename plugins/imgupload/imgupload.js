@@ -24,7 +24,7 @@
       }
       // else
       // This would be for the TinyMCE and hopefully others
-      return $(node)
+      return $(node);
     },
 
     /**
@@ -71,8 +71,8 @@
     */
     add_form: function (data, settings, instanceId) {
       // Create the buttons
-      dialogIframe = Drupal.jqui_dialog.iframeSelector();
-      btns = {};
+      var dialogIframe = Drupal.jqui_dialog.iframeSelector();
+      var btns = {};
       btns[Drupal.t('Insert')] = function () {
         // well lets test if an image has been selected
         if ($(dialogIframe).contents().find('form#wysiwyg-imageupload-upload-form').find('input#edit-wysiwyg-imageupload-file').size() > 0) {
@@ -81,7 +81,7 @@
         }
         // else
         var iid = 0;
-        form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form');
+        var form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form');
         form.ajaxSubmit({
           dataType : 'json',
           method: 'post',
@@ -120,8 +120,8 @@
     */
     update_form: function (data, settings, instanceId, options) {
       // Create buttons.
-      dialogIframe = Drupal.jqui_dialog.iframeSelector();
-      btns = {};
+      var dialogIframe = Drupal.jqui_dialog.iframeSelector();
+      var btns = {};
       // Update button.
       btns[Drupal.t('Update')] = function () {
         var iid = 0;
@@ -206,7 +206,7 @@
     detach: function (content, pluginSettings, id)  {
       var plugin = this;
       content = '<div>'+content+'</div>';
-      $content = $(content);
+      var $content = $(content);
       $content.find('img.wysiwyg_imageupload').map(
         function(i, img) {
           var $img = $(img);
@@ -224,7 +224,7 @@
     },
 
     get_rendered_wysiwyg_image: function(iid) {
-       result = '';
+       var result = '';
        $.ajax( {
           url: Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/render_wysiwyg/' + iid,
           async: false,
@@ -238,7 +238,7 @@
     },
 
     get_rendered_wysiwyg_images: function(iids) {
-      result = [];
+      var result = [];
       $.ajax( {
           url: Drupal.settings.basePath + 'index.php?q=ajax/wysiwyg_imgupl/render_wysiwyg_images/' + iids.join(','),
           async: false,
