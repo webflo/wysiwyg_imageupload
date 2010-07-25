@@ -104,7 +104,7 @@
       };
       var parent_build_id = Drupal.settings.wysiwyg_imageupload.current_form;
       // Location, where to fetch the dialog.
-      var aurl = Drupal.settings.basePath + 'index.php?q=wysiwy_imageupload/upload/' + parent_build_id;
+      var aurl = Drupal.settings.basePath + 'index.php?q=wysiwyg_imageupload/upload/' + parent_build_id;
       // Open the dialog, load the form.
       Drupal.jqui_dialog.open({
         url: aurl,

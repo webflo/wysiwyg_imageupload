@@ -29,7 +29,7 @@ function wysiwyg_imageupload_help($path, $arg) {
 */
 function wysiwyg_imageupload_menu() {
   $items = array();
-  $items['wysiwy_imageupload/upload/%'] = array(
+  $items['wysiwyg_imageupload/upload/%'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('wysiwyg_imageupload_upload_form', 2),
     'access callback' => 'user_access',
@@ -199,7 +199,6 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL, $group = nul
   // else
   return array();
 }
-
 
 /**
 *  Those presets are needed for the browser and the details form
