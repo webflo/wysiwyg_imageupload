@@ -55,7 +55,16 @@ function wysiwyg_imageupload_menu() {
   // Form for editing an image
   $items['wysiwyg_imageupload/edit/%'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_edit_form',2,3),
+    // Be aware that we dont need 2,3 as argument here, eventhough we will expect them
+    // it seems like they are passed automatically when % stands for multiple arguments
+    // ( when it is used as the last part of the path )
+    // That means, if we call the callback this way :
+    // wysiwyg_imageupload/edit/12/foo/bar/cat/dog the from callback will be called as
+    // wysiwyg_imageupload_edit_form($form_state,12,foo,bar,cat,dog) !!
+    // and we dont have the page arguments set like array('wysiwyg_imageupload_edit_form',2,3,4,5), 
+    // IF you set those arguments, the will be provided twice, so rather
+    // wysiwyg_imageupload_edit_form($form_state,12,foo,bar,cat,dog,12,foo,bar,cat,dog)    
+    'page arguments' => array('wysiwyg_imageupload_edit_form',2), 
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
