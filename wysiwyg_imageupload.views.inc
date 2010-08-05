@@ -19,12 +19,14 @@ function wysiwyg_imageupload_views_data() {
 
   $data['wysiwyg_imageupload_entity']['table']['join'] = array(
     'node' => array(
-      'left_field' => 'vid',
-      'field' => 'vid',
+      'left_table' => 'wysiwyg_imageupload_entity_revision'
+      'left_field' => 'iid',
+      'field' => 'iid',
     ),
     'node_revisions' => array(
-      'left_field' => 'vid',
-      'field' => 'vid',
+      'left_table' => 'wysiwyg_imageupload_entity_revision'
+      'left_field' => 'iid',
+      'field' => 'iid',
     ),
     'files' => array(
       'left_field' => 'fid',
@@ -176,6 +178,17 @@ function wysiwyg_imageupload_views_data() {
       'label' => t('Comment'),
       'base' => 'comments',
       'base field' => 'cid',
+    ),
+  );
+
+  $data['wysiwyg_imageupload_entity_revision']['table']['join'] = array(
+    'node' => array(
+      'left_field' => 'vid',
+      'field' => 'vid',
+    ),
+    'node_revision' => array(
+      'left_field' => 'vid',
+      'field' => 'vid',
     ),
   );
 
