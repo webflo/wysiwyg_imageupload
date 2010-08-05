@@ -117,7 +117,6 @@ function _wysiwyg_imageupload_save(&$entity) {
   if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
     return;
   }
-  dsm($entity->imgupload_images);
   foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
     // Convert file to object for compatibility.
