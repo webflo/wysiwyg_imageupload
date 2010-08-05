@@ -78,7 +78,6 @@ function _wysiwyg_imageupload_get_dest_dir() {
  */
 function _wysiwyg_imageupload_load($node) {
   $files = array();
-
   if ($node->vid) {
     $result = db_query('SELECT * FROM {wysiwyg_imageupload_entity_revision} as r LEFT JOIN {wysiwyg_imageupload_entity} AS e ON r.iid=e.iid LEFT JOIN {files} as f ON f.fid = e.fid  WHERE r.vid = %d ', $node->vid);
     while ($file = db_fetch_object($result)) {
@@ -118,7 +117,7 @@ function _wysiwyg_imageupload_save(&$entity) {
   if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
     return;
   }
-
+  dsm($entity->imgupload_images);
   foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
     // Convert file to object for compatibility.

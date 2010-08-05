@@ -113,7 +113,6 @@ function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
 */
 function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
   $m = drupal_get_path('module','wysiwyg_imageupload');
-  
   $parent_build_id = check_plain($parent_build_id);
   jquery_ui_dialog_child_js();
   drupal_set_title(t('Upload image'));
@@ -142,7 +141,6 @@ function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
 }
 
 function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
-  dsm('vali');
   $iid = _wysiwyg_imageupload_entity_upload($state['values']['parent_build_id']);
   if ($iid == false) {
     form_set_error('wysiwyg_imageupload_file',t('This file could not be uploaded'));

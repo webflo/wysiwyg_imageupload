@@ -147,7 +147,7 @@ Drupal.wysiwyg.plugins.imgupload = {
     };
 
     // Location, where to fetch the dialog.
-    var aurl = Drupal.settings.basePath + 'index.php?q=wysiwyg_imageupload/edit/' + options.iid;
+    var aurl = Drupal.settings.basePath + 'index.php?q=wysiwyg_imageupload/edit/' + options.iid +'/' + Drupal.settings.wysiwyg_imageupload.current_form;
     // Finally open the dialog.
     Drupal.jqui_dialog.open({
       url: aurl,

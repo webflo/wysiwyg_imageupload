@@ -61,9 +61,10 @@ function wysiwyg_imageupload_menu() {
     // That means, if we call the callback this way :
     // wysiwyg_imageupload/edit/12/foo/bar/cat/dog the from callback will be called as
     // wysiwyg_imageupload_edit_form($form_state,12,foo,bar,cat,dog) !!
-    // and we dont have the page arguments set like array('wysiwyg_imageupload_edit_form',2,3,4,5), 
-    // IF you set those arguments, the will be provided twice, so rather
-    // wysiwyg_imageupload_edit_form($form_state,12,foo,bar,cat,dog,12,foo,bar,cat,dog)    
+    // eventhough dont have the page arguments set like thise : array('wysiwyg_imageupload_edit_form',2,3,4,5), 
+    // IF you set those arguments, they will be provided twice in the later form callback, so rather
+    // wysiwyg_imageupload_edit_form($form_state,12,foo,bar,cat,dog,12,foo,bar,cat,dog)
+    // what is not exepected and especially bad if you have optional parameters (which will get overridden then)
     'page arguments' => array('wysiwyg_imageupload_edit_form',2), 
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
