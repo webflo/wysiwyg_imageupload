@@ -311,7 +311,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   $inline_args = $img_obj->iid;
   drupal_alter('wysiwyg_imageupload_image_attribute',$attributes,$img_obj);
 
-  $output = '<div>'.theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, $do_getsize).'</div>';
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, $do_getsize);
   drupal_alter('wysiwyg_imageupload_rendered_image', $output, $img_obj);
   return $output;
 }
