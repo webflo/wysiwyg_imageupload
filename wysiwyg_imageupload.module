@@ -74,7 +74,7 @@ function wysiwyg_imageupload_menu() {
   // Form for editing an image
   $items['wysiwyg_imageupload/reuse/%'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('wysiwyg_imageupload_edit_form',2, 3,true),
+    'page arguments' => array('wysiwyg_imageupload_edit_form', 2, 3, true),
     'access callback' => 'user_access',
     'access arguments' => array('use wysiwyg image upload'),
     'type' => MENU_CALLBACK,
