@@ -107,17 +107,17 @@ function wysiwyg_imageupload_lightbox_admin_settings(&$form) {
 function wysiwyg_imageupload_lightbox_wysiwyg_imageupload_rendered_image_alter(&$img,$img_obj) {
   $default = variable_get('wysiwyg_imageupload_lightbox_default', 1);
   // only use the defaul if nothing set yet
-  if($img_obj->lightbox > -1) {
+  if ($img_obj->lightbox > -1) {
     $default = $img_obj->lightbox;
   }
 
-  if($default != 0) {
+  if ($default != 0) {
     $transformed_path = imagecache_create_url(variable_get('wysiwyg_imageupload_lightbox_preset', 'wysiwyg_imageupload_lightbox_preset'), $img_obj->filepath);
     $link_attributes = array(
       'rel' => 'lightbox[wysiwyg_imageupload_inline]',
       'title' => $img_obj->title
     );
-    $img = l($img,$transformed_path,array('html' => true,'attributes' => $link_attributes));
+    $img = l($img, $transformed_path, array('html' => true,'attributes' => $link_attributes));
   }
 }
 

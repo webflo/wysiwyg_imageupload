@@ -99,7 +99,7 @@ function wysiwyg_imageupload_browser_browser($form_id){
   // Adding tabs.
   $tabs = array();
   $parent_build_id = arg(2);
-  $tabs[] = l(t('New Image'), 'wysiwy_imageupload/upload/'.$parent_build_id, array('title' => t('Go back to the upload form and upload a new image')));
+  $tabs[] = l(t('New Image'), 'wysiwyg_imageupload/upload/'.$parent_build_id, array('title' => t('Go back to the upload form and upload a new image')));
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= _wysiwyg_imageupload_browser_tabs($tabs,1);
 

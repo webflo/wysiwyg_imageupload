@@ -5,10 +5,8 @@
 
 /**
 * Implementation of hook_form_alter
-* Adding jquery_ui_dialog javascript / css definitions to the form.
 */
 function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
-  
   if ($form['#id'] == 'node-form' || $form['#id'] == 'comment-form' ) {
     if(variable_get('wysiwyg_imageupload_skip_dependencies_check', true)) {
       _wysiwyg_imageupload_check_dependencies();
@@ -65,7 +63,7 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
-* Inlcude all js libs and css we need for the form
+* Adding jquery_ui_dialog javascript / css definitions to the form.
 */
 function _wysiwyg_imageupload_prepare_main_form(&$form,$form_state) {
   drupal_add_js('misc/jquery.form.js');
@@ -115,7 +113,6 @@ function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
 */
 function wysiwyg_imageupload_upload_form(&$form_state, $parent_build_id) {
   $m = drupal_get_path('module','wysiwyg_imageupload');
-  
   $parent_build_id = check_plain($parent_build_id);
   jquery_ui_dialog_child_js();
   drupal_set_title(t('Upload image'));
@@ -157,10 +154,17 @@ function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
 /**
 * Called when a image was selected / uploaded and the details form should be shown.
 */
-function wysiwyg_imageupload_edit_form(&$form_state,$iid, $parent_build_id, $rebuild_entity = false) {
+function wysiwyg_imageupload_edit_form(&$form_state, $iid, $parent_build_id, $rebuild_entity = false) {
   jquery_ui_dialog_child_js(array('width' => 740));
   drupal_set_title(t('Image details'));
-  if($rebuild_entity) {
+  if($rebuild_entity != false) {
+    // If rebuild is set, we clone the entity and create a new iid. This is mainly e.g. when we create a new
+    // node revision and change an image. We dont want to change the old entitys in the previous node revisions
+    // but rather change it for the current, based on the last revision. So we clone the latest but create a new entity
+    // with new settings
+  
+    // backup for later use
+    $old_iid = $iid;
     $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
     $iid = _wysiwyg_imageupload_create_inline_entity($img_obj,true, array('title' => $img_obj->title, 'imagecache' => $img_obj->imagecache,'style' => $img_obj->style));
     $img_obj->iid= $iid;
@@ -170,6 +174,8 @@ function wysiwyg_imageupload_edit_form(&$form_state,$iid, $parent_build_id, $reb
     
     $old = cache_get('wysiwyg_imageupload_'.$parent_build_id, 'cache');
     $old = $old->data;
+    // remove the old entity
+    unset($old[$old_iid]);
     // Add the new entity
     $old[$img_obj->iid] = $img_obj;
     cache_set('wysiwyg_imageupload_'.$parent_build_id, $old,'cache', CACHE_TEMPORARY);

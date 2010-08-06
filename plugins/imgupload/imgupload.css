@@ -55,7 +55,7 @@ div.imgupl_styles_spacing_20_black_border .image_title, div.imgupl_styles_black_
 
 .image_title {
    text-decoration:underline;
-   color:grey;   
+   color: #CCCCCC;
 }
 
 #image_preview {

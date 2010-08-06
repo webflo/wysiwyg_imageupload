@@ -78,14 +78,13 @@ function _wysiwyg_imageupload_get_dest_dir() {
  */
 function _wysiwyg_imageupload_load($node) {
   $files = array();
-  
   if ($node->vid) {
     $result = db_query('SELECT * FROM {wysiwyg_imageupload_entity_revision} as r LEFT JOIN {wysiwyg_imageupload_entity} AS e ON r.iid=e.iid LEFT JOIN {files} as f ON f.fid = e.fid  WHERE r.vid = %d ', $node->vid);
     while ($file = db_fetch_object($result)) {
       $files[$file->iid] = $file;
     }
   }
-  
+
   return $files;
 }
 
@@ -118,7 +117,6 @@ function _wysiwyg_imageupload_save(&$entity) {
   if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
     return;
   }
-
   foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
     // Convert file to object for compatibility.
@@ -212,25 +210,24 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
       db_query('DELETE FROM {files} WHERE fid = %d', $entity->fid);
     }
   }
-
 }
 
 /**
  * Updates or revision table for inline images and adds a new revision
  */
 function _wysiwyg_imageupload_create_revision($iid,$vid) {
-    $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));    
-    if($idd) {
-      // version already exists, dont create a new one
-      return false;
-    }
-    $data = array(
-      'iid' => $iid,
-      'vid' => $vid
-    );
+  $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));    
+  if($idd) {
+    // version already exists, dont create a new one
+    return false;
+  }
+  $data = array(
+    'iid' => $iid,
+    'vid' => $vid
+  );
 
-    drupal_write_record('wysiwyg_imageupload_entity_revision',$data);
-    return true;
+  drupal_write_record('wysiwyg_imageupload_entity_revision',$data);
+  return true;
 }
 
 /**
@@ -243,7 +240,6 @@ function _wysiwyg_imageupload_load_inline_entity($iid) {
     drupal_alter('wysiwyg_imageupload_entity_load',$img_obj,$iid);
     return $img_obj;
   }
-  
   // else
   return false;
 }
@@ -259,6 +255,5 @@ function _wysiwyg_imageupload_create_inline_entity($file,$temporary = true, $opt
   $record = array_merge($record, $options);
 
   drupal_write_record('wysiwyg_imageupload_entity',$record);
-
   return $record['iid'];
 }
