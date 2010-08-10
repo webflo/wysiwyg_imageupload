@@ -9,10 +9,10 @@
 function wysiwyg_imageupload_filter($op, $delta = 0, $format = -1, $text = '') {
   switch ($op) {
     case 'list':
-      return array(0 => t('Drupal Wiki inline-images'));
+      return array(0 => t('WYSIWYG inline-images'));
 
     case 'description':
-      return t('Converts Drupal Wiki inline images to HTML.');
+      return t('Converts WYSIWYG inline-images to HTML.');
 
     case 'process':
       return _wysiwyg_imageupload_filter_process($text);
