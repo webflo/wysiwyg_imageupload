@@ -4,6 +4,6 @@ description = Image upload dialog for the most WYSIWYG Editors
 dependencies[] = wysiwyg
 dependencies[] = jquery_ui_dialog
 dependencies[] = imagecache
-package = Drupal Wiki
+package = WYSIWYG image upload
 core = "6.x"
 project = "wysiwyg_imageupload"
