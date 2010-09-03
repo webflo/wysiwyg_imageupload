@@ -117,6 +117,7 @@ function _wysiwyg_imageupload_save(&$entity) {
   if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
     return;
   }
+  
   foreach ($entity->imgupload_images as $iid => $file) {
     $fid = $file->fid;
     // Convert file to object for compatibility.
@@ -142,9 +143,7 @@ function _wysiwyg_imageupload_save(&$entity) {
       continue;
     }
 
-    if($file->new) {
-      file_set_status($file, FILE_STATUS_PERMANENT);
-    }
+    file_set_status($file, FILE_STATUS_PERMANENT);
 
     // It's a comment.
     if (!empty($entity->cid) && $entity->cid > 0) {
