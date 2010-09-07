@@ -244,7 +244,7 @@ function wysiwyg_imageupload_edit_form_submit($form, &$state) {
     'title' => $state['values']['title'],
     'iid' => $state['values']['iid'],
   );
-  dsm($record);
+
   // Update the details of the inline entity.
   drupal_write_record('wysiwyg_imageupload_entity',$record, $update);
   // Call all our api hooks.
