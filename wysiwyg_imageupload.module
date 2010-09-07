@@ -133,7 +133,6 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
         // we load the images out of the cache
         $cache = cache_get('wysiwyg_imageupload_' . $node->form_build_id, 'cache');
         $node->imgupload_images = $cache->data;
-        dsm($node->imgupload_images );
         // remove te cache, as we dont need it anymore
         cache_clear_all('wysiwyg_imageupload_' . $node->form_build_id, 'cache');
         // remove the filter cache
