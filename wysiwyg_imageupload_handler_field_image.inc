@@ -8,6 +8,7 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
   function construct() {
     parent::construct();
     // Add stuff from wysiwyg
+    $this->additional_fields['iid'] = array('table' => 'wysiwyg_imageupload_entity', 'field' => 'iid');    
     $this->additional_fields['imagecache'] = array('table' => 'wysiwyg_imageupload_entity', 'field' => 'imagecache');
     $this->additional_fields['style'] = array('table' => 'wysiwyg_imageupload_entity', 'field' => 'style');
     $this->additional_fields['title'] = array('table' => 'wysiwyg_imageupload_entity', 'field' => 'title');
@@ -34,7 +35,6 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
     $def['field'] = 'fid';
     $def['table'] = 'files';
     $def['type'] = 'INNER';
-
     $join = new views_join();
 
     $join->definition = $def;
@@ -53,6 +53,7 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
   
   function render($values) {
     $value = $values->{$this->field_alias};
+    
     $object = new stdClass();
     $object->iid = $value;
     $object->imagecache = $values->{$this->aliases['imagecache']};

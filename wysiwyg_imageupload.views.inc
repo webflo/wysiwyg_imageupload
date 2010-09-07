@@ -19,12 +19,12 @@ function wysiwyg_imageupload_views_data() {
 
   $data['wysiwyg_imageupload_entity']['table']['join'] = array(
     'node' => array(
-      'left_table' => 'wysiwyg_imageupload_entity_revision'
+      'left_table' => 'wysiwyg_imageupload_entity_revision',
       'left_field' => 'iid',
       'field' => 'iid',
     ),
     'node_revisions' => array(
-      'left_table' => 'wysiwyg_imageupload_entity_revision'
+      'left_table' => 'wysiwyg_imageupload_entity_revision',
       'left_field' => 'iid',
       'field' => 'iid',
     ),
