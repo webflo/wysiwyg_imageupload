@@ -1,5 +1,5 @@
 <?php
-// $Id:$
+// $Id$
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -30,7 +30,7 @@ function _wysiwyg_imageupload_entity_upload($node_form_build_id) {
     // to update the inline-entry to be static and not temporary
     $imgDetails->iid = $iid;
     $cached_files[$iid] = $imgDetails;
-    cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_TEMPORARY );
+    cache_set( 'wysiwyg_imageupload_'.$node_form_build_id, $cached_files, 'cache', CACHE_PERMANENT );
     return $iid;
   }
   //else

@@ -1,4 +1,4 @@
-; $Id:$
+; $Id$
 name = Wysiwyg imageupload - Migrates WYSIWYG imageupload 1-x t 2.x
 dependencies[] = wysiwyg_imageupload
 dependencies[] = wysiwyg_imageupload_migration

@@ -9,7 +9,7 @@ function wysiwyg_imageupload_imgupload_plugin() {
     'title' => t('Image uploading'),
     'vendor url' => 'http://impressive-media.de',
     'icon file' => 'add_img.png',
-    'icon title' => t('Insert or update an embedded image'),
+    'icon title' => t('Image'),
     'settings' => array(
       'dialog' => array(
         'url' => '',

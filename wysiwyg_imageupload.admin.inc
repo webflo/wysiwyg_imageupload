@@ -1,5 +1,5 @@
 <?php
-// $Id:$
+// $Id$
 
 // Copyright (c) 2010 KontextWork
 // Author: Eugen Mayer
