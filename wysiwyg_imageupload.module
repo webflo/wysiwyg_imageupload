@@ -1,5 +1,5 @@
 <?php
-// $Id:$
+// $Id$
 // Copyright (c) 2010 KontextWork GbR
 // Author: Eugen Mayer
 
@@ -130,6 +130,13 @@ function wysiwyg_imageupload_nodeapi(&$node, $op, $teaser) {
     case 'insert':
     case 'update':
       if (user_access('use wysiwyg image upload')) {
+        // we load the images out of the cache
+        $cache = cache_get('wysiwyg_imageupload_' . $node->form_build_id, 'cache');
+        $node->imgupload_images = $cache->data;
+        dsm($node->imgupload_images );
+        // remove te cache, as we dont need it anymore
+        cache_clear_all('wysiwyg_imageupload_' . $node->form_build_id, 'cache');
+        // remove the filter cache
         _wysiwyg_imageupload_reset_filter_cache($node->format, $node->body);
         _wysiwyg_imageupload_save($node);
       }
@@ -311,7 +318,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
   $inline_args = $img_obj->iid;
   drupal_alter('wysiwyg_imageupload_image_attribute',$attributes,$img_obj);
 
-  $output = '<div>'.theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, $do_getsize).'</div>';
+  $output = theme('imagecache', $img_obj->imagecache, $img_obj->filepath, $inline_args, $img_obj->title, $attributes, $do_getsize);
   drupal_alter('wysiwyg_imageupload_rendered_image', $output, $img_obj);
   return $output;
 }
@@ -440,7 +447,7 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
   
   if (module_exists('jquery_update')) {
     $jqv = jquery_update_get_version();
-    if (!preg_match('@1\.3\.\d+@',$jqv)) {
+    if (!preg_match('@1\.[3,4]\.\d+@',$jqv)) {
       $msg = 'Your jquery version is to old to use wysiwyg_imageupload. Therefore you need to install <a href="http://drupal.org/project/jquery_update">jquery_update</a> 6.2.x, not jquery_update 6.1.x. Please read point 3 at <a href="http://drupal.org/node/808626">this howto</a> to fix this.';
       if(is_array($requirements)) {
         $requirements['wyiwyg_imageupload_jquery_update']['description'] = $msg;
@@ -462,7 +469,7 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
   if(module_exists('imageapi')) {
     $toolkits = imageapi_get_available_toolkits();
     if(!array($toolkits) || count($toolkits) == 0) {
-      $msg = 'You need to have at least one ImageAPI library activated 6.2.x to use wysiwyg_imageupload. Please read point 4 at <a href="http://drupal.org/node/808626">this howto</a> on ho to fix this. Go to your '.l('modules page','admin/build/modules/list').' under section "imagecache"';
+      $msg = 'You need to have at least one ImageAPI library activated 6.2.x to use wysiwyg_imageupload. Please read point 4 at <a href="http://drupal.org/node/808626">this howto</a> on how to fix this. Go to your '.l('modules page','admin/build/modules/list').' under section "imagecache"';
       if(is_array($requirements)) {
         $requirements['wyiwyg_imageupload_imageapi']['description'] = $msg;
         $requirements['wyiwyg_imageupload_imageapi']['title'] = 'WYSIWYG imageupload: ImageAPI library';
@@ -482,7 +489,7 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
   
   $roles = user_roles(false,'use wysiwyg image upload'); 
   if(!array($roles) || count($roles) == 0) {
-    $msg = 'You did not give any role the "use wysiwyg image upload" permission, so nobody can use wysiwyg_imageupload. Please read point 8 at <a href="http://drupal.org/node/808626">this howto</a> on ho to fix this.';
+    $msg = 'You did not give any role the "use wysiwyg image upload" permission, so nobody can use wysiwyg_imageupload. Please read point 8 at <a href="http://drupal.org/node/808626">this howto</a> on how to fix this.';
     if(is_array($requirements)) {
       $requirements['wyiwyg_imageupload_user_permissions']['description'] = $msg;
       $requirements['wyiwyg_imageupload_user_permissions']['title'] = 'WYSIWYG imageupload: User Permissions';

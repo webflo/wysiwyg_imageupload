@@ -1,4 +1,4 @@
-; $Id:$
+; $Id$
 name = WYSIWYG Image upload - Lightbox2 integration
 description = Image upload dialog for the most WYSIWYG Editors
 dependencies[] = wysiwyg_imageupload
