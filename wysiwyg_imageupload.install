@@ -108,7 +108,7 @@ function _wysiwyg_imageupload_inline_table(&$schema) {
     'primary key' => array('iid')
   );
 
-$schema['wysiwyg_imageupload_entity_revision'] = array(
+  $schema['wysiwyg_imageupload_entity_revision'] = array(
     'description' => 'Stores the inline arguments for a specific image used inline',
     'fields' => array(
       'iid' => array(

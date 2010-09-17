@@ -329,7 +329,7 @@ function theme_wysiwyg_imageupload_render_image($img_obj, $arguments) {
 function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
   $output = '';
   if ($img_obj->title != '') {
-    $output .= "<div class='image_title'>{$img_obj->title}</div>";
+    $output .= "<span class='image_title'>{$img_obj->title}</span>";
   }
   return $output;
 }
@@ -338,7 +338,7 @@ function theme_wysiwyg_imageupload_render_meta($img_obj,$arguments) {
 * Renders the meta container of an image.
 */
 function theme_wysiwyg_imageupload_render_container($image,$meta,$img_obj,$arguments) {
-  return "<div class='wysiwyg_imageupload image {$img_obj->alignment} {$img_obj->style}'>$image <div class='image_meta'>$meta</div></div>";
+  return "<span class='wysiwyg_imageupload image {$img_obj->alignment} {$img_obj->style}'>$image <span class='image_meta'>$meta</span></span>";
 }
 
 /**

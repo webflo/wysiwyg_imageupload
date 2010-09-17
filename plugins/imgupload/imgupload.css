@@ -66,6 +66,10 @@ div.imgupl_styles_spacing_20_black_border .image_title, div.imgupl_styles_black_
   float:left;
 }
 
+.image_meta {
+  display:block;
+}
+
 #image_details_form {
   width:300px;
 }
