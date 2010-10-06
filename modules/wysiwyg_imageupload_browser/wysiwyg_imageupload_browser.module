@@ -47,7 +47,7 @@ function wysiwyg_imageupload_browser_menu() {
 function wysiwyg_imageupload_browser_form_alter(&$form, $form_state, $form_id){
   if ($form_id == 'wysiwyg_imageupload_upload_form' ||  $form_id == 'wysiwyg_imageupload_edit_form') {
     $tabs = array();
-    $tabs[] = '<a href="#">'t.('New Image').'</a>';
+    $tabs[] = '<a href="#">'.t('New Image').'</a>';
     $tabs[] = l(t('Browser'), 'ajax/wysiwyg_imageupload_browser/'.$form["#parameters"][2], array('title' => t('Choose a new image out of all your already uploaded ones')));
     $form['browse'] = array(
       '#value' => _wysiwyg_imageupload_browser_tabs($tabs,0),
