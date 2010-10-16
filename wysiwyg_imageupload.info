@@ -7,9 +7,4 @@ dependencies[] = imagecache
 package = Drupal Wiki
 core = "6.x"
 project = "wysiwyg_imageupload"
-; Information added by drupal.org packaging script on 2010-09-07
-version = "6.x-2.3"
-core = "6.x"
-project = "wysiwyg_imageupload"
-datestamp = "1283855209"
 
