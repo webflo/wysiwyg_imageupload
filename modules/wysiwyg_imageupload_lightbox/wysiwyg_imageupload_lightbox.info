@@ -5,4 +5,4 @@ dependencies[] = wysiwyg_imageupload
 dependencies[] = lightbox2
 package = Drupal Wiki
 core = "6.x"
-project = "wysiwyg_imageupload_lightbox"
+project = "wysiwyg_imageupload_lightbox

@@ -75,7 +75,8 @@ Drupal.wysiwyg.plugins.imgupload = {
     var btns = {};
     btns[Drupal.t('Insert')] = function () {
       // well lets test if an image has been selected
-      if ($(dialogIframe).contents().find('form#wysiwyg-imageupload-upload-form').find('input#edit-wysiwyg-imageupload-file').size() > 0) {
+      var form = $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').size();
+      if (form == 0) {
         alert(Drupal.t("Please select an image to upload first"));
         return;
       }
@@ -86,7 +87,10 @@ Drupal.wysiwyg.plugins.imgupload = {
         dataType : 'json',
         method: 'post',
         async: false,
-        data: { 'submitimagedetails' : 'JSinsert' },
+        data: { 
+        	submitimagedetails : 'JSinsert', 
+        	parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form 
+        },
         success : function(data,status,xhr,jq) {
             iid = data.data.iid;
             if(!iid) {
@@ -128,7 +132,11 @@ Drupal.wysiwyg.plugins.imgupload = {
       $(dialogIframe).contents().find('form#wysiwyg-imageupload-edit-form').ajaxSubmit({
         dataType : 'json',
         method: 'post',
-        data: { revisions: options.revisions, parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form, 'submitimagedetails' : 'JSinsert' },
+        data: { 
+        	revisions: options.revisions, 
+        	parent_build_id: Drupal.settings.wysiwyg_imageupload.current_form, 
+        	submitimagedetails : 'JSinsert' 
+		},
         async: false,
         success : function(data,status,xhr,jq) {
             iid = data.data.iid;

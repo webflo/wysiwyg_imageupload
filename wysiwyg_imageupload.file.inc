@@ -23,8 +23,8 @@ function _wysiwyg_imageupload_upload_file() {
 
   $validators = array(
     'file_validate_is_image' => array()
-    // TODO: Implement a administration interface for filesize settings
-    // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
+  // TODO: Implement a administration interface for filesize settings
+  // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
   );
   $file = NULL;
   if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest, FILE_EXISTS_RENAME)) {
@@ -51,7 +51,7 @@ function _wysiwyg_imageupload_upload_file() {
   return (object) $file;
 }
 
-/** 
+/**
  * Get the dest dir by parsing the settings and calling other modules
  *
  */
@@ -61,7 +61,7 @@ function _wysiwyg_imageupload_get_dest_dir() {
   // Add the global relativ path.
   $dest = "$dest/".variable_get('wysiwyg_imageupload_dest_root', 'wysiwyg_imageupload');
   // If its not a guest and we have set a userpath, add it relativly.
-  if($user->uid > 0) {      
+  if($user->uid > 0) {
     $userpath  = variable_get('wysiwyg_imageupload_relative_user', '$uid');
     if($userpath != '') {
       $userpath  = str_replace("\$uid",$user->uid,variable_get('wysiwyg_imageupload_relative_user', '$uid'));
@@ -173,7 +173,6 @@ function _wysiwyg_imageupload_save(&$entity) {
 
     drupal_write_record('wysiwyg_imageupload_entity',$data, array('iid'));
     _wysiwyg_imageupload_create_revision($iid, $entity->vid);
-    _wysiwyg_imageupload_cleanup_temps($entity->nid);
     // Call the alter hooks to react on the current attached image entity.
     $data = (object) $data;
     drupal_alter('wysiwyg_imageupload_image_entity_attached',$data);
@@ -181,10 +180,10 @@ function _wysiwyg_imageupload_save(&$entity) {
 }
 
 /**
- * Cleanup all files marked as temporary for this node
+ * Cleanup all wui entries which have no corresponding file objects anymore
  */
-function _wysiwyg_imageupload_cleanup_temps($nid) {
-  db_query('DELETE FROM {wysiwyg_imageupload_entity} WHERE temporary=1 AND nid=%d',$nid);
+function _wysiwyg_imageupload_cleanup_temps() {
+  db_query('DELETE * FROM {wysiwyg_imageupload_entity} AS wui LEFT JOIN {wysiwyg_imageupload_entity_revision} AS wuir ON wui.iid=wuir.iid WHERE NOT EXISTS (SELECT fid from {files} WHERE wui.fid=files.fid)');
 }
 
 /**
@@ -203,19 +202,38 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
 
   // Cleanup files which are no longer used.
   foreach($entities as $entity){
-    $count = db_result(db_query('SELECT COUNT(fid) FROM {wysiwyg_imageupload_entity} WHERE fid = %d', $entity->fid));
-    if ($count < 1) {
-      file_delete($file->filepath);
+    // Calling other modules to veto the file deletion
+    $do_not_delete = module_invoke_all('wysiwyg_imageupload_veto_file_deletion', $entity->fid);
+    if($do_not_delete) {
+      continue;
+    }
+    $filepath = db_result(db_query('SELECT filepath FROM {files} WHERE fid = %d', $entity->fid));
+    if (!empty($filepath)) {      
+      file_delete($filepath);
       db_query('DELETE FROM {files} WHERE fid = %d', $entity->fid);
     }
   }
+}
+
+/*
+ * Our own implementation of hook_wysiwyg_imageupload_veto_file_deletion
+ * Check if the image is used in a other node (inserted using the browser) and deny deletion
+ */
+function wysiwyg_imageupload_wysiwyg_imageupload_veto_file_deletion($fid) {
+  $count = db_result( db_query('SELECT COUNT(fid) FROM {wysiwyg_imageupload_entity} WHERE fid=%d',$fid) );  
+  // If this file is used somewhere else ( this image) dont delete it
+  if ($count > 0) {
+    return TRUE;
+  }
+  
+  return FALSE;
 }
 
 /**
  * Updates or revision table for inline images and adds a new revision
  */
 function _wysiwyg_imageupload_create_revision($iid,$vid) {
-  $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));    
+  $idd = db_result(db_query('SELECT iid FROM {wysiwyg_imageupload_entity_revision} WHERE iid=%d AND vid=%d LIMIT 1',$iid,$vid));
   if($idd) {
     // version already exists, dont create a new one
     return false;
@@ -232,7 +250,7 @@ function _wysiwyg_imageupload_create_revision($iid,$vid) {
 /**
  * Loads the inline-image object with all its details
  */
-function _wysiwyg_imageupload_load_inline_entity($iid) {  
+function _wysiwyg_imageupload_load_inline_entity($iid) {
   $result = db_query('SELECT inl.*,f.*,er.vid FROM {wysiwyg_imageupload_entity} AS inl LEFT JOIN {wysiwyg_imageupload_entity_revision} as er ON inl.iid=er.iid LEFT JOIN {files} AS f ON inl.fid=f.fid WHERE inl.iid=%d LIMIT 1', $iid);
   if($result !== false) {
     $img_obj = db_fetch_object($result);
@@ -255,4 +273,8 @@ function _wysiwyg_imageupload_create_inline_entity($file,$temporary = true, $opt
 
   drupal_write_record('wysiwyg_imageupload_entity',$record);
   return $record['iid'];
+}
+
+function wysiwyg_imageupload_cron() {
+  _wysiwyg_imageupload_cleanup_temps();
 }

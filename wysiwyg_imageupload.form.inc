@@ -156,22 +156,10 @@ function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
 /**
 * Called when a image was selected / uploaded and the details form should be shown.
 */
-function wysiwyg_imageupload_edit_form(&$form_state, $iid, $parent_build_id, $rebuild_entity = false) {
+function wysiwyg_imageupload_edit_form(&$form_state, $iid, $node_form_build_id, $rebuild_entity = false) {
   jquery_ui_dialog_child_js(array('width' => 740));
   drupal_set_title(t('Image details'));
-  if($rebuild_entity != false) {    
-    // We are asked to actually create a new iid out of specific current one. This is needed e.g. for image selected out of the browser.
-    // The image selected there is passed with its first iid, to load all its defaults. But now we need to create a new iid for the 
-    // new place, where the image gets used, so we dont overwrite the original title / settings
   
-    // backup for later use
-    $old_iid = $iid;
-    // Load are stencil image
-    $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
-    // create a new inilne id, while only some settings are used (eventhough we pass te whole object)
-    // only the fid will used out of $img_obj, merged wit the options: title, imagecache and style
-    $iid = _wysiwyg_imageupload_create_inline_entity($img_obj, true, array('title' => $img_obj->title, 'imagecache' => $img_obj->imagecache,'style' => $img_obj->style));
-  }
 
   $img_obj = _wysiwyg_imageupload_load_inline_entity($iid);
   if($img_obj == false) {
@@ -197,35 +185,54 @@ function wysiwyg_imageupload_edit_form(&$form_state, $iid, $parent_build_id, $re
   $img = theme('imagecache', 'wysiwyg_imageupload_preview', $defaults['filepath'], $iid, $defaults['title'], $attributes, TRUE, FALSE);
   // Load the details form.
   $form += _wysiwyg_imageupload_details_form($img,$iid,$defaults);
-
+  $form['rebuild_iid'] = array(
+    '#type' => 'value',
+   	'#value' => FALSE
+  );
+  
+  if ($rebuild_entity != false) {
+    $form['rebuild_iid']['#value'] = TRUE;
+  }
   return $form;
 }
 
 function wysiwyg_imageupload_edit_form_validate($form, &$state) {
-  if (isset($_POST['revisions']) && $_POST['revisions'] == 1) {
+  if ((array_key_exists('revisions', $_POST) && $_POST['revisions'] == 1) || $state['values']['rebuild_iid'] == TRUE) {
     // As this node is going to have a new revision AND we just EDITED an image (NOT updated)
     // we create a new inline entity with the new settings and dont touch the old one.
     // This way the old inline image stays the same in older revisions.
+    
+    // We are asked to actually create a new iid out of specific current one. This is needed e.g. for image selected out of the browser.
+    // The image selected there is passed with its iid, to load all its defaults. But now we need to create a new iid for the 
+    // new use of the image so we can have our own settings
+  
     $old_iid = $state['values']['iid'];
-    $img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
+    $old_img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
     // Create a new inline entity and save it to our form_state
-    // so the submit hanlder will handle the right entity.
-    $state['values']['iid'] = _wysiwyg_imageupload_create_inline_entity($img_obj, true);
+    // so the submit hanlder will handle it the right entity
+    // Dont be confused here, this create handler ignores the current iid, so always creates
+    // a new one based on the current meta-data
+    $new_iid = _wysiwyg_imageupload_create_inline_entity($old_img_obj, true);
+    
     // Remove the old inline id and place the new one in the form cache
     // as we will exchange them for this revision
-    $cache = cache_get('wysiwyg_imageupload_' . $_POST['parent_build_id'], 'cache');;
+    $cache = cache_get('wysiwyg_imageupload_' . $_POST['parent_build_id'], 'cache');
     $cache = $cache->data;
-    // We load all data from the old images as defaults
-    $new_file = $cache[$old_iid];
-    // no change the iid to the new one, as we will handle it as a new entity
-    $new_file->iid = $state['values']['iid'];
-    // Create the new.
-    $cache[$new_file->iid] = $new_file;    
-    // finally remove the old entry
-    unset($cache[$old_iid]);
+
+    // We just do this trick to not load then cloned entity from the DB again
+    $new_file = $old_img_obj;
+    // Now change the iid to the new one, as we will handle it as a new entity.
+    $new_file->iid = $new_iid;
+    // Add the new iid to the cached files. We pass those pass to the nodeapi later.
+    $cache[$new_file->iid] = $new_file;
+    // Finally remove the old file if we dont do this for a rebuild.
+    if($state['values']['rebuild_iid'] !== TRUE) {      
+      unset($cache[$old_iid]);
+    }
     
     // write it back to the cache, to update it
     cache_set('wysiwyg_imageupload_'.$_POST['parent_build_id'], $cache,'cache', CACHE_PERMANENT);
+    $state['values']['iid'] = $new_iid;
   }
 }
 
