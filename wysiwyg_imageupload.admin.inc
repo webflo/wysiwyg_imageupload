@@ -14,6 +14,13 @@ function wysiwyg_imageupload_admin_settings() {
     '#description' => t('If this is set, requirements checks will be done. If something is not correct, you get a anoying error message!'),
     '#default_value' => variable_get('wysiwyg_imageupload_skip_dependencies_check', true),
   );
+  
+  $form['wysiwyg_imageupload_filename_as_title_default'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Filename as title'),
+    '#description' => t('Should the filename be used as title by default. If not checked, the title will be empty and not shown by default'),
+    '#default_value' => variable_get('wysiwyg_imageupload_filename_as_title_default', false),
+  );
   $form['styles'] = array(
     '#type' => 'fieldset',
     '#title' => t('Styles'),

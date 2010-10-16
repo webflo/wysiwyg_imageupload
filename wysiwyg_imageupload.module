@@ -455,7 +455,7 @@ function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {
   
   if (module_exists('jquery_ui')) {
     $jquiv = jquery_ui_get_version();
-    if (!preg_match('@1\.7\.\d+@',$jquiv)) {
+    if (!preg_match('@1\.[7,8]\.\d+@',$jquiv)) {
       $msg = 'Your jquery ui library version is to old to use wysiwyg_imageupload. You need at least 1.7.x and you are currently running '.$jquiv. ' Please read <a href="http://drupal.org/node/809812">this howto</a> on how to fix this.';
       if (is_array($requirements)) {
         $requirements['wyiwyg_imageupload_jquery_ui']['description'] = $msg;

@@ -22,8 +22,11 @@ function _wysiwyg_imageupload_entity_upload($node_form_build_id) {
   // Handle new uploads. Create the files in the files table and make them temperory.
   // The will need to be made persistend on form submit in the hook_comment or hook_nodeapi
   $imgDetails = _wysiwyg_imageupload_upload_file();
-  if ($imgDetails->filepath != "") {  
-    $options = array( 'title' => check_plain($imgDetails->filename));
+  if ($imgDetails->filepath != "") {
+    $options = array();  
+    if(variable_get('wysiwyg_imageupload_filename_as_title_default', false)) {
+      $options['title'] = check_plain($imgDetails->filename);
+    }
     // save the fid as used inline and generate a iid (inline id)
     $iid = _wysiwyg_imageupload_create_inline_entity($imgDetails, true, $options);
     // we store the iid in the file object, so we can use it on submit of the node form
