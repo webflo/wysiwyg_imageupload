@@ -409,6 +409,14 @@ function _wysiwyg_imagegupload_revisions_activated($type) {
   return 0;
 }
 
+/**
+ * Implements hook_views_api().
+ */
+function wysiwyg_imageupload_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
 function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {  
   $error = false;
    if (!is_array($requirements) && module_exists('devel_themer') && (user_access('access devel theme information') || user_access('access devel information'))) {
