@@ -2,6 +2,7 @@
 name = WYSIWYG Image upload Browser
 description = Browser for the last x Images inserted by the User 
 dependencies[] = wysiwyg_imageupload
+dependencies[] = views
 package = Drupal Wiki
 core = "6.x"
 project = "wysiwyg_imageupload_browser"

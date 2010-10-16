@@ -8,23 +8,63 @@
 /**
  * Implements hook_views_data().
  */
+
+
 function wysiwyg_imageupload_views_data() {
-  $data['wysiwyg_imageupload_entity']['table']['group']  = t('Wysiwyg ImageUpload');
+  $data = array();
+  _wysiwyg_imageupload_views_data_node_related($data);
+  _wysiwyg_imageupload_views_data_all_entities($data);
+  return $data;
+}
+
+function _wysiwyg_imageupload_views_data_node_related(&$data) {
+  $data['wysiwyg_imageupload_entity_revision']['table']['group']  = t('Wysiwyg image upload');
+
+  // This displays a image, will all goodies, therefore it needs a extra handler.
+  $data['wysiwyg_imageupload_entity_revision']['iid'] = array(
+    'title' => t('Images'),
+    'help' => t('All images of all images.'),
+    'field' => array(
+      'handler' => 'wysiwyg_imageupload_handler_field_images',
+      'click sortable' => FALSE,
+    ),
+    // @TODO Perhaps someone needs a filter/sort here, but i cannot imagine this.
+  );
+
+  $data['wysiwyg_imageupload_entity_revision']['table']['join'] = array(
+    'node' => array(
+      'left_field' => 'vid',
+      'field' => 'vid',
+    ),
+    'node_revision' => array(
+      'left_field' => 'vid',
+      'field' => 'vid',
+    ),
+  );
+  
+  $data['wysiwyg_imageupload_entity_revision']['vid'] = array(
+    'title' => t('Nodes'),
+    'help' => t('The nodes'),
+    'relationship' => array(
+      'label' => t('Node'),
+      'base' => 'node',
+      'base field' => 'vid',
+  		'handler' => 'views_handler_relationship',
+    ),
+  );
+}
+
+function _wysiwyg_imageupload_views_data_all_entities(&$data) {
+  $data['wysiwyg_imageupload_entity']['table']['group']  = t('Wysiwyg image upload');
 
   $data['wysiwyg_imageupload_entity']['table']['base'] = array(
     'field' => 'iid',
-    'title' => t('Imageupload'),
+    'title' => t('WYSIWYG image upload'),
     'help' => t("A image uploaded via wysiwyg imageupload."),
   );
 
   $data['wysiwyg_imageupload_entity']['table']['join'] = array(
-    'node' => array(
-      'left_table' => 'wysiwyg_imageupload_entity_revision',
-      'left_field' => 'iid',
-      'field' => 'iid',
-    ),
-    'node_revisions' => array(
-      'left_table' => 'wysiwyg_imageupload_entity_revision',
+    'wysiwyg_imageupload_entity_revision' => array(
       'left_field' => 'iid',
       'field' => 'iid',
     ),
@@ -32,27 +72,15 @@ function wysiwyg_imageupload_views_data() {
       'left_field' => 'fid',
       'field' => 'fid',
     ),
-    'comments' => array(
-      'left_field' => 'cid',
-      'field' => 'cid',
-    ),
   );
   
   // This displays a image, will all goodies, therefore it needs a extra handler.
   $data['wysiwyg_imageupload_entity']['iid'] = array(
-    'title' => t('Image'),
-    'help' => t('The image.'),
+    'title' => t('Rendered image'),
+    'help' => t('Rendered image'),
     'field' => array(
       'handler' => 'wysiwyg_imageupload_handler_field_image',
       'click sortable' => FALSE,
-    ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
-    ),
-    'relationship' => array(
-      'base' => 'files',
-      'field' => 'fid',
-//       'label' => t('Related term'),
     ),
     // @TODO Perhaps someone needs a filter/sort here, but i cannot imagine this.
   );
@@ -135,11 +163,7 @@ function wysiwyg_imageupload_views_data() {
   
   $data['wysiwyg_imageupload_entity']['temporary'] = array(
     'title' => t('temporary'),
-    'help' => t('The temporary of the image.'),
-    'field' => array(
-      'handler' => 'views_handler_field_numeric',
-      'click sortable' => TRUE,
-    ),
+    'help' => t('The temporary of the image.'),    
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
@@ -160,41 +184,21 @@ function wysiwyg_imageupload_views_data() {
       'label' => t('File'),
       'base' => 'files',
       'base field' => 'fid',
+  		'handler' => 'views_handler_relationship',
     ),
   );
   $data['wysiwyg_imageupload_entity']['nid'] = array(
-    'title' => t('Node'),
-    'help' => t('The node the uploaded file is attached to'),
+    'title' => t('Nodes'),
+    'help' => t('The nodes'),
     'relationship' => array(
       'label' => t('Node'),
       'base' => 'node',
       'base field' => 'nid',
+  		'handler' => 'views_handler_relationship',
     ),
   );
-    $data['wysiwyg_imageupload_entity']['cid'] = array(
-    'title' => t('Comment'),
-    'help' => t('The comment the uploaded file is attached to'),
-    'relationship' => array(
-      'label' => t('Comment'),
-      'base' => 'comments',
-      'base field' => 'cid',
-    ),
-  );
-
-  $data['wysiwyg_imageupload_entity_revision']['table']['join'] = array(
-    'node' => array(
-      'left_field' => 'vid',
-      'field' => 'vid',
-    ),
-    'node_revision' => array(
-      'left_field' => 'vid',
-      'field' => 'vid',
-    ),
-  );
-
   return $data;
 }
-
 /**
  * Implements hook_vies_data_alter().
  */
@@ -211,9 +215,13 @@ function wysiwyg_imageupload_views_data_alter(&$data) {
 function wysiwyg_imageupload_views_handlers() {
   return array(
     'handlers' => array(
-      // Fields
+      'wysiwyg_imageupload_handler_field_images' => array(
+        'parent' => 'views_handler_field_prerender_list',
+        'path' => drupal_get_path('module','wysiwyg_imageupload').'/views'
+      ),
       'wysiwyg_imageupload_handler_field_image' => array(
         'parent' => 'views_handler_field',
+        'path' => drupal_get_path('module','wysiwyg_imageupload').'/views'
       ),
       // Filters
     ),

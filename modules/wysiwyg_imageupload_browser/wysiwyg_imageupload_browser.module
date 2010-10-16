@@ -14,7 +14,7 @@ function wysiwyg_imageupload_browser_imagecache_default_presets() {
       0 => array (
       'weight' => '0',
       'module' => 'imagecache',
-      'action' => 'imagecache_scale_and_crop',
+      'action' => 'imagecache_scale',
       'data' => array (
         'width' => '120',
         'height' => '120',
@@ -102,21 +102,8 @@ function wysiwyg_imageupload_browser_browser($form_id){
   $tabs[] = l(t('New Image'), 'wysiwyg_imageupload/upload/'.$parent_build_id, array('title' => t('Go back to the upload form and upload a new image')));
   $tabs[] = '<a href="#">'.t('Browser').'</a>';
   $output .= _wysiwyg_imageupload_browser_tabs($tabs,1);
-
-  $images = wysiwyg_imageupload_get_images(variable_get('wysiwyg_imageupload_browser_itemcount', 8), $user->uid, 'f.fid');
-  
   $output .= '<div id="wysiwyg_imageupload_browser_group" class="clearfix">';
-  $preset = variable_get('wysiwyg_imageupload_browser_preset', 'wysiwyg_imageupload_browser_preview');
-  foreach($images as $image){
-    $imageHTML = '<div class="browser_image">';
-    $imageHTML .= theme('imagecache', $preset, $image['filepath'], t('Insert this image'),t('Insert this image'), TRUE, FALSE);
-    $imageHTML .= '</div>';
-    $output .= l($imageHTML, 'wysiwyg_imageupload/reuse/'.$image['iid']."/$parent_build_id", array(
-      'title' => t('Insert this image'),
-      'html' => 'true',
-      'absolute' => TRUE
-    ));
-  }
+  $output .= views_embed_view('wysiwyg_imageupload_browser','default',$parent_build_id);
   $output .= '</div>';
 
   return $output;
@@ -134,3 +121,13 @@ function _wysiwyg_imageupload_browser_tabs($tabs,$active){
   $output .= '</ul>';
   return $output;
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function wysiwyg_imageupload_browser_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+

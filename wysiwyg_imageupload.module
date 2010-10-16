@@ -7,6 +7,7 @@ require_once('wysiwyg_imageupload.file.inc');
 require_once('wysiwyg_imageupload.form.inc');
 require_once('wysiwyg_imageupload.ajax.inc');
 require_once('wysiwyg_imageupload.filter.inc');
+require_once('views/wysiwyg_imageupload.views.inc');
 
 /**
 * Implementation of hook_help().
@@ -216,6 +217,33 @@ function wysiwyg_imageupload_get_images($limit = NULL, $uid = NULL, $group = nul
   return array();
 }
 
+/*
+ * Get all images of a nodes
+ * If a image is used several times in a node, it is only returned once
+ */
+
+function wysiwyg_imageupload_get_images_by_vids($vids = array()) {
+  if(!is_array($vids) || count($vids) === 0) {
+    return array();
+  }
+  $result = db_query('
+  SELECT * FROM {wysiwyg_imageupload_entity}_revision AS wuir 
+  	LEFT JOIN {wysiwyg_imageupload_entity} AS wui ON wuir.iid=wui.iid 
+  	LEFT JOIN {files} AS f ON wui.fid=f.fid 
+  	WHERE vid in ('.db_placeholders( $vids, 'int' ).') 
+  	GROUP BY f.fid', $vids);
+  
+  if ($result != FALSE) {    
+    $images = array();
+    while ($row = db_fetch_array($result)) {
+      $images[] = $row;
+    };
+    return $images;
+  }
+  // else
+  return array();
+}
+
 /**
 *  Those presets are needed for the browser and the details form
 */
@@ -281,6 +309,16 @@ function wysiwyg_imageupload_theme() {
     ),
   );
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function wysiwyg_imageupload_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+
 
 /**
 * wysiwyg_imageupload_render_image: renders the image for the node view
@@ -409,14 +447,6 @@ function _wysiwyg_imagegupload_revisions_activated($type) {
   return 0;
 }
 
-/**
- * Implements hook_views_api().
- */
-function wysiwyg_imageupload_views_api() {
-  return array(
-    'api' => 2.0,
-  );
-}
 function _wysiwyg_imageupload_check_dependencies(&$requirements = null) {  
   $error = false;
    if (!is_array($requirements) && module_exists('devel_themer') && (user_access('access devel theme information') || user_access('access devel information'))) {

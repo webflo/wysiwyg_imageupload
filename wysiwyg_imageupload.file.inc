@@ -203,7 +203,14 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
   // Cleanup files which are no longer used.
   foreach($entities as $entity){
     // Calling other modules to veto the file deletion
-    $do_not_delete = module_invoke_all('wysiwyg_imageupload_veto_file_deletion', $entity->fid);
+    $result = module_invoke_all('wysiwyg_imageupload_veto_file_deletion', $entity->fid);
+    $do_not_delete = FALSE;
+    if(is_array($result)) {
+      foreach($result as $val) {
+        $do_not_delete |= $val;
+      }
+    }
+    
     if($do_not_delete) {
       continue;
     }
@@ -222,7 +229,7 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
 function wysiwyg_imageupload_wysiwyg_imageupload_veto_file_deletion($fid) {
   $count = db_result( db_query('SELECT COUNT(fid) FROM {wysiwyg_imageupload_entity} WHERE fid=%d',$fid) );  
   // If this file is used somewhere else ( this image) dont delete it
-  if ($count > 0) {
+  if ($count > 0){
     return TRUE;
   }
   
@@ -258,7 +265,7 @@ function _wysiwyg_imageupload_load_inline_entity($iid) {
     return $img_obj;
   }
   // else
-  return false;
+  return FALSE;
 }
 
 /**
