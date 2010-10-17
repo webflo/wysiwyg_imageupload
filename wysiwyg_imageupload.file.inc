@@ -154,7 +154,6 @@ function _wysiwyg_imageupload_save(&$entity) {
         'temporary' => 0,
       );
       drupal_write_record('wysiwyg_imageupload_entity', $data, array('iid'));
-      _wysiwyg_imageupload_cleanup_temps($entity->nid);
       // Call the alter hooks to react on the current attached image entity.
       $data = (object) $data;
       drupal_alter('wysiwyg_imageupload_image_entity_attached', $data);
