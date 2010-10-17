@@ -4,8 +4,8 @@
 // Author: Eugen Mayer
 
 /**
-* Implementation of hook_filter().
-*/
+ * Implementation of hook_filter().
+ */
 function wysiwyg_imageupload_filter($op, $delta = 0, $format = -1, $text = '') {
   switch ($op) {
     case 'list':
@@ -18,7 +18,7 @@ function wysiwyg_imageupload_filter($op, $delta = 0, $format = -1, $text = '') {
       return _wysiwyg_imageupload_filter_process($text);
 
     case 'no cache':
-          return false;
+          return FALSE;
 
     case 'settings':
           $form = array();
@@ -29,8 +29,8 @@ function wysiwyg_imageupload_filter($op, $delta = 0, $format = -1, $text = '') {
 }
 
 /**
-* Finds all the occurences of a inline image tag
-*/
+ * Finds all the occurences of a inline image tag
+ */
 function _wysiwyg_imageupload_filter_process(&$body) {
   // Syntax: [[inlineimage:<iid>:<inlineargs>]]
   $body = preg_replace(array('/\[\[wysiwyg_imageupload:(\d+):([^\]]*?)\]\]/e'), array("_wysiwyg_imageupload_render_nodeview($1,'$2');"), $body);
@@ -38,8 +38,8 @@ function _wysiwyg_imageupload_filter_process(&$body) {
 }
 
 /**
-* returns a rendered(html) image for the tag
-*/
+ * returns a rendered(html) image for the tag
+ */
 function _wysiwyg_imageupload_render_nodeview($iid, $arguments) {
   $arguments = _wysiwyg_imageupload_unserialize_arguments(urldecode($arguments));
   $image_obj = _wysiwyg_imageupload_load_inline_entity($iid);
@@ -55,7 +55,7 @@ function _wysiwyg_imageupload_unserialize_arguments($arguments) {
     $result = array();
     // TODO: What about values with commas?
     $arguments = explode(',', $arguments);
-    foreach($arguments as $value) {
+    foreach ($arguments as $value) {
       $pair = explode('=', $value);
       $result[ $pair[0] ] = $pair[1];
     }

@@ -41,7 +41,7 @@ function _wysiwyg_imageupload_views_data_node_related(&$data) {
       'field' => 'vid',
     ),
   );
-  
+
   $data['wysiwyg_imageupload_entity_revision']['vid'] = array(
     'title' => t('Nodes'),
     'help' => t('The nodes'),
@@ -49,7 +49,7 @@ function _wysiwyg_imageupload_views_data_node_related(&$data) {
       'label' => t('Node'),
       'base' => 'node',
       'base field' => 'vid',
-  		'handler' => 'views_handler_relationship',
+      'handler' => 'views_handler_relationship',
     ),
   );
 }
@@ -73,7 +73,7 @@ function _wysiwyg_imageupload_views_data_all_entities(&$data) {
       'field' => 'fid',
     ),
   );
-  
+
   // This displays a image, will all goodies, therefore it needs a extra handler.
   $data['wysiwyg_imageupload_entity']['iid'] = array(
     'title' => t('Rendered image'),
@@ -160,10 +160,10 @@ function _wysiwyg_imageupload_views_data_all_entities(&$data) {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
+
   $data['wysiwyg_imageupload_entity']['temporary'] = array(
     'title' => t('temporary'),
-    'help' => t('The temporary of the image.'),    
+    'help' => t('The temporary of the image.'),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
@@ -184,7 +184,7 @@ function _wysiwyg_imageupload_views_data_all_entities(&$data) {
       'label' => t('File'),
       'base' => 'files',
       'base field' => 'fid',
-  		'handler' => 'views_handler_relationship',
+      'handler' => 'views_handler_relationship',
     ),
   );
   $data['wysiwyg_imageupload_entity']['nid'] = array(
@@ -194,7 +194,7 @@ function _wysiwyg_imageupload_views_data_all_entities(&$data) {
       'label' => t('Node'),
       'base' => 'node',
       'base field' => 'nid',
-  		'handler' => 'views_handler_relationship',
+      'handler' => 'views_handler_relationship',
     ),
   );
   return $data;
@@ -217,11 +217,11 @@ function wysiwyg_imageupload_views_handlers() {
     'handlers' => array(
       'wysiwyg_imageupload_handler_field_images' => array(
         'parent' => 'views_handler_field_prerender_list',
-        'path' => drupal_get_path('module','wysiwyg_imageupload').'/views'
+        'path' => drupal_get_path('module', 'wysiwyg_imageupload') . '/views'
       ),
       'wysiwyg_imageupload_handler_field_image' => array(
         'parent' => 'views_handler_field',
-        'path' => drupal_get_path('module','wysiwyg_imageupload').'/views'
+        'path' => drupal_get_path('module', 'wysiwyg_imageupload') . '/views'
       ),
       // Filters
     ),

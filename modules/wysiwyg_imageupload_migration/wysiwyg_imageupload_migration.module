@@ -12,7 +12,7 @@ function wysiwyg_imageupload_migration_menu() {
     'type' => MENU_LOCAL_TASK,
   );*/
 
-  $items['admin/build/wysiwyg_imageupload'] = array (
+  $items['admin/build/wysiwyg_imageupload'] = array(
     'title' => 'Wysiwyg imageupload migration',
     'page callback' => '_wysiwyg_imageupload_migration_dashboard',
     'access arguments' => array('administer site configuration'),
@@ -31,24 +31,24 @@ function _wysiwyg_imageupload_migration_dashboard() {
 }
 
 function _wysiwyg_imageupload_migration_imageassist() {
-  if(!module_exists('img_assist')) {
-    drupal_set_message(t('You nee to have img_assist activated during migration'),'warning');
+  if (!module_exists('img_assist')) {
+    drupal_set_message(t('You nee to have img_assist activated during migration'), 'warning');
     return '';
   }
-  $result = db_query('select nid from {node}');
+  $result = db_query('SELECT nid FROM {node}');
   $nodes = array();
-  while($row = db_fetch_object($result)) {
+  while ($row = db_fetch_object($result)) {
     $nodes[] = node_load($row->nid);
   }
   $images = 0;
-  foreach($nodes as $node) {
+  foreach ($nodes as $node) {
     $images += _wysiwyg_imageupload_migraion_imgassist_migratenode($node);
   }
   return t("Migration completed, overall !images images migrated", array('!images' => $images));
 }
 
 function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
-  require_once(drupal_get_path('module','img_assist').'/img_assist.module');
+  require_once(drupal_get_path('module', 'img_assist') . '/img_assist.module');
   $text = $node->body;
   init_theme();
   $reg = theme_get_registry();
@@ -76,7 +76,7 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
     // get the file object which corresponds to this object and save it
     // in our relation
     $image_node = node_load($macro['nid']);
-    if($image_node->images['_original'] == "") {
+    if ($image_node->images['_original'] == "") {
       drupal_set_message("empty origin of image node {$image_node->nid}");
     }
     $file = wysiwyg_imageupload_get_file($image_node->images['_original']);
@@ -90,12 +90,12 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
   // Save the relation.. question is, if the node api is called anyway...
   // in that case we dont need to call the handler manually but could wait for
   // hook_nodeapi.
-  $m = drupal_get_path('module','wysiwyg_imageupload');
+  $m = drupal_get_path('module', 'wysiwyg_imageupload');
   require_once("$m/wysiwyg_imageupload.file.inc");
   node_save($node);
   $images = count($node->imgupload_images);
-  if($images) {
-	  drupal_set_message("migrated node: {$node->nid} ($images images)");
+  if ($images) {
+    drupal_set_message("migrated node: {$node->nid} ($images images)");
   }
   return $images;
 }
@@ -103,11 +103,11 @@ function _wysiwyg_imageupload_migraion_imgassist_migratenode($node) {
 function _wysiwyg_imageupload_migraion_render_imgassist_img($node, $size, $attributes) {
   global $base_path;
 
-  if($size['width'] != '') {
+  if ($size['width'] != '') {
     $width = " width='{$size['width']}'";
   }
 
-  if($size['height'] != '') {
+  if ($size['height'] != '') {
     $height = " height='{$size['height']}'";
   }
   $output = "<img{$width}{$height} src='$base_path{$node->images['_original']}' alt=\"{$node->images['_original']}\" title=\"{$attributes['title']}\" class=\"imgupload imagecache imgupl_floating_{$attributes['align']}\">";

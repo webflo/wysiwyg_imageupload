@@ -1,5 +1,6 @@
 <?php
-class wysiwyg_imageupload_handler_field_image extends views_handler_field {  
+// $Id$
+class wysiwyg_imageupload_handler_field_image extends views_handler_field {
   function init(&$view, &$options) {
     parent::init($view, $options);
     $this->additional_fields['iid'] = 'iid';
@@ -8,14 +9,14 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
   function query() {
     $this->add_additional_fields();
   }
-  
+
   function option_definition() {
     $options = array();
     $options['preset'] = array('default' => TRUE);
     $options['link_for_browser'] = array('default' => FALSE);
     return $options;
   }
-  
+
   function options_form(&$form, &$form_state) {
     $presets = imagecache_presets();
     $styles = array();
@@ -29,24 +30,21 @@ class wysiwyg_imageupload_handler_field_image extends views_handler_field {
       '#default_value' =>  $this->options['preset'],
       '#options' => $styles,
     );
-    
+
     $form['link_for_browser'] = array(
       '#type' => 'checkbox',
       '#title' => t('Links images for browser'),
       '#default_value' =>  $this->options['link_for_browser']
     );
-    
-    
-    
     return $form;
   }
-  
+
   function render($values) {
-    $img_obj =  _wysiwyg_imageupload_load_inline_entity($values->{$this->field_alias});    
+    $img_obj =  _wysiwyg_imageupload_load_inline_entity($values->{$this->field_alias});
     $output = theme('imagecache', $this->options['preset'], $img_obj->filepath, NULL, $img_obj->title);
     $parent_build_id = $this->view->args[0];
-    if($this->options['link_for_browser'] == 1) {
-      $output = l($output, 'wysiwyg_imageupload/reuse/'.$img_obj->iid."/$parent_build_id", array(
+    if ($this->options['link_for_browser'] == 1) {
+      $output = l($output, 'wysiwyg_imageupload/reuse/' . $img_obj->iid . "/$parent_build_id", array(
         'title' => t('Insert this image'),
         'html' => 'true',
         'absolute' => TRUE

@@ -1,4 +1,4 @@
-<?php 
+<?php
 // $Id$
 // Copyright (c) 2010 KontextWork GbR
 // Author: Eugen Mayer
@@ -121,8 +121,6 @@ function wysiwyg_imageupload_views_default_views() {
     'weight' => 0,
     'name' => 'navigation',
   ));
-  
-    
   $views['wysiwyg_imageupload_by_node'] = $view;
   return $views;
 }

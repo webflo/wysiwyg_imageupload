@@ -1,15 +1,16 @@
 <?php
+// $Id$
 
 /**
-* This class overcomes a few common annoyances with the DOMDocument class,
-* such as saving partial HTML without automatically adding extra tags
-* and properly recognizing various encodings, specifically UTF-8.
-*
-* @author Artem Russakovskii
-* @version 0.4
-* @link http://beerpla.net
-* @link http://www.php.net/manual/en/class.domdocument.php
-*/
+ * This class overcomes a few common annoyances with the DOMDocument class,
+ * such as saving partial HTML without automatically adding extra tags
+ * and properly recognizing various encodings, specifically UTF-8.
+ *
+ * @author Artem Russakovskii
+ * @version 0.4
+ * @link http://beerpla.net
+ * @link http://www.php.net/manual/en/class.domdocument.php
+ */
 class SmartDOMDocument extends DOMDocument {
 
   /**
@@ -66,7 +67,7 @@ class SmartDOMDocument extends DOMDocument {
 </div>
 CONTENT;
 
-    print "Before removing the image, the content is: " . htmlspecialchars($content) . "<br>";
+    print "Before removing the image, the content is: " . htmlspecialchars($content) . "<br />";
 
     $content_doc = new SmartDOMDocument();
     $content_doc->loadHTML($content);
@@ -80,12 +81,14 @@ CONTENT;
         $content = $content_doc->saveHTMLExact();
 
         $image_doc = new SmartDOMDocument();
-        $image_doc->appendChild($image_doc->importNode($first_image, true));
+        $image_doc->appendChild($image_doc->importNode($first_image, TRUE));
         $image = $image_doc->saveHTMLExact();
       }
-    } catch(Exception $e) { }
+    }
+    catch (Exception $e) {
+    }
 
-    print "After removing the image, the content is: " . htmlspecialchars($content) . "<br>";
+    print "After removing the image, the content is: " . htmlspecialchars($content) . "<br />";
     print "The image is: " . htmlspecialchars($image);
   }
 

@@ -1,4 +1,4 @@
-<?php 
+<?php
 // $Id$
 // Copyright (c) 2010 KontextWork GbR
 // Author: Eugen Mayer
@@ -82,7 +82,7 @@ function wysiwyg_imageupload_browser_views_default_views() {
     ),
     'separator' => '',
     'hide_empty' => 1,
-  ));  
+  ));
   $views = array();
   $views['wysiwyg_imageupload_browser'] = $view;
   return $views;

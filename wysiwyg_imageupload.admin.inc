@@ -12,21 +12,21 @@ function wysiwyg_imageupload_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Do the requirements checks'),
     '#description' => t('If this is set, requirements checks will be done. If something is not correct, you get a anoying error message!'),
-    '#default_value' => variable_get('wysiwyg_imageupload_skip_dependencies_check', true),
+    '#default_value' => variable_get('wysiwyg_imageupload_skip_dependencies_check', TRUE),
   );
-  
+
   $form['wysiwyg_imageupload_filename_as_title_default'] = array(
     '#type' => 'checkbox',
     '#title' => t('Filename as title'),
     '#description' => t('Should the filename be used as title by default. If not checked, the title will be empty and not shown by default'),
-    '#default_value' => variable_get('wysiwyg_imageupload_filename_as_title_default', false),
+    '#default_value' => variable_get('wysiwyg_imageupload_filename_as_title_default', FALSE),
   );
   $form['styles'] = array(
     '#type' => 'fieldset',
     '#title' => t('Styles'),
     '#description' => t('Set the available styles (css) here'),
-    '#collapsed' => true,
-    '#collapsible' => true,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
     '#weight' => -2,
   );
   $form['styles']['wysiwyg_imageupload_imgstyles'] = array(
@@ -47,8 +47,8 @@ function wysiwyg_imageupload_admin_settings() {
     '#type' => 'fieldset',
     '#title' => t('Allowed presets'),
     '#description' => t('Only the selected presets are allowed to be chosen in the dialog'),
-    '#collapsed' => true,
-    '#collapsible' => true,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
     '#weight' => -2,
   );
 
@@ -63,21 +63,21 @@ function wysiwyg_imageupload_admin_settings() {
     '#type' => 'fieldset',
     '#title' => t('Upload destination'),
     '#description' => t('Upload path for the images'),
-    '#collapsed' => true,
-    '#collapsible' => true,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
     '#weight' => -1,
   );
   $form['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_dest_root'] = array(
     '#type' => 'textfield',
     '#title' => t('Root destination'),
-    '#description' => t('This is the root destination relative to the current files directory ("'.file_directory_path().'"). Neither insert a preceding nor successive slash.'),
+    '#description' => t('This is the root destination relative to the current files directory ("' . file_directory_path() . '"). Neither insert a preceding nor successive slash.'),
     '#default_value' => variable_get('wysiwyg_imageupload_dest_root', 'wysiwyg_imageupload')
   );
 
   $form['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_relative_user'] = array(
     '#type' => 'textfield',
     '#title' => t('Subdirectory for private uploads'),
-    '#description' => t('This is the user-files destination relative to the current wysiwyg_imageupload root destination(see above) directory (e.g. "'.file_directory_path().'/rootdest/$uid"). $uid will be replaced by the current user-id. Keep blanc to save it in the root.'),
+    '#description' => t('This is the user-files destination relative to the current wysiwyg_imageupload root destination(see above) directory (e.g. "' . file_directory_path() . '/rootdest/$uid"). $uid will be replaced by the current user-id. Keep blanc to save it in the root.'),
     '#default_value' => variable_get('wysiwyg_imageupload_relative_user', '$uid')
   );
 

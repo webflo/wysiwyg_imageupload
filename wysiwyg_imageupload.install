@@ -23,9 +23,9 @@ function wysiwyg_imageupload_uninstall() {
 }
 
 function _wysiwyg_imageupload_install_styles_if_missing() {
-  $value = variable_get('wysiwyg_imageupload_imgstyles',FALSE);
+  $value = variable_get('wysiwyg_imageupload_imgstyles', FALSE);
   if ($value == FALSE) {
-    variable_set('wysiwyg_imageupload_imgstyles','Spacing 20px Border=imgupl_styles_spacing_20_black_border\n\rBlack Border=imgupl_styles_black_border\n\rSpacing 5px=imgupl_styles_spacing_5\n\rSpacing 10px=imgupl_styles_spacing_10');
+    variable_set('wysiwyg_imageupload_imgstyles', 'Spacing 20px Border=imgupl_styles_spacing_20_black_border\n\rBlack Border=imgupl_styles_black_border\n\rSpacing 5px=imgupl_styles_spacing_5\n\rSpacing 10px=imgupl_styles_spacing_10');
   }
 }
 /**
@@ -127,7 +127,7 @@ $schema['wysiwyg_imageupload_entity_revision'] = array(
       ),
 
     ),
-    'primary key' => array('vid','iid'),
+    'primary key' => array('vid', 'iid'),
     'indexes' => array(
       'iid' => array('iid'),
       'vid' => array('vid'),
@@ -145,18 +145,18 @@ function wysiwyg_imageupload_update_6200() {
 }
 
 function wysiwyg_imageupload_update_6201() {
-   $value = variable_get('wysiwyg_imageupload_imgstyles',FALSE);
+  $value = variable_get('wysiwyg_imageupload_imgstyles', FALSE);
   if ($value !== FALSE) {
-    variable_set('wysiwyg_imageupload_imgstyles',str_replace(';',"\r",$value));
+    variable_set('wysiwyg_imageupload_imgstyles', str_replace(';', "\r", $value));
   }
   return array();
 }
 
 function wysiwyg_imageupload_requirements($phase) {
   $requirements = array();
-  if($phase == 'runtime') {
-    require_once('wysiwyg_imageupload.module');    
-    variable_set('wysiwyg_imageupload_imgstyles','Spacing 20px Border=imgupl_styles_spacing_20_black_border
+  if ($phase == 'runtime') {
+    require_once('wysiwyg_imageupload.module');
+    variable_set('wysiwyg_imageupload_imgstyles', 'Spacing 20px Border=imgupl_styles_spacing_20_black_border
         Black Border=imgupl_styles_black_border
         Spacing 5px=imgupl_styles_spacing_5
         Spacing 10px=imgupl_styles_spacing_10');
