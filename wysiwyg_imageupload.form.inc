@@ -148,10 +148,16 @@ function wysiwyg_imageupload_upload_form_validate(&$form, &$state) {
     form_set_error('wysiwyg_imageupload_file', t('This file could not be uploaded'));
     return;
   }
+  
   // If the upload was fine, redirect to the details form
-  drupal_goto("wysiwyg_imageupload/edit/$iid/" . $state['values']['parent_build_id']);
+  $state['submitted'] = TRUE;
+  $state['values']['iid'] = $iid;
+  $state['values']['redirect'] = 'wysiwyg_imageupload/edit/' . $iid .'/' . $state['values']['parent_build_id'];
 }
 
+function wysiwyg_imageupload_upload_form_submit($form, &$form_state) {
+  $form_state['redirect'] = array($form_state['values']['redirect']);
+}
 
 /**
  * Called when a image was selected / uploaded and the details form should be shown.
