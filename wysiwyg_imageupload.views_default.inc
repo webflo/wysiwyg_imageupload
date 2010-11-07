@@ -70,12 +70,16 @@ function wysiwyg_imageupload_views_default_views() {
       'empty_zero' => 0,
       'type' => 'separator',
       'separator' => ' ',
-      'preset' => 'wysiwyg_imageupload_preview',
+      'wui_preset' => 'wysiwyg_imageupload_browser_preview',
       'exclude' => 0,
+      'preset' => 'wysiwyg_imageupload_preview',
       'id' => 'iid',
       'table' => 'wysiwyg_imageupload_entity_revision',
       'field' => 'iid',
       'relationship' => 'none',
+      'override' => array(
+        'button' => 'Überschreiben',
+      ),
     ),
   ));
   $handler->override_option('filters', array(
@@ -121,6 +125,7 @@ function wysiwyg_imageupload_views_default_views() {
     'weight' => 0,
     'name' => 'navigation',
   ));
+
   $views['wysiwyg_imageupload_by_node'] = $view;
   return $views;
 }

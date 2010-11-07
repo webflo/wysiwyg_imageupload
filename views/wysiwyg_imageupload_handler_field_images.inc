@@ -35,7 +35,7 @@ class wysiwyg_imageupload_handler_field_images extends views_handler_field_prere
 
   function option_definition() {
     $options = parent::option_definition();
-    $options['preset'] = array('default' => TRUE);
+    $options['wui_preset'] = array('default' => TRUE);
     return $options;
   }
 
@@ -48,10 +48,10 @@ class wysiwyg_imageupload_handler_field_images extends views_handler_field_prere
       // We can use the presetid here (http://drupal.org/node/694188).
       $styles[$preset['presetname']] = t("!preset", array('!preset' => $preset['presetname']));
     }
-    $form['preset'] = array(
+    $form['wui_preset'] = array(
       '#type' => 'select',
       '#title' => t('User this imagecache preset'),
-      '#default_value' =>  $this->options['preset'],
+      '#default_value' =>  $this->options['wui_preset'],
       '#options' => $styles,
     );
 

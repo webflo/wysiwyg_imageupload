@@ -58,23 +58,28 @@ function wysiwyg_imageupload_admin_settings() {
     '#default_value' => variable_get('wysiwyg_imageupload_presets_whitelist', $styles),
     '#options' => $styles
   );
-
-  $form['wysiwyg_imageupload_destdir_group'] = array(
+  $form['paths']  = array(
     '#type' => 'fieldset',
-    '#title' => t('Upload destination'),
-    '#description' => t('Upload path for the images'),
+    '#title' => t('Paths'),
     '#collapsed' => TRUE,
     '#collapsible' => TRUE,
-    '#weight' => -1,
+    '#weight' => -2,
   );
-  $form['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_dest_root'] = array(
+  $form['wysiwyg_imageupload_max_filesize'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximal filesize in KB'),
+    '#description' => t('Maximal filesize in KB for an image, which gets uploaded. 0 for "no limitation"'),
+    '#default_value' => variable_get('wysiwyg_imageupload_max_filesize', 0),
+  );
+  
+  $form['paths']['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_dest_root'] = array(
     '#type' => 'textfield',
     '#title' => t('Root destination'),
     '#description' => t('This is the root destination relative to the current files directory ("' . file_directory_path() . '"). Neither insert a preceding nor successive slash.'),
     '#default_value' => variable_get('wysiwyg_imageupload_dest_root', 'wysiwyg_imageupload')
   );
 
-  $form['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_relative_user'] = array(
+  $form['paths']['wysiwyg_imageupload_destdir_group']['wysiwyg_imageupload_relative_user'] = array(
     '#type' => 'textfield',
     '#title' => t('Subdirectory for private uploads'),
     '#description' => t('This is the user-files destination relative to the current wysiwyg_imageupload root destination(see above) directory (e.g. "' . file_directory_path() . '/rootdest/$uid"). $uid will be replaced by the current user-id. Keep blanc to save it in the root.'),

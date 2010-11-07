@@ -34,9 +34,33 @@ function wysiwyg_imageupload_browser_views_default_views() {
   ));
   $handler->override_option('fields', array(
     'iid' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'wui_preset' => 'wysiwyg_imageupload_browser_preview',
+      'wui_link_for_browser' => 1,
+      'exclude' => 0,
       'preset' => 'wysiwyg_imageupload_browser_preview',
       'link_for_browser' => 1,
-      'exclude' => '',
       'id' => 'iid',
       'table' => 'wysiwyg_imageupload_entity',
       'field' => 'iid',
@@ -83,6 +107,7 @@ function wysiwyg_imageupload_browser_views_default_views() {
     'separator' => '',
     'hide_empty' => 1,
   ));
+
   $views = array();
   $views['wysiwyg_imageupload_browser'] = $view;
   return $views;

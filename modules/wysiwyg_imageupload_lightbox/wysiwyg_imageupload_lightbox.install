@@ -38,5 +38,5 @@ function wysiwyg_imageupload_lightbox_uninstall() {
   // Remove tables.
   db_drop_field($ret, 'wysiwyg_imageupload_entity', 'lightbox');
   // Remove variables.
-  db_query("DELETE FROM {variable} WHERE name LIKE 'wysiwyg_imageupload_lightbox_%%'");
+  db_query("DELETE FROM {variable} WHERE name LIKE 'wysiwyg_imageupload_lightbox_%'");
 }

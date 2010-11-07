@@ -23,9 +23,11 @@ function _wysiwyg_imageupload_upload_file() {
 
   $validators = array(
     'file_validate_is_image' => array()
-  // TODO: Implement a administration interface for filesize settings
-  // 'file_validate_size' => array($limits['file_size'], $limits['user_size']),
   );
+  $max_filesize = variable_get('wysiwyg_imageupload_max_filesize', 0) * 1000;
+  if($max_filesize > 0) {
+    $validators['file_validate_size'] =  array( $max_filesize , 0);
+  }
   $file = NULL;
   if (user_access('use wysiwyg image upload') && $file = file_save_upload('wysiwyg_imageupload_file', $validators, $dest, FILE_EXISTS_RENAME)) {
     foreach (module_implements('wysiwyg_imageupload_image_uploaded') as $module) {
@@ -113,66 +115,50 @@ function _wysiwyg_imageupload_save(&$entity) {
     // comments might be submitted as array.
     $entity = (object)$entity;
   }
+  $body = '';
+  // how does that look like for a comment?
+  if (!empty($entity->cid) && $entity->cid > 0) {
+    $body = $entity->comment;
+  }
+  else {
+    $body = $entity->body;
+  }
+  $images = array();
+  preg_match_all(_wysiwyg_imageupload_filter_pattern(), $body, $matches);
 
-  if (empty($entity->imgupload_images) || !is_array($entity->imgupload_images)) {
+  if(empty($matches)) {
     return;
   }
+  
+  for($i=0; $i<count($matches[0]); $i++) {
+    $iid =$matches[1][$i];
+    // remove the widget from the array as all the restovers will be deleted then
+    $images[$iid] = _wysiwyg_imageupload_load_inline_entity($iid);
+  }
 
-  foreach ($entity->imgupload_images as $iid => $file) {
-    $fid = $file->fid;
+  foreach ($images as $iid => $file) {
     // Convert file to object for compatibility.
     $file = (object)$file;
-
-    // Remove file. Process removals first since no further processing
-    // will be required.
-    if (!empty($file->remove)) {
-      // Delete from our relation table - removing the inline entity.
-      db_query('DELETE FROM {wysiwyg_imageupload_entity} WHERE iid = %d', $file->iid);
-
-      // If the file isn't used by any other revisions delete it completely.
-      $count = db_result(db_query('SELECT COUNT(fid) FROM {wysiwyg_imageupload_entity} WHERE fid = %d', $fid));
-      if ($count < 1) {
-        file_delete($file->filepath);
-        db_query('DELETE FROM {files} WHERE fid = %d', $fid);
-      }
-
-      // Remove it from the session in the case of new uploads,
-      // that you want to disassociate before node submission.
-      unset($entity->imgupload_images[$fid]);
-      // Move on, so the removed file won't be added to new revisions.
-      continue;
-    }
-
     file_set_status($file, FILE_STATUS_PERMANENT);
-
-    // It's a comment.
-    if (!empty($entity->cid) && $entity->cid > 0) {
-      $data = array(
-        'nid' => $entity->nid,
-        'cid' => $entity->cid,
-        'iid' => $file->iid,
-        'temporary' => 0,
-      );
-      drupal_write_record('wysiwyg_imageupload_entity', $data, array('iid'));
-      // Call the alter hooks to react on the current attached image entity.
-      $data = (object) $data;
-      drupal_alter('wysiwyg_imageupload_image_entity_attached', $data);
-      // Skip the other steps, as its a comment - not a node.
-      continue;
-    }
-
-    // Its a node.
-    // Create a new revision, or associate a new file needed.
     $data = array(
-      'nid' => $entity->nid,
-      'cid' => 0,
       'iid' => $file->iid,
       'temporary' => 0,
     );
 
+    // It's a comment.
+    if (!empty($entity->cid) && $entity->cid > 0) {
+      $data['nid'] = $entity->nid;
+      $data['cid'] = $entity->cid;
+    }
+    else {
+      // Its a node.
+      $data['nid'] = $entity->nid;
+      $data['cid'] = 0;
+      // Create a new revision, or associate a new file needed.
+      _wysiwyg_imageupload_create_revision($iid, $entity->vid);
+    }
     drupal_write_record('wysiwyg_imageupload_entity', $data, array('iid'));
-    _wysiwyg_imageupload_create_revision($iid, $entity->vid);
-    // Call the alter hooks to react on the current attached image entity.
+      // Call the alter hooks to react on the current attached image entity.
     $data = (object) $data;
     drupal_alter('wysiwyg_imageupload_image_entity_attached', $data);
   }
@@ -197,7 +183,7 @@ function _wysiwyg_imageupload_handle_node_delete($nid) {
     $entities[] = $entity;
   }
   // Delete all inline entities for all version.
-  db_query('DELETE r.*,e.* FROM {wysiwyg_imageupload_entity} as e LEFT JOIN {wysiwyg_imageupload_entity_revision} AS r ON e.iid=r.iid WHERE nid=%d', $nid);
+  db_query('DELETE e,r FROM {wysiwyg_imageupload_entity} AS e LEFT JOIN {wysiwyg_imageupload_entity_revision} AS r ON e.iid=r.iid WHERE nid=%d', $nid);
 
   // Cleanup files which are no longer used.
   foreach ($entities as $entity) {

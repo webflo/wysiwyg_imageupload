@@ -15,50 +15,6 @@ function wysiwyg_imageupload_form_alter(&$form, $form_state, $form_id) {
     // If you save or preview the form and a validation error occurs, form_alter is not called
     // in that case all our javascript would be missing
     $form['#after_build'][] = '_wysiwyg_imageupload_prepare_main_form';
-    // Add this as in some cases like comments drupal is not inlcude it by default
-
-    // In the case of an preview, where we dont have a validation error
-    // the form gets rebuild and gets a new form_build_id. In this case we have to transfer our cache
-    // to the new form_buil_id so we can later restore the cache properly in our _wysiwyg_imageupload_transfer_cache method
-    if ($form_state['submitted'] == TRUE && $form_state['rebuild'] == TRUE) {
-      // The form has been saved or is preview, transfer the cache to the new form_build_id
-      _wysiwyg_imageupload_transfer_cache($form, $form_state);
-    }
-    elseif ($form_state['submitted'] == TRUE) {
-      // From submitted, but not rebuild. We dont need to do anything here
-    }
-    else {
-      // Load already existing files and put them in the array before the form is shown.
-      // This must be done when nodes or comments are edited, to ensure that already uploaded images
-      // are in the cache.
-      if (
-        $form['#id'] == 'comment-form' &&   // Should only match, if we have a comment formular.
-        $form['cid']['#value'] != NULL      // If its a creation of a new comment, we dont need to load any files.
-      ) {
-        // We need this special case, as there is no "op=load" in the hook_comment hook_comment
-        // so we cant load extra data like our files. We only call this on the first load of the edit form
-        // so on a preview or similar, we already have written this cache and only load (transfer) it.
-        $files = _wysiwyg_imageupload_commment_load($form['cid']['#value']);
-      }
-      elseif (
-        $form['#id'] == 'node-form' &&
-        $form['#node']->nid != NULL &&
-        !empty($form['#node']->imgupload_images)
-      ) {
-        $files = $form['#node']->imgupload_images;
-      }
-      // Save them in the cache, if there are any.
-      if (is_array($files) && count($files) > 0) {
-        cache_set('wysiwyg_imageupload_' . $form['#build_id'], $files, 'cache', CACHE_PERMANENT);
-      }
-    }
-    // Comment form is incompatible with form caching see http://drupal.org/node/644222
-    if ($form['#id'] != 'comment-form') {
-      // Thats is mandatory now, as we handle or cache ourselfs
-      $form['#cache'] = TRUE;
-    }
-
-    $form['#validate'][] = 'wysiwyg_imageupload_form_validate';
   }
 }
 
@@ -77,35 +33,6 @@ function _wysiwyg_imageupload_prepare_main_form(&$form, $form_state) {
   drupal_add_js(array('wysiwyg_imageupload' => $settings), 'setting');
   jquery_ui_dialog_parent_js();
   return $form;
-}
-
-/**
- * This method transfers the cache of the old from_build_id to a new cache setting
- * using the new form_build_id. This is need due every preview and save of a non cached form
- * is causing the form_build_id to change and therefor we could later not load our uploaded files
- * for making them persisten.
- */
-function _wysiwyg_imageupload_transfer_cache($form, $form_state) {
-  $old_form_build_id = $form_state['values']['form_build_id'];
-  $new_form_build_id = $form['#build_id'];
-  // Lets get the old cache and set it to the new cache
-  $old = cache_get('wysiwyg_imageupload_' . $old_form_build_id);
-  // remove te old one
-  cache_clear_all('wysiwyg_imageupload_' . $old_form_build_id, 'cache');
-  // Now apply it using the new from_build_id
-  cache_set('wysiwyg_imageupload_' . $new_form_build_id, $old->data, 'cache', CACHE_PERMANENT);
-}
-
-/**
- * Called on every node or comment save
- * This method will load the cache and put the loaded files into the comment-object for use in insert/update
- * where those files will be made persistent and added to the relation table.
- */
-function wysiwyg_imageupload_form_validate(&$form, &$form_state) {
-  if ($form_state['submitted'] == TRUE) {
-    $value = cache_get('wysiwyg_imageupload_' . $form_state['values']['form_build_id'], 'cache');
-    $form_state['values']['imgupload_images'] = $value->data;
-  }
 }
 
 /**
@@ -210,7 +137,6 @@ function wysiwyg_imageupload_edit_form_validate($form, &$state) {
     // We are asked to actually create a new iid out of specific current one. This is needed e.g. for image selected out of the browser.
     // The image selected there is passed with its iid, to load all its defaults. But now we need to create a new iid for the
     // new use of the image so we can have our own settings.
-
     $old_iid = $state['values']['iid'];
     $old_img_obj = _wysiwyg_imageupload_load_inline_entity($old_iid);
     // Create a new inline entity and save it to our form_state
@@ -218,26 +144,6 @@ function wysiwyg_imageupload_edit_form_validate($form, &$state) {
     // Dont be confused here, this create handler ignores the current iid, so always creates
     // a new one based on the current meta-data
     $new_iid = _wysiwyg_imageupload_create_inline_entity($old_img_obj, TRUE);
-
-    // Remove the old inline id and place the new one in the form cache
-    // as we will exchange them for this revision
-    $cache = cache_get('wysiwyg_imageupload_' . $_POST['parent_build_id'], 'cache');
-    $cache = $cache->data;
-
-    // We just do this trick to not load then cloned entity from the DB again
-    $new_file = $old_img_obj;
-    // Now change the iid to the new one, as we will handle it as a new entity.
-    $new_file->iid = $new_iid;
-    // Add the new iid to the cached files. We pass those pass to the nodeapi later.
-    $cache[$new_file->iid] = $new_file;
-    // Finally remove the old file if we dont do this for a rebuild.
-    if ($state['values']['rebuild_iid'] !== TRUE) {
-      unset($cache[$old_iid]);
-    }
-
-    // write it back to the cache, to update it
-    cache_set('wysiwyg_imageupload_' . $_POST['parent_build_id'], $cache, 'cache', CACHE_PERMANENT);
-    $state['values']['iid'] = $new_iid;
   }
 }
 
