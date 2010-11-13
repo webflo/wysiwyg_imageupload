@@ -1,0 +1,5 @@
+; $Id$
+name = Drupalwiki imageselect element
+description = Use this helper to make nice looking select boxes with images
+package=Drupal Wiki
+core = 6.x
