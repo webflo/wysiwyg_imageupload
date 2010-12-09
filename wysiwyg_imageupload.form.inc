@@ -144,6 +144,7 @@ function wysiwyg_imageupload_edit_form_validate($form, &$state) {
     // Dont be confused here, this create handler ignores the current iid, so always creates
     // a new one based on the current meta-data
     $new_iid = _wysiwyg_imageupload_create_inline_entity($old_img_obj, TRUE);
+    $state['values']['iid'] = $new_iid;
   }
 }
 
