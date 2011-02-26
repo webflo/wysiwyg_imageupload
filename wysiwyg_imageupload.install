@@ -152,6 +152,22 @@ function wysiwyg_imageupload_update_6201() {
   return array();
 }
 
+/**
+ * Enable drupalwiki_imageselect_element.
+ */
+function wysiwyg_imageupload_update_6202() {
+  $ret = array();
+  
+  if (!module_exists('drupalwiki_imageselect_element')) {
+    drupal_install_modules(array('drupalwiki_imageselect_element'));
+    if (!module_exists('drupalwiki_imageselect_element')) { 
+      $ret['#abort'] = array('#success' => 'FALSE', 'query' => 'Can not enable drupalwiki_imageselect_element module.');
+    }
+  }
+
+  return $ret;
+}
+
 function wysiwyg_imageupload_requirements($phase) {
   $requirements = array();
   if ($phase == 'runtime') {
